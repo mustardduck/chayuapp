@@ -1,0 +1,127 @@
+//
+//  CYMyCommentModel.h
+//  茶语
+//
+//  Created by Leen on 16/2/23.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+
+@interface CYMyTeaCommentModel : NSObject
+
+@property (nonatomic,strong)NSString *teaid;//茶叶ID
+@property (nonatomic,strong)NSString *bid;//茶叶大类ID
+@property (nonatomic,strong)NSString *bname;//茶叶大类名称
+@property (nonatomic,strong)NSString *sid;//茶叶小类ID
+@property (nonatomic,strong)NSString *sname;//茶叶小类名称
+@property (nonatomic,strong)NSString *teaTitle;//茶叶标题
+@property (nonatomic,strong)NSString *teaFavorites;//茶叶收藏量
+@property (nonatomic,strong)NSString *teaComments;//茶叶评论数
+@property (nonatomic,strong)NSString *content;//评论内容
+@property (nonatomic,strong)NSString *replies;//评论回复量
+@property (nonatomic,strong)NSString *favors;//评论喜欢量
+@property (nonatomic,strong)NSString *status;//状态（0未审核 1已审核 2已锁定 3已删除
+@property (nonatomic,strong)NSString *created;//评论时间
+
+@end
+
+
+@interface CYMyArcCommentModel : NSObject
+
+@property (nonatomic,strong)NSString *arcId;//文章ID
+@property (nonatomic,strong)NSString *arcCatId;//分类ID
+@property (nonatomic,strong)NSString *arcCatName;//分类名称
+@property (nonatomic,strong)NSString *arcTitle;//文章标题
+@property (nonatomic,strong)NSString *arcClicks;//文章点击量
+@property (nonatomic,strong)NSString *arcComments;//文章评论数
+@property (nonatomic,strong)NSString *arcFavorites;//文章收藏量
+@property (nonatomic,strong)NSString *arcSuports;//文章支持数
+@property (nonatomic,strong)NSString *pid;//父评论ID
+@property (nonatomic,strong)NSString *content;//评论内容
+@property (nonatomic,strong)NSString *comments;//评论喜欢量
+@property (nonatomic,strong)NSString *status;//状态（0未审核 1已审核 2已锁定 3已删除
+@property (nonatomic,strong)NSString *created;//评论时间
+@property (nonatomic,strong)NSString *pUid;//父评论用户ID
+@property (nonatomic,strong)NSString *pNickname;//父评论用户昵称
+@property (nonatomic,strong)NSString *pContent;//父评论内容
+@property (nonatomic,strong)NSString *replies;
+@property (nonatomic,strong)NSString *praises;
+@property (nonatomic,strong)NSString *rpostCreatedNickname;//回复某人昵称
+
+@end
+
+
+@interface CYMyThemeCommentModel : NSObject
+
+@property (nonatomic,strong)NSString *gid;//圈子ID
+@property (nonatomic,strong)NSString *created_time;//分类ID
+@property (nonatomic,strong)NSString *groupname;//圈子名称
+@property (nonatomic,strong)NSString *postContent;//回复内容
+@property (nonatomic,strong)NSString *praises;//回复赞量
+@property (nonatomic,strong)NSString *replies;//回复回复量
+@property (nonatomic,strong)NSString *rpid;//父回复内容ID
+@property (nonatomic,strong)NSString *rpostContent;//父回复内容（如果存在父回复）
+@property (nonatomic,strong)NSString *rpostCreatedNickname;//父回复用户昵称（如果存在父回复）
+@property (nonatomic,strong)NSString *rpostCreatedUid;//父回复用户ID（如果存在父回复）
+@property (nonatomic,strong)NSString *topicAttentionnum;//帖子关注量
+@property (nonatomic,strong)NSString *topicCreatedNickname;//发帖用户昵称
+@property (nonatomic,strong)NSString *topicCreatedUid;//发帖用户ID
+@property (nonatomic,strong)NSString *topicHits;//帖子浏览量
+@property (nonatomic,strong)NSString *topicId;//帖子ID
+@property (nonatomic,strong)NSString *topicReplies;//帖子回复量
+@property (nonatomic,strong)NSString *topicSubject;//帖子标题
+@property (nonatomic,strong)NSString *topicSuports;//帖子顶量
+
+
+@end
+
+@interface CYWenZhangCommentModel : NSObject
+
+@property (nonatomic, strong) NSString * commentId;//评论ID
+//@property (nonatomic, strong) NSString * type;
+//@property (nonatomic, strong) NSString * cid;
+@property (nonatomic, strong) NSString * pid;
+@property (nonatomic, strong) NSString * uid;//评论人ID
+//@property (nonatomic, strong) NSString * touid;
+@property (nonatomic, strong) NSString * itemid;//文章ID
+@property (nonatomic, strong) NSString * created;//创建时间
+@property (nonatomic, strong) NSString * content;//评论内容
+@property (nonatomic, strong) NSString * suports;//点赞数
+//@property (nonatomic, strong) NSString * comments;//评论量
+//@property (nonatomic, strong) NSString * checker;
+//@property (nonatomic, strong) NSString * checktime;
+//@property (nonatomic, strong) NSString * status;
+//@property (nonatomic, strong) NSString * ip;
+@property (nonatomic, strong) NSString * nickname;
+@property (nonatomic, strong) ChaYuer * user;//评论人B
+@property (nonatomic, strong) ChaYuer * touser;//评论人A （"评论人A"回复"评论人B"）(uid = touser评论人A的uid)
+//@property (nonatomic, strong) NSString * replycount;
+@property (nonatomic, assign) BOOL is_suport;
+@property (nonatomic, strong) NSArray * reply;
+@property (nonatomic, assign) BOOL isZhanKai;
+
+@end
+
+
+@interface CYQuanZiCommentModel : NSObject
+
+@property (nonatomic, strong)NSString * pid;//回复ID
+@property (nonatomic, strong)NSString * rpid;//父回复ID
+@property (nonatomic, strong)NSString * tid;//话题ID
+@property (nonatomic, strong)NSString * content;//回复内容
+@property (nonatomic, strong)NSString * replies;//回复量
+@property (nonatomic, strong)NSString * praises;//赞量
+@property (nonatomic, strong)NSString * created_time;//
+@property (nonatomic, assign)BOOL isSuported;//是否赞
+@property (nonatomic, strong)NSString * created_uid;//创建者ID
+@property (nonatomic, strong)NSString * avatar;//创建者头像
+@property (nonatomic, strong)NSString * nickname;//
+@property (nonatomic, assign)NSInteger floor;//楼层号
+@property (nonatomic, strong)NSString * rpostContent;//引用内容
+@property (nonatomic, strong)NSString * rpostCreatedUid;//引用内容的作者id
+@property (nonatomic, strong)NSString * rpostCreatedNickname;//引用内容的作者昵称
+
+@property (nonatomic, strong)NSArray * attach;//回复带图片 最多 9 张
+
+@end

@@ -1,0 +1,320 @@
+//
+//  CYMyViewController.m
+//  茶语
+//
+//  Created by Chayu on 16/2/16.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYMyViewController.h"
+#import "CYSCartViewController.h"
+#import "CYMyOrderViewController.h"
+#import "CYPersonalCenterViewController.h"
+#import "CYMyCommentViewController.h"
+#import "CYHongBaoViewController.h"
+#import "CYMyGroupViewController.h"
+#import "CYMyTeaViewController.h"
+#import "CYSettingViewController.h"
+#import "CYCollectViewController.h"
+#import "CYTuiJianViewController.h"
+#import "CYMyShiJiCell.h"
+#import "CYMyQuanZiCell.h"
+#import "CYMyChaPingCell.h"
+#import "CYAdviceCell.h"
+#import "CYMyMessageCell.h"
+#import "CYAddressListViewController.h"
+#import "CYMyTeaViewController.h"
+#import "CYDuiHuanLiShiController.h"
+#import "CYMyGuanZhu.h"
+#import "CYMyGroupViewController.h"
+@interface CYMyViewController ()<UITableViewDelegate,UITableViewDataSource>
+{
+    
+}
+
+
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+- (IBAction)goback:(id)sender;
+
+
+@end
+
+@implementation CYMyViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+
+    
+    self.automaticallyAdjustsScrollViewInsets = false;
+    [self creatkongNavBar];
+
+}
+
+-(IBAction)setting:(UIButton *)sender
+{
+    CYSettingViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"CYSettingViewController"];
+    //vc.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+//    [_tbl_my reloadData];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [MobClick beginLogPageView:@"我的"];
+}
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:@"我的"];
+}
+
+
+-(void)creatBackItem{
+    
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return 5;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return 1;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.section == 0) {
+        return 190.;
+    }else if (indexPath.section == 1){
+        return 117.0;
+    }else if (indexPath.section == 2){
+        return 225.0;
+    }else if(indexPath.section ==3){
+        return 117.0f;
+    }else{
+        return 51.0;
+    }
+}
+
+- (UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.section == 0) {
+        CYMyMessageCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYMyMessageCell"];
+        cell.menuclickBlock = ^(NSInteger selectindex){
+            switch (selectindex) {
+                case 0://我的消息
+                {
+                    
+                    break;
+                }
+                case 1://我的收藏
+                {
+                    CYCollectViewController *vc = viewControllerInStoryBoard(@"CYCollectViewController", @"My");
+                    vc.hidesBottomBarWhenPushed = YES;
+                    [self.navigationController pushViewController:vc animated:YES];
+                    break;
+                }
+                case 2://我的评论
+                {
+                    CYMyCommentViewController *vc = viewControllerInStoryBoard(@"CYMyCommentViewController", @"My");
+                    vc.hidesBottomBarWhenPushed = YES;
+                    [self.navigationController pushViewController:vc animated:YES];
+                    break;
+                }
+                case 3://夺宝记录
+                {
+                    
+                    break;
+                }
+                case 4://收货地址
+                {
+                    CYAddressListViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"CYAddressListViewController"];
+                    vc.addressType = CYAddressTypeManager;
+                    [self.navigationController pushViewController:vc animated:YES];
+                    
+                    break;
+                }
+                    
+                default:
+                    break;
+            }
+        };
+        return cell;
+    }else if (indexPath.section == 1){
+        CYMyChaPingCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYMyChaPingCell"];
+        cell.menuclickBlock = ^(NSInteger selectindex){
+            switch (selectindex) {
+                case 0://我的茶评
+                {
+                    CYMyTeaViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"CYMyTeaViewController"];
+                    [self.navigationController pushViewController:vc animated:YES];
+                    break;
+                }
+                case 1://茶样兑换历史
+                {
+                    CYDuiHuanLiShiController *vc =[self.storyboard instantiateViewControllerWithIdentifier:@"CYDuiHuanLiShiController"];
+                    [self.navigationController pushViewController:vc animated:YES];
+                    break;
+                }
+ 
+                    
+                default:
+                    break;
+            }
+        };
+        return cell;
+    }else if(indexPath.section == 2){
+        CYMyShiJiCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYMyShiJiCell"];
+        cell.menuclickBlock = ^(NSInteger selectindex){
+            switch (selectindex) {
+                case 0://我的订单
+                {
+                    CYMyOrderViewController *vc = viewControllerInStoryBoard(@"CYMyOrderViewController", @"My");
+                    vc.ordertype = OrderTypeAll;
+//                    vc.hidesBottomBarWhenPushed = YES;
+                    [self.navigationController pushViewController:vc animated:YES];
+                    break;
+                }
+                case 1://代付款
+                {
+                    CYMyOrderViewController *vc = viewControllerInStoryBoard(@"CYMyOrderViewController", @"My");
+//                    vc.hidesBottomBarWhenPushed = YES;
+                    vc.ordertype = OrderTypePendingPayment;
+                    [self.navigationController pushViewController:vc animated:YES];
+                    break;
+                }
+                case 2://待发货
+                {
+                    CYMyOrderViewController *vc = viewControllerInStoryBoard(@"CYMyOrderViewController", @"My");
+//                    vc.hidesBottomBarWhenPushed = YES;
+                     vc.ordertype = OrderTypePendingShipped;
+                    [self.navigationController pushViewController:vc animated:YES];
+                    break;
+                }
+                case 3://待收货
+                {
+                    CYMyOrderViewController *vc = viewControllerInStoryBoard(@"CYMyOrderViewController", @"My");
+                          vc.ordertype = OrderTypeInbound;
+//                    vc.hidesBottomBarWhenPushed = YES;
+                    [self.navigationController pushViewController:vc animated:YES];
+                    break;
+                }
+                case 4://待评价
+                {
+                    CYMyOrderViewController *vc = viewControllerInStoryBoard(@"CYMyOrderViewController", @"My");
+//                    vc.hidesBottomBarWhenPushed = YES;
+                           vc.ordertype = OrderTypeEvaluated;
+                    [self.navigationController pushViewController:vc animated:YES];
+                    break;
+                }
+                case 5://退款 /退货
+                {
+                    CYMyOrderViewController *vc = viewControllerInStoryBoard(@"CYMyOrderViewController", @"My");
+                        vc.ordertype = OrderTypeRefund;
+//                    vc.hidesBottomBarWhenPushed = YES;
+                    [self.navigationController pushViewController:vc animated:YES];
+                    break;
+                }
+                case 6://购物车
+                {
+                 
+                    CYSCartViewController *vc = viewControllerInStoryBoard(@"CYSCartViewController", @"My");
+//                    vc.hidesBottomBarWhenPushed = YES;
+                    [self.navigationController pushViewController:vc animated:YES];
+                    break;
+                }
+                case 7://抵扣券
+                {
+                    CYHongBaoViewController *vc = viewControllerInStoryBoard(@"CYHongBaoViewController", @"My");
+//                    vc.hidesBottomBarWhenPushed = YES;
+                    [self.navigationController pushViewController:vc animated:YES];
+                    break;
+                }
+                case 8://我的银行卡
+                {
+                    
+                    break;
+                }
+                case 9://贡献等级
+                {
+                    
+                    break;
+                }
+                case 10://我的关注
+                {
+                    CYMyGuanZhu *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"CYMyGuanZhu"];
+                    [self.navigationController pushViewController:vc animated:YES];
+                    break;
+                }
+                    
+                default:
+                    break;
+            }
+        };
+        return cell;
+    }else if (indexPath.section == 3){
+        CYMyQuanZiCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYMyQuanZiCell"];
+        cell.menuclickBlock = ^(NSInteger selectindex){
+            switch (selectindex) {
+                case 0://我的圈子
+                {
+                    CYMyGroupViewController *vc = viewControllerInStoryBoard(@"CYMyGroupViewController", @"My");
+                    vc.quanzitype = WoDeQuanZiTypeQuanZi;
+//                    vc.hidesBottomBarWhenPushed = YES;
+                    [self.navigationController pushViewController:vc animated:YES];
+                    break;
+                }
+                case 1://我的话题
+                {
+                    CYMyGroupViewController *vc = viewControllerInStoryBoard(@"CYMyGroupViewController", @"My");
+//                    vc.hidesBottomBarWhenPushed = YES;
+                    vc.quanzitype = WoDeQuanZiTypeHuaTi;
+                    [self.navigationController pushViewController:vc animated:YES];
+                    break;
+                }
+                    
+                    
+                default:
+                    break;
+            }
+        };
+        return cell;
+    }else if (indexPath.section == 4){
+        CYAdviceCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYAdviceCell"];
+        return cell;
+    }else{
+        return nil;
+    }
+}
+
+
+
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+@end

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="Dhv-vl-iOQ" customClass="CYNoDataView">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <subviews>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="no_data" translatesAutoresizingMaskIntoConstraints="NO" id="4nU-Dk-fZb">
+                    <rect key="frame" x="130" y="184" width="60" height="60"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="60" id="fUO-1t-bUr"/>
+                        <constraint firstAttribute="height" constant="60" id="gLq-de-s4O"/>
+                    </constraints>
+                </imageView>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="暂无数据" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Scd-kW-Njb">
+                    <rect key="frame" x="130" y="252" width="60" height="18"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <color key="textColor" red="0.86666666670000003" green="0.86666666670000003" blue="0.86666666670000003" alpha="1" colorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="4nU-Dk-fZb" firstAttribute="centerY" secondItem="Dhv-vl-iOQ" secondAttribute="centerY" constant="-70" id="4gx-od-aEA"/>
+                <constraint firstItem="4nU-Dk-fZb" firstAttribute="centerX" secondItem="Dhv-vl-iOQ" secondAttribute="centerX" id="LOo-ee-iyS"/>
+                <constraint firstItem="Scd-kW-Njb" firstAttribute="centerX" secondItem="Dhv-vl-iOQ" secondAttribute="centerX" id="p0f-I5-IIQ"/>
+                <constraint firstItem="Scd-kW-Njb" firstAttribute="top" secondItem="4nU-Dk-fZb" secondAttribute="bottom" constant="8" id="xz1-hQ-Vcd"/>
+            </constraints>
+            <point key="canvasLocation" x="235" y="240"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="no_data" width="120" height="120"/>
+    </resources>
+</document>

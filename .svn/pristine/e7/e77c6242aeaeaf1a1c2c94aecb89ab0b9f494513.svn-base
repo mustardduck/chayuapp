@@ -1,0 +1,272 @@
+//
+//  CYExchangeTeaViewController.m
+//  茶语
+//
+//  Created by Chayu on 16/3/2.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYExchangeTeaViewController.h"
+#import "CYTeaAddressCell.h"
+#import "CYDuihuanCHaYangCell.h"
+#import "CYAddressListViewController.h"
+#import "CYShippingAddressModel.h"
+@interface CYExchangeTeaViewController ()<UITableViewDataSource,UITableViewDelegate>
+{
+    NSDictionary *deliDef;//收货信息
+    NSMutableArray *numArr;
+    NSMutableArray *sampleidArr;
+    NSString *addressId;
+    CYShippingAddressModel *shipingModel;
+    NSDictionary *dataInfo;
+    NSInteger sampPrice;
+    NSDictionary *conInfo;
+}
+
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+
+- (IBAction)goback:(id)sender;
+
+
+@end
+
+@implementation CYExchangeTeaViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    numArr = [NSMutableArray array];
+    sampleidArr = [NSMutableArray array];
+    [numArr addObject:@"1"];
+    [self creatkongNavBar];
+    hiddenSepretor(_tableView);
+    _tableView.hidden = YES;
+    if (_goodsId.length) {
+        [sampleidArr addObject:_goodsId];
+        [self lodViewData];
+    }
+    
+    
+    //    [self loadAddressMessage];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [MobClick beginLogPageView:@"兑换茶样"];
+}
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:@"兑换茶样"];
+}
+
+
+-(void)lodViewData
+{
+    __weak __typeof(self) weakSelf = self;
+    [CYWebClient Post:@"Applyexchange" parametes:@{@"sampleid":_goodsId} success:^(id responObject) {
+        _tableView.hidden = NO;
+        dataInfo = responObject;
+        deliDef = [responObject objectForKey:@"deliData"];
+        conInfo = [responObject objectForJSONKey:@"condata"];
+        sampPrice = [[conInfo objectForKey:@"price"] integerValue];
+        //        weakSelf.mycoin.text =[responObject objectForJSONKey:@"score"];
+        //        weakSelf.allcoin.text = [conInfo objectForJSONKey:@"price"];;
+        addressId = [deliDef objectForJSONKey:@"addressid"];
+        [weakSelf.tableView reloadData];
+    } failure:^(id error) {
+        
+    }];
+}
+
+
+- (void)loadAddressMessage
+{
+    __weak typeof(self) weakSelf = self;
+    [CYWebClient Post:@"Address" parametes:nil success:^(id responObj) {
+        if ([responObj count]) {
+            shipingModel = [CYShippingAddressModel objectWithKeyValues:responObj[0]];
+            NSString *readAddress = [NSString stringWithFormat:@"%@%@%@%@",shipingModel.provinceName,shipingModel.cityName,shipingModel.areaName,shipingModel.areaAddress];
+            addressId = shipingModel.addressId;
+            deliDef = @{@"address":readAddress,@"name":shipingModel.name,@"mobile":shipingModel.mobile};
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:1 inSection:0];
+            [weakSelf.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+        }
+        
+    } failure:^(id err) {
+        NSLog(@"%@",err);
+    }];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+#pragma mark -
+#pragma mark UITableViewDataSource method
+-(NSInteger )tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    if (section == 0) {
+        return 2;
+    }else{
+        return 2;
+    }
+}
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView{
+    return 2;
+}
+
+-(CGFloat )tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.section == 0) {
+        if (indexPath.row == 0) {
+            return 40;
+        }else{
+            return 65;
+        }
+    }else{
+        if (indexPath.row == 0) {
+            return 130.0f;
+        }else{
+            return 90;
+        }
+    }
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.section == 0) {
+        if (indexPath.row == 0) {
+            UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"addressTitle"];
+            return cell;
+        }else{
+            CYTeaAddressCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYTeaAddressCell"];
+            cell.addressInfo = deliDef;
+            return cell;
+        }
+        
+    }else{
+        if (indexPath.row == 0) {
+            CYDuiHuanChaYangCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYDuiHuanChaYangCell"];
+            NSString *thumb = [conInfo objectForKey:@"thumb"];
+            if (thumb.length >0) {
+                [cell.teaImg sd_setImageWithURL:[NSURL URLWithString:thumb] placeholderImage:SQUARE];
+            }
+            cell.titleLbl.text = [NSString stringWithFormat:@"[%@]%@",  [conInfo objectForJSONKey:@"brand"], [conInfo objectForJSONKey:@"title"]];
+            cell.coinNum.text = [conInfo objectForJSONKey:@"price"];
+            cell.content.text = _content;
+            
+            return cell;
+        }else{
+            UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYLijiduihuanCell"];
+            UIButton *button = [cell.contentView viewWithTag:600];
+            UILabel *numLbl = [cell.contentView viewWithTag:700];
+            numLbl.text = [dataInfo objectForJSONKey:@"score"];
+            [button addTarget:self action:@selector(lijiduihuan_click:) forControlEvents:UIControlEventTouchUpInside];
+            return cell;
+        }
+        
+    }
+    
+}
+-(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    if (section>0) {
+        UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 10)];
+        view.backgroundColor = CLEARCOLOR;
+        return view;
+    }else{
+        return nil;
+    }
+    
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    if (section >0) {
+        return 10;
+    }
+    return 0.00001;
+}
+
+-(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
+{
+    UIView *view = [UIView new];
+    return view;
+}
+-(CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+{
+    return 0.000001;
+}
+
+#pragma mark -
+#pragma mark CYDuiHuanChaYangCellDelegate method
+- (void)changeTeaSamNum:(CYDuiHuanChaYangCell *)cell andCoinNum:(NSInteger)num withAllCoin:(NSInteger)coin
+{
+    [numArr replaceObjectAtIndex:0 withObject:[NSString stringWithFormat:@"%d",(int)num]];
+    //    _allcoin.text = [NSString stringWithFormat:@"%d",(int)coin];
+}
+#pragma mark -
+#pragma mark UITableViewDelegate method
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.section == 0) {
+        if (indexPath.row == 1) {
+            CYAddressListViewController *vc = viewControllerInStoryBoard(@"CYAddressListViewController", @"My");
+            vc.addressType = CYAddressTypeChoose;
+            //            __weak __typeof(self) weakSelf = self;
+            vc.back = ^(CYShippingAddressModel *model){
+                
+                NSString *readAddress = [NSString stringWithFormat:@"%@%@%@%@",model.provinceName,model.cityName,model.areaName,model.areaAddress];
+                addressId = model.addressId;
+                CYTeaAddressCell *cell = (CYTeaAddressCell *)[tableView cellForRowAtIndexPath:indexPath];
+                deliDef = @{@"address":readAddress,@"name":model.name,@"mobile":model.mobile};
+                cell.addressInfo = deliDef;
+            };
+            
+            [self.navigationController pushViewController:vc animated:YES];
+        }
+    }else{
+        if (indexPath.row == 0) {
+            
+        }
+    }
+}
+
+-(void)lijiduihuan_click:(UIButton *)sender
+{
+    if (!addressId.length) {
+        return;
+    }
+    sender.userInteractionEnabled = NO;
+    NSInteger score =[[dataInfo objectForJSONKey:@"score"] integerValue];
+    if (score <sampPrice) {
+        [SVProgressHUD showInfoWithStatus:@"茶币不足!"];
+    }
+    NSMutableDictionary *param = [NSMutableDictionary dictionary];
+    [param setObject:[sampleidArr JSONString] forKey:@"sampleid"];
+    [param setObject:[numArr JSONString] forKey:@"num"];
+    [param setObject:addressId forKey:@"addressid"];
+    [CYWebClient basePost:@"Applyconfirm" parametes:param success:^(id responObject) {
+        sender.userInteractionEnabled = NO;
+        NSInteger state = [[responObject objectForKey:@"state"] integerValue];
+        if (state == 400) {
+            ChaYuer *user = [ChaYuManager getCurrentUser];
+            NSInteger score = [user.score integerValue];
+            //            score -= [_allcoin.text integerValue];
+            user.score = [NSString stringWithFormat:@"%d",(int)score];
+            [ChaYuManager archiveCurrentUser:user];
+            [self performSelector:@selector(goback:) withObject:nil afterDelay:1];
+        }
+    } failure:^(id error) {
+        sender.userInteractionEnabled = NO;
+    }];
+}
+
+
+
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+@end

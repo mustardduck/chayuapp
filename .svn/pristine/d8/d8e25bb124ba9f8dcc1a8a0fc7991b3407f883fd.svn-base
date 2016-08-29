@@ -1,0 +1,318 @@
+//
+//  CYAdviseViewController.m
+//  茶语
+//
+//  Created by Chayu on 16/7/21.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYAdviseViewController.h"
+#import "NTAlbum.h"
+#import "PlaceholderTextView.h"
+#import "CYWeiQuanCell.h"
+#import "CYShenQingWeiQuanController.h"
+#import "CYWeiQuanDetController.h"
+#define IMGCOUNT 9
+@interface CYAdviseViewController ()<UITableViewDelegate,UITableViewDataSource>
+{
+    NSInteger page;
+    NSMutableArray *dataArr;
+}
+
+@property (weak, nonatomic) IBOutlet UIView *imgchooseBg;
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *imgchoose_height_cons;
+
+@property (nonatomic,strong)NTAlbum *albumView;
+@property (weak, nonatomic) IBOutlet UIScrollView *contentView;
+
+- (IBAction)goback:(id)sender;
+
+@property (weak, nonatomic) IBOutlet PlaceholderTextView *contentTxt;
+
+@property (weak, nonatomic) IBOutlet UITextField *calTf;
+
+@property (weak, nonatomic) IBOutlet UITextField *emailTf;
+
+- (IBAction)menu_click:(id)sender;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *lin_leading_cons;
+
+@property (weak, nonatomic) IBOutlet UIView *topBg;
+
+@property (weak, nonatomic) IBOutlet UIView *weiquanView;
+
+@property (weak, nonatomic) IBOutlet UIView *emptyView;
+
+
+- (IBAction)shenqingweiquan_click:(id)sender;
+
+
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+@property (weak, nonatomic) IBOutlet UIView *dataView;
+
+@end
+
+@implementation CYAdviseViewController
+
+
+
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+     [CYTopWindow hide];
+    page = 1;
+    dataArr = [NSMutableArray array];
+    _contentTxt.placeholder = @"亲爱的用户：请在此填写您遇到的问题和建议，您的意见对我们非常重要，您的关注是我们前进的动力!";
+    [_imgchooseBg addSubview:self.albumView];
+    __weak __typeof(self) weakSelf = self;
+    weakSelf.albumView.imgcuntChangeBlock = ^(NSInteger imgcount){
+        if (imgcount <IMGCOUNT) {
+            _imgchoose_height_cons.constant = ceilf((imgcount+1)/4.)*82 +58;
+        }else{
+            _imgchoose_height_cons.constant = ceilf(imgcount/4.)*82 +58;
+        }
+        
+        [_contentView layoutIfNeeded];
+        
+    };
+    
+    _tableView.header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        [weakSelf loadWeiQuanListData:NO];
+        
+    }];
+    [_tableView.header beginRefreshing];
+    _tableView.footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+        [weakSelf loadWeiQuanListData:YES];
+    }];
+    
+}
+
+//维权列表
+-(void)loadWeiQuanListData:(BOOL)hasMore
+{
+//    2.0_shiji.rights
+    
+    if (hasMore) {
+        page ++;
+    }else{
+        page =1 ;
+    }
+    __weak __typeof(self) weakSelf = self;
+    [CYWebClient Post:@"2.0_shiji.rights" parametes:@{@"p":@(page),@"pageSize":@"10"} success:^(id responObj) {
+        if (hasMore) {
+            [weakSelf.tableView.footer endRefreshing];
+        }else{
+            [weakSelf.tableView.header endRefreshing];
+            [dataArr removeAllObjects];
+            [weakSelf.tableView reloadData];
+        }
+        NSArray *arr = responObj;
+        if ([arr count]<10) {
+            [weakSelf.tableView.footer endRefreshingWithNoMoreData];
+            
+        }else{
+            [weakSelf.tableView.footer resetNoMoreData];
+        }
+        
+        [dataArr addObjectsFromArray:arr];
+        [weakSelf.tableView reloadData];
+        
+        if (dataArr.count<10) {
+            weakSelf.tableView.footer = nil;
+        }else{
+            [weakSelf.tableView.footer resetNoMoreData];
+        }
+        if ([dataArr count] == 0) {
+            weakSelf.emptyView.hidden = NO;
+            weakSelf.dataView.hidden = YES;
+        }else{
+            weakSelf.emptyView.hidden = YES;
+            weakSelf.dataView.hidden = NO;
+        }
+    } failure:^(id err) {
+        if (hasMore) {
+            [weakSelf.tableView.footer endRefreshing];
+        }else{
+            [weakSelf.tableView.header endRefreshing];
+        }
+    }];
+    
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (NTAlbum *)albumView
+{
+    if (!_albumView) {
+        _albumView = [[[NSBundle mainBundle] loadNibNamed:@"NTAlbum" owner:nil options:nil] firstObject];
+        _albumView.frame = _imgchooseBg.bounds;
+        _albumView.imageCountLimit = IMGCOUNT;
+        _albumView.contro = self;
+    }
+    return _albumView;
+}
+
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+//
+
+
+//提交投诉流程
+- (IBAction)tijiao_click:(id)sender {
+//
+    if (_contentTxt.text.length == 0) {
+        [Itost showMsg:@"反馈内容不能为空！" inView:self.view];
+        return;
+    }
+    
+    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+    [params setObject:_contentTxt.text forKey:@"content"];
+    if (_emailTf.text.length>0) {
+        [params setObject:_emailTf.text forKey:@"email"];
+    }
+    
+    if (_calTf.text.length >0) {
+        [params setObject:_calTf.text forKey:@"mobile"];
+    }
+
+    NSMutableDictionary *files = [NSMutableDictionary dictionary];
+    if (self.albumView.imageArr > 0) {
+        [files setObject:self.albumView.imageArr forKey:@"attach"];
+    }
+
+    [SVProgressHUD showWithStatus:@"正在提交" maskType:SVProgressHUDMaskTypeBlack];
+    [CYWebClient Post:@"2.0_user.advice.apply" parametes:params files:files success:^(id responObject) {
+        NSInteger status = [[responObject objectForKey:@"state"] integerValue];
+        NSString *msg = [responObject objectForKey:@"msg"];
+        if (status == 400) {
+            [SVProgressHUD showSuccessWithStatus:@"感谢您的反馈"];
+            [self performSelector:@selector(goback:) withObject:nil afterDelay:0.5f];
+        }else{
+            [SVProgressHUD showErrorWithStatus:msg];
+        }
+        
+    } failure:^(id error) {
+        [SVProgressHUD showErrorWithStatus:@""];
+    }];
+    
+}
+
+
+#pragma mark -
+#pragma mark UITableViewDataSource method
+-(NSInteger )tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return 1;
+}
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView{
+    return [dataArr count];
+}
+
+-(CGFloat )tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 92.f;
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSDictionary *info = dataArr[indexPath.row];
+    CYWeiQuanCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYWeiQuanCell"];
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    cell.bianhaoLbl.text = [NSString stringWithFormat:@"维权编号：%@",[info objectForJSONKey:@"rights_sn"]];
+    cell.contentLbl.text = [NSString stringWithFormat:@"维权内容：%@",[info objectForKey:@"rights_content"]];
+    cell.timeLbl.text =[NSString stringWithFormat:@"发起时间：%@",[info objectForJSONKey:@"created_time"]];
+    cell.statusLbl.text = [info objectForJSONKey:@"status"];
+    return cell;
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+{
+    return 10;
+}
+-(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
+{
+    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 10)];
+    
+    view.backgroundColor = CLEARCOLOR;
+    return view;
+}
+
+#pragma mark -
+#pragma mark UITableViewDelegate method
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CYWeiQuanDetController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"CYWeiQuanDetController"];
+    NSDictionary *info = dataArr[indexPath.row];
+    vc.weiquanId = [info objectForJSONKey:@"id"];
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+
+#pragma mark -
+#pragma mark 按钮点击事件 method
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+-(IBAction)menu_click:(id)sender
+{
+    UIButton *selectButton = (UIButton *)sender;
+    for (int i = 6325; i<6327; i++) {
+        UIButton *button = (UIButton *)[_topBg viewWithTag:i];
+        if (button.tag == selectButton.tag) {
+            button.selected = YES;
+        }else{
+            button.selected = NO;
+        }
+    }
+    
+    
+    switch (selectButton.tag) {
+        case 6325://我的评论
+        {
+            _weiquanView.hidden = YES;
+            _contentView.hidden = NO;
+
+            break;
+        }
+        case 6326://回复我的
+        {
+            if ([dataArr count] == 0) {
+                [self loadWeiQuanListData:NO];
+            }
+            _weiquanView.hidden = NO;
+            _contentView.hidden = YES;
+            break;
+        }
+            
+        default:
+            break;
+    }
+    [UIView animateWithDuration:0.25 animations:^{
+        _lin_leading_cons.constant = selectButton.x;
+        [_topBg layoutIfNeeded];
+    }];
+}
+
+- (IBAction)shenqingweiquan_click:(id)sender {
+    
+    CYShenQingWeiQuanController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"CYShenQingWeiQuanController"];
+    __weak __typeof(self) weakSelf = self;
+    vc.backBlock = ^(){
+       [weakSelf loadWeiQuanListData:NO];
+    };
+    [self.navigationController pushViewController:vc animated:YES];
+    
+}
+@end

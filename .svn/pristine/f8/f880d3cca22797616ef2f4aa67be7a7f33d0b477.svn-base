@@ -1,0 +1,25 @@
+//
+//  CYQuanZiAllCommentView.h
+//  茶语
+//
+//  Created by Leen on 16/7/27.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+
+@protocol CYQuanZiAllCommentViewDelegate;
+
+@interface CYQuanZiAllCommentView : UIView
+
+@property (nonatomic, strong) NSString * topicId;
+@property (nonatomic, assign) id<CYQuanZiAllCommentViewDelegate> delegate;
+
+@end
+
+@protocol CYQuanZiAllCommentViewDelegate <NSObject>
+
+- (void)zanBtnClicked:(id)sender;
+- (void)commentBtnClicked:(id)sender;
+
+@end

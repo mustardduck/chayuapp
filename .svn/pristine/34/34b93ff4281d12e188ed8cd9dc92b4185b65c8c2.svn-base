@@ -1,0 +1,152 @@
+//
+//  CYBuyerDetailReusableView.m
+//  茶语
+//
+//  Created by Leen on 16/6/20.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYBuyerDetailReusableView.h"
+
+@interface CYBuyerDetailReusableView()<BBWebViewSizeAdjust, UIWebViewDelegate>
+
+@property (weak, nonatomic) IBOutlet UIButton *shareBtn;
+@property (weak, nonatomic) IBOutlet UIButton *followBtn;
+@property (weak, nonatomic) IBOutlet UIButton *allBtn;
+@property (weak, nonatomic) IBOutlet UIButton *popularBtn;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *lineLeadingCons;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *sellerNameLblAlignXCons;
+@property (weak, nonatomic) IBOutlet UIImageView *sellerImgView;
+@property (weak, nonatomic) IBOutlet UILabel *sellerNameLbl;
+@property (weak, nonatomic) IBOutlet UIImageView *wap_thumb;
+
+@end
+
+
+
+@implementation CYBuyerDetailReusableView
+
+- (void)awakeFromNib {
+    [super awakeFromNib];
+    // Initialization code
+    
+
+}
+
+- (void) setDetailInfo:(CYBuyerDetailInfo *)detailInfo
+{
+    _detailInfo = detailInfo;
+    
+    _sellerNameLbl.text = _detailInfo.realname;
+    
+    _sellerNameLblAlignXCons.constant = - 10;
+    
+    [_sellerNameLbl setNeedsDisplay];
+    
+    _followBtn.selected = [_detailInfo.isAttend integerValue] ? YES : NO;
+    
+    [_sellerImgView sd_setImageWithURL:[NSURL URLWithString:_detailInfo.avatar] placeholderImage:DEFAULTHEADER];
+    
+    [_wap_thumb sd_setImageWithURL:[NSURL URLWithString:_detailInfo.wap_thumb] placeholderImage:[UIImage imageNamed:@"750×400"]];
+    
+    if(_detailInfo.wap_content.length)
+    {
+        _TopWebView.sizeDelegate = self;
+        _TopWebView.userInteractionEnabled = NO;
+        _TopWebView.scalesPageToFit = YES;
+
+        [_TopWebView loadHTMLString:_detailInfo.wap_content baseURL:nil];
+        
+        _TopWebView.hidden = !_dropBtn.selected;
+    }
+    else
+    {
+        _TopWebView.hidden = YES;
+    }
+
+}
+
+-(void)doAttend:(NSString *)masterId
+{
+    [CYWebClient Post:@"DoAttend" parametes:@{@"sellerUid":masterId} success:^(id responObj) {
+        NSInteger status = [[responObj objectForKey:@"status"] integerValue];
+        if (status == 1) {
+            _detailInfo.isAttend = @"0";
+            _followBtn.selected = NO;
+        }else{
+            _detailInfo.isAttend = @"1";
+            _followBtn.selected = YES;
+        }
+        
+    } failure:^(id err) {
+        NSLog(@"%@",err);
+    }];
+}
+
+- (IBAction)touchUpInsideOn:(id)sender
+{
+    UIButton * btn = (UIButton *)sender;
+    
+    if(btn == _shareBtn)
+    {
+        if(self.delegate && [self.delegate respondsToSelector:@selector(shareBtnClicked)])
+        {
+            [self.delegate shareBtnClicked];
+        }
+    }
+    else if (btn == _dropBtn)
+    {
+        _dropBtn.selected = !_dropBtn.selected;
+        
+        _TopWebView.hidden = !_dropBtn.selected;
+        
+        if(self.delegate && [self.delegate respondsToSelector:@selector(dropBtnClicked:)])
+        {
+            [self.delegate dropBtnClicked:_dropBtn];
+        }
+    }
+    else if(btn == _followBtn)
+    {
+        [self doAttend:_detailInfo.uid];
+    }
+    else if(btn == _allBtn)
+    {
+        _allBtn.selected = YES;
+        _popularBtn.selected = NO;
+        _lineLeadingCons.constant = 0;
+        
+        if(self.delegate && [self.delegate respondsToSelector:@selector(allBtnClicked)])
+        {
+            [self.delegate allBtnClicked];
+        }
+    }
+    else if(btn == _popularBtn)
+    {
+        _popularBtn.selected = YES;
+        _allBtn.selected = NO;
+        _lineLeadingCons.constant = SCREEN_WIDTH / 2;
+        
+        if(self.delegate && [self.delegate respondsToSelector:@selector(popularBtnClicked)])
+        {
+            [self.delegate popularBtnClicked];
+        }
+    }
+    
+}
+
+#pragma mark -
+#pragma mark BBWebViewSizeAdjust delegate method
+- (void)bbweb:(BBWebView *)web didAdjustSizeTo:(CGSize)endSize from:(CGSize)startSize
+{
+    if (startSize.height<endSize.height)
+    {
+//        CGFloat height = endSize.height;
+//        CGRect frame = web.frame;
+//        frame.size.height = height;
+//        _TopWebView.frame = frame;
+        _webHeightCons.constant = endSize.height;
+    }
+}
+
+
+@end

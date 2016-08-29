@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="CYSearchReMenFooter">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="440"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="acX-Ws-RfY">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="50"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="热门搜索" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lVN-E3-ZO4">
+                            <rect key="frame" x="20" y="15" width="64" height="20"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                            <color key="textColor" red="0.59999999999999998" green="0.59999999999999998" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6ig-nJ-WZZ">
+                            <rect key="frame" x="270" y="0.0" width="105" height="50"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="105" id="eII-Fp-e2x"/>
+                            </constraints>
+                            <state key="normal" image="sousuo_huanyipi"/>
+                            <connections>
+                                <action selector="huanyipi_click:" destination="iN0-l3-epB" eventType="touchUpInside" id="YOa-v0-MP9"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="bottom" secondItem="6ig-nJ-WZZ" secondAttribute="bottom" id="1B8-92-gpd"/>
+                        <constraint firstItem="lVN-E3-ZO4" firstAttribute="leading" secondItem="acX-Ws-RfY" secondAttribute="leading" constant="20" id="ahw-ts-wc5"/>
+                        <constraint firstAttribute="trailing" secondItem="6ig-nJ-WZZ" secondAttribute="trailing" id="hTz-oD-fPP"/>
+                        <constraint firstItem="6ig-nJ-WZZ" firstAttribute="top" secondItem="acX-Ws-RfY" secondAttribute="top" id="rv4-1L-yEb"/>
+                        <constraint firstItem="lVN-E3-ZO4" firstAttribute="centerY" secondItem="acX-Ws-RfY" secondAttribute="centerY" id="sWR-a0-OlK"/>
+                        <constraint firstAttribute="height" constant="50" id="tQH-bw-FqM"/>
+                    </constraints>
+                </view>
+                <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="SPz-Fx-AHC">
+                    <rect key="frame" x="0.0" y="50" width="375" height="390"/>
+                </scrollView>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="SPz-Fx-AHC" secondAttribute="trailing" id="9nl-yO-GeP"/>
+                <constraint firstAttribute="trailing" secondItem="acX-Ws-RfY" secondAttribute="trailing" id="BSX-tc-XKV"/>
+                <constraint firstItem="acX-Ws-RfY" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="bIA-Dx-nWr"/>
+                <constraint firstItem="SPz-Fx-AHC" firstAttribute="top" secondItem="acX-Ws-RfY" secondAttribute="bottom" id="cfw-kj-l3n"/>
+                <constraint firstItem="acX-Ws-RfY" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="nlC-dS-UYF"/>
+                <constraint firstAttribute="bottom" secondItem="SPz-Fx-AHC" secondAttribute="bottom" id="sNg-Jf-Anc"/>
+                <constraint firstItem="SPz-Fx-AHC" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="snH-F9-Bv6"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <nil key="simulatedTopBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="scrollerView" destination="SPz-Fx-AHC" id="fDZ-42-Mk8"/>
+            </connections>
+            <point key="canvasLocation" x="306.5" y="334"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="sousuo_huanyipi" width="62" height="14"/>
+    </resources>
+</document>

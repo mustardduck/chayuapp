@@ -1,0 +1,50 @@
+//
+//  CYWengZhangTypeCell.m
+//  茶语
+//
+//  Created by taotao on 16/7/2.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYWengZhangTypeCell.h"
+
+@interface CYWengZhangTypeCell ()
+
+@property (weak, nonatomic) IBOutlet UIImageView *showImg1;
+
+@property (weak, nonatomic) IBOutlet UIImageView *showImg2;
+
+@end
+
+@implementation CYWengZhangTypeCell
+
+- (void)awakeFromNib {
+    [super awakeFromNib];
+    // Initialization code
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+
+
+- (void)setInfo:(NSDictionary *)info
+{
+    _info = info;
+    NSDictionary *left = [_info objectForKey:@"left"];
+    NSDictionary *right = [_info objectForKey:@"right"];
+    if (left.count) {
+        NSString *thumb = [left objectForKey:@"thumb"];
+        [_showImg1 sd_setImageWithURL:[NSURL URLWithString:thumb] placeholderImage:WIDEIMG];
+    }
+    
+    if (right.count) {
+        NSString *thumb = [right objectForKey:@"thumb"];
+        [_showImg2 sd_setImageWithURL:[NSURL URLWithString:thumb] placeholderImage:WIDEIMG];
+    }
+    
+}
+
+@end

@@ -1,0 +1,615 @@
+//
+//  CYEvaListViewController.m
+//  茶语
+//
+//  Created by 李峥 on 16/2/19.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYEvaListViewController.h"
+#import "CYTeaReviewDetailViewController.h"
+#import "CYTeaReviewInfo.h"
+#import "CYTeaSampleInfo.h"
+#import "CYDropListMenuView.h"
+#import "CYTeaReviewCell.h"
+#import "CYPingPaiFenLeiView.h"
+#import "CYMyViewController.h"
+#import "CYSouSuoHomeViewController.h"
+#import "CYExchangeTeaViewController.h"
+#import "CYTeaSampleDetailViewController.h"
+@interface CYEvaListViewController ()<CYDropListDelegate,UITableViewDelegate,UITableViewDataSource>
+{
+    NSMutableArray *dataArr;
+    NSInteger page;
+    
+    OSMessage * _shareMsg;
+}
+@property (weak, nonatomic) IBOutlet UIView *mToolsView;
+
+@property (weak, nonatomic) IBOutlet UILabel *mNumberLabel;
+
+@property (nonatomic, strong) UIButton *lastSelectedBtn;
+
+@property (nonatomic, strong) NSArray *mToolsBtnNameList;
+
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+@property (nonatomic, strong) NSString *mSort;
+
+@property (nonatomic, strong) CYDropListMenuView *mCateMenuView;
+@property (nonatomic, strong) CYDropListMenuView *mYearsMenuView;
+@property (nonatomic, strong) CYDropListMenuView *mRatingMenuView;
+@property (nonatomic, strong) CYPingPaiFenLeiView *pingpaifenleiView;
+- (IBAction)goback:(id)sender;
+@property (weak, nonatomic) IBOutlet UIView *emptyView;
+
+
+@end
+
+@implementation CYEvaListViewController
+
+- (CYDropListMenuView *)mRatingMenuView
+{
+    if (_mRatingMenuView == nil) {
+        _mRatingMenuView = [[CYDropListMenuView alloc] initWithFrame:CGRectMake(0,90*SCREENBILI+60, [UIScreen mainScreen].bounds.size.width, CGRectGetHeight(self.view.frame) - 90*SCREENBILI-60) listType:DropType_Rating];
+        _mRatingMenuView.delegate = self;
+        [_mRatingMenuView hide];
+        [self.view addSubview:_mRatingMenuView];
+    }
+    
+    return _mRatingMenuView;
+}
+
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+-(void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    [APP_DELEGATE setTabbarHidden:YES animated:animated];
+}
+
+- (CYDropListMenuView *)mYearsMenuView
+{
+    if (_mYearsMenuView == nil) {
+        _mYearsMenuView = [[CYDropListMenuView alloc] initWithFrame:CGRectMake(0, 90*SCREENBILI+60, [UIScreen mainScreen].bounds.size.width, CGRectGetHeight(self.view.frame) - 90*SCREENBILI-60) listType:DropType_TeaYear];
+        _mYearsMenuView.delegate = self;
+        [_mYearsMenuView hide];
+        [self.view addSubview:_mYearsMenuView];
+    }
+    
+    return _mYearsMenuView;
+}
+
+- (CYDropListMenuView *)mCateMenuView
+{
+    if (_mCateMenuView == nil) {
+        _mCateMenuView = [[CYDropListMenuView alloc] initWithFrame:CGRectMake(0, 90*SCREENBILI+60, [UIScreen mainScreen].bounds.size.width, CGRectGetHeight(self.view.frame) - 90*SCREENBILI-60) listType:DropType_TeaCategory];
+        _mCateMenuView.delegate = self;
+        [_mCateMenuView hide];
+        [self.view addSubview:_mCateMenuView];
+    }
+    
+    return _mCateMenuView;
+}
+
+- (CYPingPaiFenLeiView *)pingpaifenleiView
+{
+    if (!_pingpaifenleiView) {
+        _pingpaifenleiView = [[[NSBundle mainBundle] loadNibNamed:@"CYPingPaiFenLeiView" owner:nil options:nil] firstObject];
+        _pingpaifenleiView.frame = CGRectMake(0, 90*SCREENBILI+60, [UIScreen mainScreen].bounds.size.width, CGRectGetHeight(self.view.frame) - 90*SCREENBILI-60);
+        _pingpaifenleiView.hidden = YES;
+        [self.view addSubview:_pingpaifenleiView];
+    }
+    return _pingpaifenleiView;
+}
+
+
+
+
+- (NSArray *)mToolsBtnNameList
+{
+    NSString *chaleiStr = @"茶类";
+    if (_teaCateStr.length) {
+        chaleiStr = _teaCateStr;
+    }
+        _mToolsBtnNameList = @[@{@"name":chaleiStr,@"sort":@"0",@"type":@"1"},
+                               @{@"name":@"评分",@"sort":@"2",@"type":@"1"},
+                               @{@"name":@"评鉴年份",@"sort":@"1",@"type":@"1"},
+                               @{@"name":@"茶样库存",@"sort":@"3",@"type":@"2"}];
+    
+    return _mToolsBtnNameList;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    _shareMsg = [[OSMessage alloc] init];
+    
+    if (!_isPingPai) {
+      
+    }else{
+        [self loadpigpaiData];
+    }
+        [self loadCateData];
+  
+    page = 1;
+    dataArr =[NSMutableArray array];
+    [self initToolsView];
+    [self creatkongNavBar];
+    __weak __typeof(self) weakSelf = self;
+    _tableView.header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        [weakSelf reloadData:NO];
+        
+    }];
+    [_tableView.header beginRefreshing];
+    
+    
+    _tableView.footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+        [weakSelf reloadData:YES];
+    }];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [MobClick beginLogPageView:@"茶评茶样列表"];
+}
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:@"茶评茶样列表"];
+}
+
+
+-(void)loadCateData
+{
+    __weak __typeof(self) weakSelf = self;
+    [CYWebClient Post:@"2.0_tea.lists.get_search_banner" parametes:@{@"type":@"category"} success:^(id responObject) {
+        NSArray *cateList = [CYTeaCategoryInfo objectArrayWithKeyValuesArray:[responObject objectForKey:@"category_list"]];
+        NSMutableArray *mAllList = [NSMutableArray new];
+//        [mAllList addObject:@{@"bid":@"0",@"name":@"不限",@"ico":@"all"}];
+        [mAllList addObjectsFromArray:cateList];
+        weakSelf.mCateMenuView.mCateList = [CYTeaCategoryInfo objectArrayWithKeyValuesArray:mAllList];
+        weakSelf.mYearsMenuView.mYearsList = [NSMutableArray arrayWithArray:[responObject objectForKey:@"pingjiannianfen"]];
+        weakSelf.mRatingMenuView.mRatingList = [NSMutableArray arrayWithArray:[responObject objectForKey:@"pingfen"]];
+    } failure:^(id error) {
+        
+    }];
+}
+
+
+-(void)loadpigpaiData
+{
+    
+    [CYWebClient Post:@"tea" parametes:@{@"type":@"brand"} success:^(id responObject) {
+        NSArray *brand_list = [responObject objectForKey:@"brand_list"];
+        self.pingpaifenleiView.brand_list = [CYPingPaiInfo objectArrayWithKeyValuesArray:brand_list];//        [self.view addSubview:self.pingpaifenleiView];
+    } failure:^(id error) {
+        
+    }];
+}
+
+
+
+
+#pragma mark -
+#pragma mark UITableViewDataSource method
+-(NSInteger )tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return [dataArr count];
+}
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView{
+    return 1;
+}
+
+-(CGFloat )tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 133.f;
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CYTeaReviewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYTeaReviewCell"];
+    CYTeaReviewInfo *info = dataArr[indexPath.row];
+    if ([info.remain integerValue]<=0) {
+        cell.duihuanBtn.hidden = YES;
+    }else{
+           cell.duihuanBtn.hidden = NO;
+    }
+    [cell parseData:info];
+    
+    cell.duiHuanClickBlock = ^(NSString * sampleId)
+    {
+        if(sampleId.length)
+        {
+            [self duiHuanChaYang:sampleId];
+        }
+    };
+    return cell;
+}
+
+#pragma mark -
+#pragma mark UITableViewDelegate method
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CYTeaReviewInfo *info = dataArr[indexPath.row];
+    CYTeaReviewDetailViewController *vc = [[CYTeaReviewDetailViewController alloc] initWithNibName:@"CYTeaReviewDetailViewController" bundle:nil];
+    vc.mTeaId = info.id;
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (void)duiHuanChaYang:(NSString *)teaId
+{
+    
+    CYExchangeTeaViewController *vc = viewControllerInStoryBoard(@"CYExchangeTeaViewController", @"Eva");
+    vc.goodsId = teaId;
+    [self.navigationController pushViewController:vc animated:YES];
+//    CYTeaSampleDetailViewController *vc = viewControllerInStoryBoard(@"CYTeaSampleDetailViewController", @"Eva");
+//    vc.mSampleid = teaId;
+//    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (void)initToolsView
+{
+    CGFloat btnWidth = [UIScreen mainScreen].bounds.size.width/4;
+    
+    for (NSInteger i = 0;i < self.mToolsBtnNameList.count;i++){
+        NSDictionary *dict = [self.mToolsBtnNameList objectAtIndex:i];
+        
+        CategoryButton *sortBtn = [CategoryButton buttonWithType:UIButtonTypeCustom];
+        sortBtn.frame = CGRectMake(i*btnWidth, 0, btnWidth, CGRectGetHeight(self.mToolsView.frame));
+        [sortBtn setTitle:[dict objectForKey:@"name"] forState:UIControlStateNormal];
+        sortBtn.titleLabel.font = [UIFont systemFontOfSize:15.0];
+        sortBtn.tag = 100+i;
+        [sortBtn setTitleColor:TITLECOLOR forState:UIControlStateNormal];
+
+        NSInteger type = [[dict objectForKey:@"type"] integerValue];
+        NSInteger sort = [[dict objectForKey:@"sort"] integerValue];
+        if (sort == 0) {
+            self.mTeaCateBtn = sortBtn;
+        }
+        
+        if (type == 1) {
+            [sortBtn setTitleColor:RGB(137, 62, 32) forState:UIControlStateSelected];
+            [sortBtn setImage:[UIImage imageNamed:@"chaping_down_row"] forState:UIControlStateNormal];
+            [sortBtn setImage:[UIImage imageNamed:@"chaping_up_row"] forState:UIControlStateSelected];
+        }else
+        {
+            [sortBtn setImage:[UIImage imageNamed:@"chaping_down_jiantou"] forState:UIControlStateNormal];
+            [sortBtn setImage:[UIImage imageNamed:@"chaping_up_jiantou"] forState:UIControlStateSelected];
+        }
+        
+        
+        if (sort == 4) {
+            sortBtn.selected = YES;
+        }
+        
+        [sortBtn addTarget:self action:@selector(clickSort:) forControlEvents:UIControlEventTouchUpInside];
+        
+        [self.mToolsView addSubview:sortBtn];
+    }
+}
+
+
+- (void)setTeaCateStr:(NSString *)teaCateStr
+{
+    _teaCateStr = teaCateStr;
+    for (UIView *view in self.mToolsView.subviews) {
+        [view removeFromSuperview];
+    }
+    [_mTeaCateBtn setTitle:teaCateStr forState:UIControlStateNormal];
+    NSString *chaleiStr = @"茶类";
+    if (_teaCateStr.length) {
+        chaleiStr = _teaCateStr;
+    }
+    _mToolsBtnNameList = @[@{@"name":chaleiStr,@"sort":@"0",@"type":@"1"},
+                               @{@"name":@"评分",@"sort":@"2",@"type":@"1"},
+                               @{@"name":@"评鉴年份",@"sort":@"1",@"type":@"1"},
+                               @{@"name":@"茶样库存",@"sort":@"3",@"type":@"2"}];
+
+    [self initToolsView];
+    
+
+}
+
+- (void)reloadData:(BOOL)hasMore
+{
+    NSMutableDictionary *param = [NSMutableDictionary new];
+
+    if (hasMore) {
+        page ++;
+    }else{
+        page = 1;
+    }
+    if (self.sid.length > 0) {
+        [param setObject:self.sid forKey:@"sid"];
+    }
+    
+    if (_brandid.length) {
+           [param setObject:_brandid forKey:@"brandid"];
+    }
+    
+    if (self.bid.length > 0) {
+        [param setObject:self.bid forKey:@"bid"];
+    }
+    
+    if (_order_score.length>0) {
+        [param setObject:_order_score forKey:@"order"];
+
+    }
+    
+    if (_order_created) {
+         [param setObject:_order_created forKey:@"review_year"];
+    }
+    
+//    if (_order_price) {
+//        [param setObject:_order_price forKey:@"brandid"];
+//    }
+    
+    [param setObject:@(page) forKey:@"p"];//pageNo
+
+
+    [param setObject:@"10" forKey:@"pageSize"];
+      __weak __typeof(self) weakSelf = self;
+    [CYWebClient Post:@"2.0_tea.lists.index" parametes:param success:^(id responObject) {
+        
+        NSDictionary * shareInfo = [responObject objectForJSONKey:@"share"];
+        if ([shareInfo isKindOfClass:[NSDictionary class]] && [shareInfo count]>0) {
+            _shareMsg.title = [shareInfo objectForJSONKey:@"title"];
+            _shareMsg.desc = [shareInfo objectForJSONKey:@"description"];
+            _shareMsg.link = [shareInfo objectForJSONKey:@"url"];
+            _shareMsg.imgUrl = [shareInfo objectForJSONKey:@"thumb"];
+        }
+        
+        if (hasMore) {
+            [weakSelf.tableView.footer endRefreshing];
+        }else{
+            [weakSelf.tableView.header endRefreshing];
+            [dataArr removeAllObjects];
+            [weakSelf.tableView reloadData];
+        }
+        weakSelf.mNumberLabel.text = [NSString stringWithFormat:@"%@",[responObject objectForJSONKey:@"count"]];
+        NSArray *list = [responObject objectForKey:@"list"];
+        if ([list isKindOfClass:[NSArray class]]) {
+            [dataArr addObjectsFromArray:[CYTeaReviewInfo objectArrayWithKeyValuesArray:list]];
+
+        }
+        
+        if(dataArr.count)
+        {
+            [weakSelf.tableView reloadData];
+            weakSelf.emptyView.hidden = YES;
+        }
+        else
+        {
+            weakSelf.emptyView.hidden = NO;
+        }
+        
+        if (dataArr.count<10) {
+            [weakSelf.tableView.footer endRefreshingWithNoMoreData];
+        }else{
+            [weakSelf.tableView.footer resetNoMoreData];
+        }
+        
+       
+    } failure:^(id error) {
+        
+    }];
+}
+- (void)clickSort:(id)sender
+{
+    UIButton *btn = (UIButton *)sender;
+    NSDictionary *dict = [self.mToolsBtnNameList objectAtIndex:[sender tag] - 100];
+    NSInteger sort = [[dict objectForKey:@"sort"] integerValue];
+    
+    if (_isPingPai) {
+        self.pingpaifenleiView.hidden = YES;
+    }else{
+        [self.mCateMenuView hide];
+    }
+
+    [self.mYearsMenuView hide];
+    [self.mRatingMenuView hide];
+    
+    if (sort == 0) {
+        //分类
+        if (btn.selected) {
+            btn.selected = NO;
+        }else
+        {
+            self.lastSelectedBtn.selected = NO;
+            btn.selected = YES;
+            self.lastSelectedBtn = btn;
+            if (_isPingPai) {
+                self.pingpaifenleiView.hidden = NO;
+                 __weak __typeof(self) weakSelf = self;
+                self.pingpaifenleiView.pingPaiSelectBlock = ^(NSString *bandid,NSString *name){
+                    weakSelf.brandid = bandid;
+                    [weakSelf.lastSelectedBtn setTitle:name forState:UIControlStateNormal];
+                    [weakSelf reloadData:NO];
+                    weakSelf.pingpaifenleiView.hidden = YES;
+                    weakSelf.lastSelectedBtn.selected = NO;
+                };
+            }else{
+               [self.mCateMenuView show];
+            }
+      
+        }
+    }else if (sort == 1)
+    {
+        //年份
+        if (btn.selected) {
+            btn.selected = NO;
+        }else
+        {
+            self.lastSelectedBtn.selected = NO;
+            btn.selected = YES;
+            self.lastSelectedBtn = btn;
+            
+            [self.mYearsMenuView show];
+        }
+    }else if (sort == 2)
+    {
+        //评分
+        if (btn.selected) {
+            btn.selected = NO;
+            _order_score = @"";
+        }else
+        {
+            self.lastSelectedBtn.selected = NO;
+            btn.selected = YES;
+            self.lastSelectedBtn = btn;
+            
+            [self.mRatingMenuView show];
+        }
+    }else
+    {
+        if (self.lastSelectedBtn != btn) {
+            self.lastSelectedBtn.selected = NO;
+        }
+        btn.selected = !btn.selected;
+        self.lastSelectedBtn = btn;
+        
+        if (sort == 3){
+            // 参考价
+                if (btn.selected) {
+                    _order_score = @"remain";
+//                    _order_price = @"remain";
+//                    self.mSort = @"price_desc";
+                }else
+                {
+                    _order_score = @"";
+                    self.mSort = @"price_asc";
+                }
+        }
+        [self reloadData:NO];
+    }
+    
+}
+
+
+#pragma mark - CYDropListDelegate
+- (void)dropListDidSelectData:(id)data forType:(DropType)type addit:(NSString *)str superId:(NSString *)sid
+{
+    self.lastSelectedBtn.selected = NO;
+    
+    switch (type) {
+        case DropType_TeaCategory:
+        {
+            if (data == nil) {
+                self.bid = @"";
+                self.sid = @"";
+                [self.lastSelectedBtn setTitle:@"不限" forState:UIControlStateNormal];
+            }
+            if ([data isKindOfClass:[CYTeaCategoryInfo class]]) {
+                CYTeaCategoryInfo *info = data;
+                
+                [self.lastSelectedBtn setTitle:info.name forState:UIControlStateNormal];
+
+                self.sid = @"";
+                self.bid = info.bid;
+            }
+            
+            if ([data isKindOfClass:[CYTeaChildCategoryInfo class]]) {
+                CYTeaChildCategoryInfo *info = data;
+                [self.lastSelectedBtn setTitle:str forState:UIControlStateNormal];
+
+                self.sid = info.sid;
+                self.bid = sid;
+            }
+            
+            [self reloadData:NO];
+        }
+            break;
+            
+        case DropType_TeaYear:
+        {
+            _order_created = [data objectForKey:@"id"];
+               [self reloadData:NO];
+        }
+            break;
+        case DropType_Rating:
+        {
+            _order_score = [data objectForKey:@"id"];
+            NSString *name = [data objectForKey:@"name"];
+            [self.lastSelectedBtn setTitle:name forState:UIControlStateNormal];
+            [self reloadData:NO];;
+        }
+            break;
+        default:
+            break;
+    }
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+
+#pragma mark -
+#pragma mark 按钮点击事件 method
+- (IBAction)gotousercenter_click:(id)sender {
+    if (!MANAGER.isLoged) {
+        [APP_DELEGATE showLogView];
+        return;
+    }
+    CYMyViewController *vc = viewControllerInStoryBoard(@"CYMyViewController", @"My");
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+
+
+- (IBAction)sousuo_click:(id)sender {
+    CYSouSuoHomeViewController *vc = viewControllerInStoryBoard(@"CYSouSuoHomeViewController", @"SouSuo");
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (IBAction)navbar_clicked:(id)sender
+{
+    [self navBarClicked:self.navigationController tag:((UIButton *)sender).tag shareMessage:_shareMsg];
+    
+}
+
+
+@end
+
+@implementation ToolsView
+
+- (void)drawRect:(CGRect)rect
+{
+    [super drawRect:rect];
+    
+    UIBezierPath *path = [UIBezierPath bezierPath];
+    [path moveToPoint:CGPointMake(0, CGRectGetHeight(rect))];
+    [path addLineToPoint:CGPointMake(CGRectGetWidth(rect), CGRectGetHeight(rect))];
+    [UIColorFromRGB(0xdddddd) setStroke];
+    [path stroke];
+}
+
+@end
+
+@implementation CategoryButton
+
+-(void)layoutSubviews {
+    [super layoutSubviews];
+    
+    // Center image
+    CGRect imgFrame = self.imageView.frame;
+    imgFrame.origin.y = self.frame.size.height/2 - imgFrame.size.height/2;
+    
+    //Center text
+    CGRect newFrame = [self titleLabel].frame;
+    newFrame.origin.y = self.frame.size.height/2 - newFrame.size.height/2;
+    
+    newFrame.origin.x = (self.frame.size.width - imgFrame.size.width - newFrame.size.width - 2)/2;
+    
+    imgFrame.origin.x = CGRectGetMaxX(newFrame) + 2;
+    
+    self.imageView.frame = imgFrame;
+    self.titleLabel.frame = newFrame;
+
+}
+
+@end

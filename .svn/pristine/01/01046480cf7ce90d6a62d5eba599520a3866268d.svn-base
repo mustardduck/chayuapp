@@ -1,0 +1,240 @@
+//
+//  CYSendBackViewController.m
+//  茶语
+//
+//  Created by Chayu on 16/4/23.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYSendBackViewController.h"
+#import "CYWuliuTableViewCell.h"
+#import "CYMyOrderViewController.h"
+#import "BaseButton.h"
+#import "CYRefundViewController.h"
+@interface CYSendBackViewController ()<UITextFieldDelegate,UITableViewDataSource,UITableViewDelegate,UIGestureRecognizerDelegate>
+{
+    NSString *selectWuliu;
+    NSMutableArray *dataArr;
+}
+- (IBAction)submit_click:(id)sender;
+
+- (IBAction)selectwuliu_click:(id)sender;
+@property (weak, nonatomic) IBOutlet UIButton *wuliuBtn;
+
+@property (weak, nonatomic) IBOutlet UITextField *trackingnumberTf;
+
+@property (weak, nonatomic) IBOutlet UIView *kuiadiView;
+
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *kuaidi_cons;
+
+- (IBAction)cancel_click:(id)sender;
+
+- (IBAction)goback:(id)sender;
+
+@property (weak, nonatomic) IBOutlet BaseButton *tijiaoBtn;
+
+
+@end
+
+@implementation CYSendBackViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    dataArr = [NSMutableArray array];
+    //    NSArray *kuaidiArr = @[@"顺丰速运",@"宅急送",@"圆通速递",@"申通快递",@"天天快递",@"中通快递",@"全峰快递",@"韵达快递",@"百世汇通",@"优速快递",@"快捷快递",@"国通快递",@"中国邮政"];
+    //    NSArray *kuaidiId = @[@"1",@"2",@"3",@"4",@"6",@"7",@"8",@"9",@"10",@"11",@"12",@"13",@"14"];
+    //    for (int i =0; i<[kuaidiId count]; i++) {
+    //        [dataArr addObject:@{@"id":kuaidiId[i],@"name":kuaidiArr[i],@"select":@(NO)}];
+    //    }
+    
+    
+    [self loadKuaiDiInfo];
+}
+
+
+-(void)loadKuaiDiInfo
+{
+    
+    [CYWebClient Post:@"2.0_shiji.logistics" parametes:nil success:^(id responObj) {
+        [dataArr addObjectsFromArray:responObj];
+        [dataArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            NSMutableDictionary *params = [NSMutableDictionary dictionaryWithDictionary:obj];
+            [params setObject:@(NO) forKey:@"select"];
+            [dataArr replaceObjectAtIndex:idx withObject:params];
+            
+        }];
+        
+        [_tableView reloadData];
+    } failure:^(id err) {
+        
+    }];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [MobClick beginLogPageView:self.title];
+}
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:self.title];
+}
+
+
+-(void)dissmisswuliu
+{
+    [self showrwuliuView:NO];
+}
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+ #pragma mark - Navigation
+ 
+ // In a storyboard-based application, you will often want to do a little preparation before navigation
+ - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+ // Get the new view controller using [segue destinationViewController].
+ // Pass the selected object to the new view controller.
+ }
+ */
+
+-(BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    
+    [textField resignFirstResponder];
+    return YES;
+}
+
+- (IBAction)submit_click:(id)sender {
+    if (!_trackingnumberTf.text.length) {
+        [Itost showMsg:@"  请填写快递单号  " inView:WINDOW];
+        return;
+    }
+    if (!selectWuliu.length) {
+        [Itost showMsg:@"  请选择物流  " inView:WINDOW];
+        return;
+    }
+    
+    
+    [CYWebClient basePost:@"savePostBack" parametes:@{@"backId":_orderId,@"logisticsType":selectWuliu,@"waybillNumber":_trackingnumberTf.text} success:^(id responObject) {
+        NSInteger state = [[responObject objectForKey:@"state"] integerValue];
+        if (state == 400) {
+            NSArray *vcArr = self.navigationController.viewControllers;
+            UIViewController *aimVC = nil;
+            for (NSInteger i=vcArr.count-1; i>=0; i--) {
+                if ([vcArr[i] isKindOfClass:[CYRefundViewController class]]) {
+                    aimVC = vcArr[i];
+                    break;
+                }
+            }
+            if (aimVC) {
+                [self.navigationController popToViewController:aimVC animated:YES];
+            }
+        }
+        
+    } failure:^(id error) {
+        
+    }];
+    
+    
+}
+
+- (IBAction)selectwuliu_click:(id)sender {
+    
+    if (_kuaidi_cons.constant == 0.0) {
+        [self showrwuliuView:NO];
+    }else{
+        [self showrwuliuView:YES];
+    }
+    
+}
+
+
+-(void)showrwuliuView:(BOOL)show
+{
+    if (show) {
+        [UIView animateWithDuration:0.25 animations:^{
+            _kuaidi_cons.constant = 0.0f;
+            [self.view layoutIfNeeded];
+        } completion:^(BOOL finished) {
+            if (finished) {
+                
+            }
+        }];
+        
+    }else{
+        
+        [UIView animateWithDuration:0.25 animations:^{
+            _kuaidi_cons.constant = SCREEN_WIDTH;
+            [self.view layoutIfNeeded];
+        } completion:^(BOOL finished) {
+        }];
+        
+    }
+}
+
+
+#pragma mark -
+#pragma mark UITableViewDataSource method
+-(NSInteger )tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return [dataArr count];
+}
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView{
+    return 1;
+}
+
+-(CGFloat )tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 48.;
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString *wuliuIdentify = @"CYWuliuTableViewCell";
+    CYWuliuTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:wuliuIdentify];
+    if (!cell) {
+        cell = [[[NSBundle mainBundle] loadNibNamed:@"CYWuliuTableViewCell" owner:nil options:nil] firstObject];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    }
+    cell.info = dataArr[indexPath.row];
+    return cell;
+}
+
+#pragma mark -
+#pragma mark UITableViewDelegate method
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+    NSDictionary *selectInfo = dataArr[indexPath.row];
+    [_wuliuBtn setTitle:selectInfo[@"name"] forState:UIControlStateNormal];
+    selectWuliu = [selectInfo[@"id"] description];
+    for (int i = 0; i<[dataArr count]; i++) {
+        NSMutableDictionary *info =  [NSMutableDictionary dictionaryWithDictionary:dataArr[i]];
+        if (i == indexPath.row) {
+            [info setObject:@(YES) forKey:@"select"];
+        }else{
+            [info setObject:@(NO) forKey:@"select"];
+        }
+        [dataArr replaceObjectAtIndex:i withObject:info];
+    }
+    
+    [tableView reloadData];
+    
+}
+
+
+- (IBAction)cancel_click:(id)sender {
+    [self showrwuliuView:NO];
+}
+
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+@end

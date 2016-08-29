@@ -1,0 +1,72 @@
+//
+//  CYEvaCommentInfo.h
+//  茶语
+//
+//  Created by 李峥 on 16/2/21.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+
+@interface CYEvaCommentInfo : NSObject
+
+@property (nonatomic,strong)NSString *id;
+
+/**
+ *  id
+ */
+@property (nonatomic, strong) NSString *itemid;
+/**
+ *  用户Id
+ */
+@property (nonatomic, strong) NSString *uid;
+/**
+ *  组Id：2为专家，3为达人
+ */
+@property (nonatomic, assign) NSInteger gid;
+/**
+ *  总分
+ */
+@property (nonatomic, strong) NSString *score;
+/**
+ *  评论时间
+ */
+@property (nonatomic, strong) NSString *created;
+/**
+ *  评论内容
+ */
+@property (nonatomic, strong) NSString *content;
+/**
+ *  喜欢数量
+ */
+@property (nonatomic, strong) NSString *favors;
+/**
+ *  用户昵称
+ */
+@property (nonatomic, strong) NSString *nickname;
+/**
+ *  用户头像
+ */
+@property (nonatomic, strong) NSString *avatar;
+
+/**
+ *  图片
+ */
+@property (nonatomic, strong) NSString *imgUrl;
+
+/**
+ *  是不喜欢过：1是0否
+ */
+//@property (nonatomic, assign) BOOL support;
+
+@property (nonatomic,strong)NSArray *attach;
+
+@property (nonatomic,strong)NSArray *replys;
+//是否展开
+@property (nonatomic,assign)BOOL isOpen;
+
+@property (nonatomic,assign) BOOL is_support;
+
+@property (nonatomic,strong)NSString *support;
+
+@end

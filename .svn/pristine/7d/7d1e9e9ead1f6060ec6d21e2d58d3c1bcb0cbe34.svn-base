@@ -1,0 +1,94 @@
+//
+//  CYMyTeaViewController.m
+//  茶语
+//
+//  Created by Leen on 16/3/4.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYMyTeaViewController.h"
+#import "CYMyChaPingTableViewCell.h"
+
+
+@interface CYMyTeaViewController ()<UITableViewDataSource,UITableViewDelegate>
+{
+    NSMutableArray *dataArr;
+    NSInteger page;
+}
+
+- (IBAction)goback:(id)sender;
+
+
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+
+
+- (IBAction)menu_click:(id)sender;
+
+
+@property (weak, nonatomic) IBOutlet UIView *lineView;
+
+
+@end
+
+@implementation CYMyTeaViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    self.title = @"我的茶评";
+    dataArr = [NSMutableArray array];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [MobClick beginLogPageView:self.title];
+}
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:self.title];
+}
+#pragma mark -
+#pragma mark UITableViewDataSource method
+-(NSInteger )tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return [dataArr count];
+}
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView{
+    return 1;
+}
+
+-(CGFloat )tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 125.f;
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CYMyChaPingTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYMyChaPingTableViewCell"];
+    
+
+    return cell;
+}
+
+#pragma mark -
+#pragma mark UITableViewDelegate method
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+}
+
+
+
+
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+- (IBAction)menu_click:(id)sender {
+}
+@end

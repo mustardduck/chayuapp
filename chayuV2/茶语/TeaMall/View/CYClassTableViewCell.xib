@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="CYClassTableViewCell" id="KGk-i7-Jjw" customClass="CYClassTableViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="51"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="W1s-pj-c3E">
+                        <rect key="frame" x="15" y="5" width="290" height="40"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="bottom" secondItem="W1s-pj-c3E" secondAttribute="bottom" constant="5" id="43i-nU-UY3"/>
+                    <constraint firstAttribute="trailing" secondItem="W1s-pj-c3E" secondAttribute="trailing" constant="15" id="Ehd-uc-aX1"/>
+                    <constraint firstItem="W1s-pj-c3E" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="5" id="JcX-ZW-XJB"/>
+                    <constraint firstItem="W1s-pj-c3E" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="15" id="kkK-y6-Ywk"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="classView" destination="W1s-pj-c3E" id="LwY-dN-tML"/>
+            </connections>
+            <point key="canvasLocation" x="290" y="440"/>
+        </tableViewCell>
+    </objects>
+</document>

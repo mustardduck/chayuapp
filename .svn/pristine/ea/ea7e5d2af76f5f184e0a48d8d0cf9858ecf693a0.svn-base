@@ -1,0 +1,29 @@
+//
+//  CYTeaReviewCell.m
+//  茶语
+//
+//  Created by 李峥 on 16/2/19.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYTeaReviewCell.h"
+
+@implementation CYTeaReviewCell
+
+- (void)parseData:(id)data
+{
+    CYTeaReviewInfo *info = [CYTeaReviewInfo objectWithKeyValues:data];
+    
+    [_mImageView sd_setImageWithURL:[NSURL URLWithString:info.thumb] placeholderImage:[UIImage imageNamed:@"zwt_width"]];
+    
+    _mTitleLabel.text = info.title;
+    _mOfficialLabel.text = info.review_score;
+    _mComplexLabel.text = info.score;
+    _clickLbl.text = info.clicks;
+    _mAddressLabel.text = [NSString stringWithFormat:@"参考价：￥%@",info.price];
+    _mTypeLabel.text = info.catename;
+    _mComments.text = info.comments;
+    self.mClickData = info;
+}
+
+@end

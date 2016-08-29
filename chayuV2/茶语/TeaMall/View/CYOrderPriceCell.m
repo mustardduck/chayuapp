@@ -1,0 +1,74 @@
+//
+//  CYOrderPriceCell.m
+//  茶语
+//
+//  Created by Chayu on 16/2/25.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYOrderPriceCell.h"
+
+@interface  CYOrderPriceCell ()
+
+@property (weak, nonatomic) IBOutlet UILabel *orderpriceLbl;
+
+@property (weak, nonatomic) IBOutlet UILabel *couppriceLbl;
+
+@property (weak, nonatomic) IBOutlet UILabel *shippriceLbl;
+
+@property (weak, nonatomic) IBOutlet UILabel *goods_amountLbl;
+@property (weak, nonatomic) IBOutlet UILabel *sellernameLbl;
+
+@property (weak, nonatomic) IBOutlet UILabel *sellercalLbl;
+
+
+
+@end
+
+@implementation CYOrderPriceCell
+
+- (void)awakeFromNib {
+    // Initialization code
+}
+
++(instancetype)cellWidthTableView:(UITableView*)tableView{
+    static NSString *orderPriceIdentify = @"CYOrderPriceCell";
+    CYOrderPriceCell *cell = [tableView dequeueReusableCellWithIdentifier:orderPriceIdentify];
+    if (!cell) {
+        cell = [[[NSBundle mainBundle] loadNibNamed:@"CYOrderPriceCell" owner:nil options:nil] firstObject];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    }
+    return cell;
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+
+-(void)setPriceInfo:(NSDictionary *)priceInfo
+{
+    _priceInfo = priceInfo;
+    _orderpriceLbl.text = [NSString stringWithFormat:@"￥%.2f",[[_priceInfo objectForKey:@"orderPrice"] floatValue]];
+    _couppriceLbl.text = [NSString stringWithFormat:@"-￥%.2f",[[_priceInfo objectForKey:@"coupon_price"] floatValue]];
+    _shippriceLbl.text = [NSString stringWithFormat:@"+￥%.2f",[[_priceInfo objectForKey:@"ship_price"] floatValue]];
+    _goods_amountLbl.text = [NSString stringWithFormat:@"￥%.2f",[[_priceInfo objectForKey:@"goods_amount"] floatValue]];
+    
+    NSInteger isEditOrderPrice = [[priceInfo objectForKey:@"isEditOrderPrice"] integerValue];
+    if (isEditOrderPrice == 1) {
+        NSMutableString *amountprice = [NSMutableString stringWithString:_goods_amountLbl.text];
+        [amountprice appendString:@"（改）"];
+        _goods_amountLbl.text = amountprice;
+    }
+    
+}
+
+-(void)setSellerInfo:(NSDictionary *)sellerInfo
+{
+    _sellerInfo = sellerInfo;
+    _sellernameLbl.text = [sellerInfo objectForKey:@"sellerName"];
+    _sellercalLbl.text = [sellerInfo objectForKey:@"sellerMobile"];
+}
+
+@end

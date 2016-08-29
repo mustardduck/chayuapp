@@ -1,0 +1,242 @@
+//
+//  CYTeaReviewInfo.h
+//  茶语
+//
+//  Created by 李峥 on 16/2/20.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+#import "CYTeaProcessInfo.h"
+
+@interface CYTeaReviewStarsInfo : NSObject
+
+/**
+ *  综合评分
+ */
+@property (nonatomic, assign) CGFloat score;
+/**
+ *  用户评分
+ */
+@property (nonatomic, assign) CGFloat user_score;
+/**
+ *  达人评分
+ */
+@property (nonatomic, assign) CGFloat daren_score;
+/**
+ *  专家评分
+ */
+@property (nonatomic, assign) CGFloat expert_score;
+/**
+ *  用户评分
+ */
+@property (nonatomic, assign) CGFloat review_score;
+
+
+
+@end
+
+
+@interface CYTeaReviewInfo : NSObject
+
+@property (nonatomic,strong)NSString *desc;
+
+
+//2.0版参数
+
+/**
+ *  <#属性说明#>
+ */
+@property (nonatomic,strong)NSString *catename;
+
+
+@property (nonatomic,strong)NSString *id;
+
+/**
+ *  <#属性说明#>
+ */
+@property (nonatomic,strong)NSString *price;
+
+//收藏
+@property (nonatomic,assign)BOOL isfavor;
+
+/**
+ *  茶叶Id
+ */
+@property (nonatomic, strong) NSString *teaid;
+/**
+ *  茶大类id
+ */
+@property (nonatomic, strong) NSString *bid;
+/**
+ *  <#Description#>
+ */
+@property (nonatomic, strong) NSString *sid;
+
+/**
+ *  图片链接
+ */
+@property (nonatomic, strong) NSString *thumb;
+/**
+ *  茶叶名称
+ */
+@property (nonatomic, strong) NSString *title;
+/**
+ *  综合评分
+ */
+@property (nonatomic, strong) NSString *score;
+@property (nonatomic, strong) NSString *bcname;
+@property (nonatomic, strong) NSString *scname;
+
+@property (nonatomic,strong) NSString *clicks;
+
+@property (nonatomic,strong)NSString *comments;
+
+/**
+ *  商家地址
+ */
+@property (nonatomic,strong)NSString *shopurl;
+
+
+/**
+ *  茶语评分
+ */
+@property (nonatomic, strong) NSString *review_score;
+
+#pragma mark - Detail
+/**
+ *  品牌名称
+ */
+@property (nonatomic, strong) NSString *brand;
+/**
+ *  参考价格
+ */
+//@property (nonatomic,strong) NSString *price;
+/**
+ *  总评
+ */
+@property (nonatomic, strong) NSString *review;
+/**
+ *  生产时间
+ */
+@property (nonatomic, strong) NSString *year;
+/**
+ *  保质期
+ */
+@property (nonatomic, strong) NSString *shelflife;
+/**
+ *  品种
+ */
+@property (nonatomic, strong) NSString *variety;
+/**
+ *  内部等级
+ */
+@property (nonatomic, strong) NSString *rank;
+/**
+ *  规格
+ */
+@property (nonatomic, strong) NSString *size;
+/**
+ *  包装
+ */
+@property (nonatomic, strong) NSString *is_giftpack;
+/**
+ *  生产许可证
+ */
+@property (nonatomic, strong) NSString *license;
+/**
+ *  执行标准
+ */
+@property (nonatomic, strong) NSString *standard;
+/**
+ *  相关认证
+ */
+@property (nonatomic, strong) NSString *certificate;
+/**
+ *  产区
+ */
+@property (nonatomic, strong) NSString *district;
+/**
+ *  茶类
+ */
+@property (nonatomic, strong) NSString *chalei;
+/**
+ *  其他分类
+ */
+@property (nonatomic, strong) NSString *type;
+
+/**
+ *  推荐指数
+ */
+@property (nonatomic, strong) NSString *zhishu;
+
+@property (nonatomic,strong) NSString *recommend_score_name;
+
+/**
+ * 数组，星星的宽度，包括综合评分、用户评分、达人评分、专家评分
+ */
+@property (nonatomic, strong) CYTeaReviewStarsInfo *stars;
+/**
+ *  焦点图数组
+ */
+@property (nonatomic, strong) NSArray<NSDictionary *> *focus_list;
+
+/**
+ *  评论条数
+ */
+@property (nonatomic, assign) NSInteger comcount;
+
+/**
+ *  分享链接
+ */
+@property (nonatomic, strong) NSString *shareurl;
+
+/**
+ *  冲泡过程
+ */
+@property (nonatomic, strong) CYTeaProcessInfo *process;
+
+@property (nonatomic, strong)NSString *shopname;
+
+
+
+/**
+ *  茶大类名 - 我收藏的茶评
+ */
+@property (nonatomic, strong) NSString *bigcate;
+
+/**
+ *  茶小类名 - 我收藏的茶评
+ */
+@property (nonatomic, strong) NSString *smallcate;
+
+@property (nonatomic,strong)NSString *pingjianshijian;
+
+@property (nonatomic,strong)NSString *cankaojiage;
+
+//推荐指数
+@property (nonatomic,strong)NSString *recommend_score;
+
+@property (nonatomic,strong)NSString *baozhuang;
+
+
+@property (nonatomic,strong)NSString *review_score_star;
+@property (nonatomic,strong)NSString *expert_scor_star;
+@property (nonatomic,strong)NSString *daren_score_star;
+@property (nonatomic,strong)NSString *user_score_star;
+
+
+//茶样ID
+@property (nonatomic,strong)NSString *sample_id;
+
+//茶样数量
+@property (nonatomic,strong)NSString *sample_remain;
+
+//列表 茶样数量
+@property (nonatomic,strong)NSString *remain;
+
+
+@property (nonatomic,strong)NSString *smapleid;
+
+@end
+

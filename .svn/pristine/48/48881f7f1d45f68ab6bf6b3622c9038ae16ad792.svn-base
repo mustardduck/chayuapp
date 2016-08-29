@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="CYGuangGaoView">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" image="tuijian_banner" translatesAutoresizingMaskIntoConstraints="NO" id="ryd-ts-nOi">
+                    <rect key="frame" x="22" y="75" width="331" height="219"/>
+                </imageView>
+                <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="q9I-fJ-S25" customClass="BaseButton">
+                    <rect key="frame" x="127" y="371" width="120" height="40"/>
+                    <color key="backgroundColor" red="0.8862745098" green="0.31764705879999999" blue="0.01176470588" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="40" id="NWY-dI-ClP"/>
+                        <constraint firstAttribute="width" constant="120" id="Xhm-YT-JS9"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <state key="normal" title="查看详情"/>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="2"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="chakanxiangqing_click:" destination="iN0-l3-epB" eventType="touchUpInside" id="v7m-2p-P0d"/>
+                    </connections>
+                </button>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="首次下载茶语网APP或成功邀请你的朋友下载，即可获得柑普一枚，邀请越多收获越多。" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sA0-aI-Arn">
+                    <rect key="frame" x="49" y="314" width="278" height="32"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="278" id="i7r-PJ-7Ll"/>
+                        <constraint firstAttribute="height" constant="32" id="yX4-Fv-t7e"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                    <color key="textColor" red="0.40000000000000002" green="0.40000000000000002" blue="0.40000000000000002" alpha="1" colorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="guanggao_button_logo" translatesAutoresizingMaskIntoConstraints="NO" id="BMB-v8-yYN">
+                    <rect key="frame" x="122" y="562" width="132" height="65"/>
+                </imageView>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="BMB-v8-yYN" secondAttribute="bottom" constant="40" id="Wwh-7x-PsB"/>
+                <constraint firstItem="q9I-fJ-S25" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="Y4C-fG-fQ5"/>
+                <constraint firstItem="q9I-fJ-S25" firstAttribute="top" secondItem="sA0-aI-Arn" secondAttribute="bottom" constant="25" id="bVN-Dr-eCb"/>
+                <constraint firstItem="ryd-ts-nOi" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="75" id="ewE-0f-2ef"/>
+                <constraint firstItem="sA0-aI-Arn" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="fTK-dG-EBV"/>
+                <constraint firstItem="ryd-ts-nOi" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="fhY-w1-h5p"/>
+                <constraint firstItem="BMB-v8-yYN" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="qNe-6W-0ph"/>
+                <constraint firstItem="sA0-aI-Arn" firstAttribute="top" secondItem="ryd-ts-nOi" secondAttribute="bottom" constant="20" id="xBA-mN-0pw"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina47"/>
+            <connections>
+                <outlet property="altLbl" destination="sA0-aI-Arn" id="5ww-5T-TjI"/>
+            </connections>
+            <point key="canvasLocation" x="375.5" y="300.5"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="guanggao_button_logo" width="132" height="65"/>
+        <image name="tuijian_banner" width="331" height="219"/>
+    </resources>
+</document>

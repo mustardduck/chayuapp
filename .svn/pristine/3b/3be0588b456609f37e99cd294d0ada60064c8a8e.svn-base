@@ -1,0 +1,22 @@
+//
+//  CYBuyerProductCollectionViewCell.h
+//  茶语
+//
+//  Created by Leen on 16/6/24.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+
+@interface CYBuyerProductCollectionViewCell : UICollectionViewCell
+
+@property (weak, nonatomic) IBOutlet UIImageView *imgView;
+
+@property (weak, nonatomic) IBOutlet UIButton *deleteBtn;
+@property (weak, nonatomic) IBOutlet UIButton *addImageBtn;
+
+
+@property (nonatomic, copy) void(^deleteBtnBlock)();
+@property (nonatomic, copy) void(^addImageBtnBlock)();
+
+@end

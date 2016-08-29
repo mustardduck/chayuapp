@@ -1,0 +1,63 @@
+//
+//  CYHuaTiDetLikeCell.m
+//  茶语
+//
+//  Created by Chayu on 16/7/7.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYHuaTiDetLikeCell.h"
+
+@interface CYHuaTiDetLikeCell ()
+{
+    
+}
+
+@property (weak, nonatomic) IBOutlet UIView *likeListView;
+
+
+@end
+
+@implementation CYHuaTiDetLikeCell
+
+- (void)awakeFromNib {
+    [super awakeFromNib];
+    
+}
+
+- (void)setLikeArr:(NSArray *)likeArr
+{
+    _likeArr = likeArr;
+    for (int i = 0; i<[_likeArr count]; i++) {
+        NSDictionary *info = _likeArr[i];
+        UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+        button.frame = CGRectMake(20,i*35,SCREEN_WIDTH-40,35);
+        NSString *title = [NSString stringWithFormat:@"· %@",[info objectForKey:@"subject"]];
+        [button setTitle:title forState:UIControlStateNormal];
+        button.titleLabel.font = FONT(14.0);
+        [button setTitleColor:[UIColor getColorWithHexString:@"333333"] forState:UIControlStateNormal];
+        button.tag = 5000+i;
+        [button addTarget:self action:@selector(selcthuati:) forControlEvents:UIControlEventTouchUpInside];
+        [_likeListView addSubview:button];
+    }
+}
+
+
+-(void)selcthuati:(UIButton *)sender
+{
+    NSInteger selectIndex = sender.tag - 5000;
+    if (self.selecthuatiBlock) {
+        NSDictionary *info = _likeArr[selectIndex];
+        self.selecthuatiBlock([info objectForKey:@"tid"]);
+    }
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+}
+
+
+
+
+@end

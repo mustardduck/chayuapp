@@ -1,0 +1,148 @@
+//
+//  CYBuyerProfileVC.m
+//  茶语
+//
+//  Created by Leen on 16/7/2.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYBuyerProfileVC.h"
+#import "CYBuyerProfileHeaderView.h"
+#import "CYBuyerProfileFooterView.h"
+#import "UICommon.h"
+#import "UILabel+Utilities.h"
+#import "UIColor+Additions.h"
+
+@interface CYBuyerProfileVC ()<UITableViewDelegate, UITableViewDataSource>
+{
+    NSMutableArray * _dataArr;
+}
+
+@property (nonatomic, strong) CYBuyerProfileHeaderView * headerView;
+@property (nonatomic, strong) CYBuyerProfileFooterView * footerView;
+@property (weak, nonatomic) IBOutlet UITableView *mainTable;
+
+@end
+
+@implementation CYBuyerProfileVC
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    _dataArr = [NSMutableArray array];
+    _mainTable.tableHeaderView = self.headerView;
+    _mainTable.tableFooterView = self.footerView;
+    
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (CGFloat) tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    UITableViewCell * cell = (UITableViewCell *)[self tableView:tableView cellForRowAtIndexPath:indexPath];
+    return cell.height;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString * cellId = @"profileCell";
+    UITableViewCell * cell = [tableView dequeueReusableCellWithIdentifier:cellId];
+    if(!cell)
+    {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellId];
+    }
+    else
+    {
+        for(UIView * view in [cell subviews])
+        {
+            [view removeFromSuperview];
+        }
+    }
+    
+    NSDictionary * dic = _dataArr[indexPath.row];
+    
+    NSInteger type = [[dic objectForJSONKey:@"type"] integerValue];//type 1 介绍 2 图片
+    
+    if(type == 1)
+    {
+        NSString * content = [dic objectForJSONKey:@"content"];
+        
+        UILabel * contentLbl = [[UILabel alloc] initWithFrame:CGRectMake(20, 0, SCREEN_WIDTH - 55 - 20, 0)];
+        contentLbl.textColor = [UIColor grayTextColor];
+        contentLbl.font = FONT(16);
+        contentLbl.backgroundColor = [UIColor clearColor];
+        contentLbl.numberOfLines = 0;
+        
+        
+        CGFloat labHeight = [UICommon lableHeightWithString:content Size:CGSizeMake(contentLbl.width,MAXFLOAT) fontSize:16];
+        
+        [UICommon setLabelPadding:contentLbl text:content padding:6];
+        NSInteger numberOfLines = labHeight / 16;
+        contentLbl.height = labHeight + 6 * (numberOfLines - 1) + 15 * 2;
+        
+        [cell.contentView addSubview:contentLbl];
+        
+        UIButton *contDelBtn = [[UIButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH - 55, 0, 55, contentLbl.height)];
+        contDelBtn.backgroundColor = [UIColor clearColor];
+        [contDelBtn setImage:[UIImage imageNamed:@"profileCloseBtnIcon"] forState:UIControlStateNormal];
+        [contDelBtn setContentVerticalAlignment:UIControlContentVerticalAlignmentTop];
+        [contDelBtn setContentEdgeInsets:UIEdgeInsetsMake(15, 0, 0, 0)];
+        [cell.contentView addSubview:contDelBtn];
+        
+        UIView * line = [[UIView alloc]initWithFrame:CGRectMake(0, contentLbl.y + contentLbl.height - 0.5, SCREEN_WIDTH, 0.5)];
+        line.backgroundColor = [UIColor grayTitleOrLineColor];
+        
+        [cell.contentView addSubview:line];
+        
+        cell.height = contentLbl.y + contentLbl.height;
+
+    }
+    else
+    {
+//        UIImageView * imgView = [[UIImageView alloc] initWithFrame:CGRectMake((SCREEN_WIDTH - 150) / 2, 15, 150, 100)];
+//        NSString * imgUrl = [dic objectForJSONKey:@"imgUrl"];
+//        
+//        UIButton *contDelBtn = [[UIButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH - 55, 0, 55, imgView.height)];
+//        contDelBtn.backgroundColor = [UIColor clearColor];
+//        [contDelBtn setImage:[UIImage imageNamed:@"profileCloseBtnIcon"] forState:UIControlStateNormal];
+//        [contDelBtn setContentVerticalAlignment:UIControlContentVerticalAlignmentTop];
+//        [contDelBtn setContentEdgeInsets:UIEdgeInsetsMake(15, 0, 0, 0)];
+//        [cell.contentView addSubview:contDelBtn];
+
+        
+    }
+    
+    return cell;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return _dataArr.count;
+}
+
+- (CYBuyerProfileHeaderView *)headerView
+{
+    if(!_headerView)
+    {
+        CGFloat he = 212 *(SCREEN_WIDTH / 375.) + 45;
+        _headerView = [[[NSBundle mainBundle] loadNibNamed:@"CYBuyerProfileHeaderView" owner:nil options:nil] firstObject];
+        _headerView.frame = CGRectMake(0, 0, SCREEN_WIDTH, he);
+    }
+    
+    return _headerView;
+}
+
+- (CYBuyerProfileFooterView *)footerView
+{
+    if(!_footerView)
+    {
+        _footerView = [[[NSBundle mainBundle] loadNibNamed:@"CYBuyerProfileFooterView" owner:nil options:nil] firstObject];
+        _footerView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 235);
+    }
+    return _footerView;
+}
+
+@end

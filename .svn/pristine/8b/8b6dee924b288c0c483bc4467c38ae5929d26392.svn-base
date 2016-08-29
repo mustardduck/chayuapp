@@ -1,0 +1,197 @@
+//
+//  CYGuangGaoView.m
+//  茶语
+//
+//  Created by Chayu on 16/6/6.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYGuangGaoView.h"
+#import "CYArticleDetailViewController.h"
+#import "CYProductDetViewController.h"
+#import "CYPublicAvtiveViewController.h"
+#import "CYTopicDetailController.h"
+#import "CYTeaReviewDetailViewController.h"
+//#import "CYTeaSampleDetailViewController.h"
+#import "AppDelegate.h"
+#import "CYTuiJianViewController.h"
+@interface CYGuangGaoView ()
+{
+  NSInteger   statusTime;     //倒计时时间
+    NSTimer     *countTime;
+}
+@property (weak, nonatomic) IBOutlet UILabel *altLbl;
+
+@property (nonatomic,strong)NSDictionary *guanggaoInfo;
+
+@end
+
+
+@implementation CYGuangGaoView
+
+/*
+// Only override drawRect: if you perform custom drawing.
+// An empty implementation adversely affects performance during animation.
+- (void)drawRect:(CGRect)rect {
+    // Drawing code
+}
+*/
+
+-(void)awakeFromNib
+{
+    statusTime = 2;
+    countTime = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(countDown:) userInfo:nil repeats:YES];
+    NSMutableAttributedString *str = [[NSMutableAttributedString alloc] initWithString:@"首次下载茶语网APP或成功邀请你的朋友下载，即可获得柑普一枚。邀请越多收获越多。"];
+    [str addAttribute:NSForegroundColorAttributeName value:[UIColor getColorWithHexString:@"e25103"] range:NSMakeRange(26,14)];
+    [str addAttribute:NSForegroundColorAttributeName value:[UIColor getColorWithHexString:@"666666"] range:NSMakeRange(30,1)];
+    [str addAttribute:NSForegroundColorAttributeName value:[UIColor getColorWithHexString:@"666666"] range:NSMakeRange(str.length-1,1)];
+    _altLbl.attributedText = str;
+    
+}
+
+#pragma mark 验证码倒计时
+-(void)countDown:(NSTimer *)time {
+    statusTime --;
+    if (statusTime <= -1) {
+        [time invalidate];
+        countTime = nil;
+        [UIView animateWithDuration:0.25 animations:^{
+            self.alpha = 0.0;
+        } completion:^(BOOL finished) {
+            if (finished) {
+                [self removeFromSuperview];
+            }
+        }];
+    }
+}
+
++(void)show:(NSDictionary *)info
+{
+    CYGuangGaoView *view = [[[NSBundle mainBundle] loadNibNamed:@"CYGuangGaoView" owner:self options:nil] firstObject];
+    view.frame = WINDOW.bounds;
+    view.guanggaoInfo = info;
+    [WINDOW addSubview:view];
+}
+
+- (void)setGuanggaoInfo:(NSDictionary *)guanggaoInfo
+{
+    _guanggaoInfo = guanggaoInfo;
+}
+
+- (IBAction)chakanxiangqing_click:(id)sender {
+
+    AppDelegate *appledelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    id viewCon = appledelegate.tabBarController.selectedViewController;
+    //推荐有礼
+    CYTuiJianViewController *vc = viewControllerInStoryBoard(@"CYTuiJianViewController", @"Huodong");
+    //vc.hidesBottomBarWhenPushed = YES;
+    [viewCon pushViewController:vc animated:YES];
+    
+    [UIView animateWithDuration:0.25 animations:^{
+        self.alpha = 0.0;
+    } completion:^(BOOL finished) {
+        if (finished) {
+            [self removeFromSuperview];
+        }
+    }];
+//    NSInteger type = [[_guanggaoInfo objectForKey:@"type"] integerValue];
+//    switch (type) {
+//        case 1://文章
+//        {
+//            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//                CYArticleInfo *info = [[CYArticleInfo alloc] init];
+//                info.itemid = [_guanggaoInfo objectForKey:@"id"];
+//                CYArticleDetailViewController *vc = [[CYArticleDetailViewController alloc] initWithNibName:@"CYArticleDetailViewController" bundle:nil];
+//                vc.mArticleInfo = info;
+//                //vc.hidesBottomBarWhenPushed = YES;
+//                NSLog(@"viewCon = %@",viewCon);
+//                if ([viewCon isKindOfClass:[UINavigationController class]]) {
+//                    [viewCon pushViewController:vc animated:YES];
+//                }
+//            });
+//            
+//            break;
+//        }
+//        case 2://商品
+//        {
+//            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//                CYProductDetViewController  *vc = viewControllerInStoryBoard(@"CYProductDetViewController", @"TeaMall");
+//                vc.goodId = [_guanggaoInfo objectForKey:@"id"];
+//                //vc.hidesBottomBarWhenPushed = YES;
+//                NSLog(@"viewCon = %@",viewCon);
+//                if ([viewCon isKindOfClass:[UINavigationController class]]) {
+//                    [viewCon pushViewController:vc animated:YES];
+//                }
+//            });
+//            
+//            break;
+//        }
+//        case 3://活动
+//        {
+//            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//                if (!MANAGER.isLoged) {
+//                    [APP_DELEGATE showLogView];
+//                    return;
+//                }
+//                CYPublicAvtiveViewController *vc = viewControllerInStoryBoard(@"CYPublicAvtiveViewController", @"TeaMall");
+//                vc.requestUrl = [_guanggaoInfo objectForKey:@"url"];
+//                vc.titleStr = [_guanggaoInfo objectForKey:@"title"];
+//                vc.isRedPack = @"0";
+//                //vc.hidesBottomBarWhenPushed = YES;
+//                if ([viewCon isKindOfClass:[UINavigationController class]]) {
+//                    [viewCon pushViewController:vc animated:YES];
+//                }
+//            });
+//            break;
+//        }
+//        case 4://话题
+//        {
+//            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//                CYTopicDetailController *tdc = viewControllerInStoryBoard(@"CYTopicDetailController", @"BBS");
+//                tdc.hidesBottomBarWhenPushed = YES;
+//                tdc.tid = [_guanggaoInfo objectForKey:@"id"];
+//                tdc.hidesBottomBarWhenPushed = YES;
+//                if ([viewCon isKindOfClass:[UINavigationController class]]) {
+//                    [viewCon pushViewController:tdc animated:YES];
+//                }
+//            });
+//            break;
+//        }
+//        case 5://茶样
+//        {
+//            
+//            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//                CYTeaSampleDetailViewController *vc = [[CYTeaSampleDetailViewController alloc] initWithNibName:@"CYTeaSampleDetailViewController" bundle:nil];
+//                vc.mSampleid = [_guanggaoInfo objectForKey:@"id"];
+//                //vc.hidesBottomBarWhenPushed = YES;
+//                if ([viewCon isKindOfClass:[UINavigationController class]]) {
+//                    [viewCon pushViewController:vc animated:YES];
+//                }
+//            });
+//            
+//            break;
+//        }
+//            
+//        case 6://茶评
+//        {
+//            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//                CYTeaReviewDetailViewController *vc = [[CYTeaReviewDetailViewController alloc] initWithNibName:@"CYTeaReviewDetailViewController" bundle:nil];
+//                vc.mTeaId = [_guanggaoInfo objectForKey:@"id"];
+//                //vc.hidesBottomBarWhenPushed = YES;
+//                if ([viewCon isKindOfClass:[UINavigationController class]]) {
+//                    [viewCon pushViewController:vc animated:YES];
+//                }
+//            });
+//            
+//            break;
+//        }
+//        default:
+//            break;
+//    }
+//    
+    
+}
+
+
+
+@end

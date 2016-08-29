@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10117" systemVersion="15C50" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="CYTeaMallHeaderView">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="415"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BL6-0e-mtK">
+                    <rect key="frame" x="0.0" y="270" width="375" height="145"/>
+                    <subviews>
+                        <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fz8-UZ-YNb">
+                            <rect key="frame" x="0.0" y="0.0" width="375" height="30"/>
+                            <subviews>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Fkq-Nq-MMd">
+                                    <rect key="frame" x="15" y="8" width="345" height="15"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                    <color key="textColor" red="0.89411764705882357" green="0.13333333333333333" blue="0.14901960784313725" alpha="1" colorSpace="calibratedRGB"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                            </subviews>
+                            <color key="backgroundColor" red="0.15686274509803921" green="0.16078431372549021" blue="0.16470588235294117" alpha="1" colorSpace="calibratedRGB"/>
+                            <constraints>
+                                <constraint firstAttribute="trailing" secondItem="Fkq-Nq-MMd" secondAttribute="trailing" constant="15" id="Nhe-tp-obc"/>
+                                <constraint firstAttribute="height" constant="30" id="d4U-6e-EZl"/>
+                                <constraint firstItem="Fkq-Nq-MMd" firstAttribute="top" secondItem="fz8-UZ-YNb" secondAttribute="top" constant="8" id="h1M-Pd-gjW"/>
+                                <constraint firstItem="Fkq-Nq-MMd" firstAttribute="leading" secondItem="fz8-UZ-YNb" secondAttribute="leading" constant="15" id="hXo-uG-9I4"/>
+                                <constraint firstAttribute="bottom" secondItem="Fkq-Nq-MMd" secondAttribute="bottom" constant="7" id="pOX-US-pdW"/>
+                            </constraints>
+                        </view>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstItem="fz8-UZ-YNb" firstAttribute="leading" secondItem="BL6-0e-mtK" secondAttribute="leading" id="2rh-Lx-ldK"/>
+                        <constraint firstItem="fz8-UZ-YNb" firstAttribute="top" secondItem="BL6-0e-mtK" secondAttribute="top" id="5vl-4j-yqf"/>
+                        <constraint firstAttribute="trailing" secondItem="fz8-UZ-YNb" secondAttribute="trailing" id="iFZ-YF-6qc"/>
+                    </constraints>
+                </view>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="dlH-Iu-v6A">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="200"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="200" id="idn-G7-cM1"/>
+                    </constraints>
+                </imageView>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gQx-CJ-TN7">
+                    <rect key="frame" x="0.0" y="200" width="375" height="70"/>
+                    <subviews>
+                        <button opaque="NO" tag="9000" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fgC-J4-d3E">
+                            <rect key="frame" x="0.0" y="0.0" width="75" height="70"/>
+                            <state key="normal" image="shiji_dashi_Ico_d"/>
+                            <state key="selected" image="shiji_dashi_Ico_s"/>
+                            <connections>
+                                <action selector="topMenu_click:" destination="iN0-l3-epB" eventType="touchUpInside" id="sIZ-is-5eY"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" tag="9001" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LNI-qB-3Ol">
+                            <rect key="frame" x="75" y="0.0" width="75" height="70"/>
+                            <state key="normal" image="shiji_mingjia_ico_d"/>
+                            <state key="selected" image="shiji_mingjia_ico_s"/>
+                            <connections>
+                                <action selector="topMenu_click:" destination="iN0-l3-epB" eventType="touchUpInside" id="yts-Lx-dSd"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" tag="9002" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="93t-pW-Wmg">
+                            <rect key="frame" x="150" y="0.0" width="75" height="70"/>
+                            <state key="normal" image="shiji_mingxin_ico_d"/>
+                            <state key="selected" image="shiji_mingxin_ico_s"/>
+                            <connections>
+                                <action selector="topMenu_click:" destination="iN0-l3-epB" eventType="touchUpInside" id="T3e-VK-Mwk"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" tag="9003" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4gV-eK-MlA">
+                            <rect key="frame" x="225" y="0.0" width="75" height="70"/>
+                            <state key="normal" image="shiji_shangpin_ico_d"/>
+                            <state key="selected" image="shiji_shangpin_ico_s"/>
+                            <connections>
+                                <action selector="topMenu_click:" destination="iN0-l3-epB" eventType="touchUpInside" id="ub6-gf-bIq"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" tag="9004" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UxU-Um-6M2">
+                            <rect key="frame" x="300" y="0.0" width="75" height="70"/>
+                            <state key="normal" image="shiji_fenlei_ico_d"/>
+                            <state key="selected" image="shiji_fenlei_ico_s"/>
+                            <connections>
+                                <action selector="topMenu_click:" destination="iN0-l3-epB" eventType="touchUpInside" id="LcB-eu-EZW"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="70" id="0i9-dr-aa8"/>
+                        <constraint firstItem="UxU-Um-6M2" firstAttribute="leading" secondItem="4gV-eK-MlA" secondAttribute="trailing" id="3fn-fm-CYD"/>
+                        <constraint firstItem="LNI-qB-3Ol" firstAttribute="top" secondItem="gQx-CJ-TN7" secondAttribute="top" id="4Xk-hu-Aej"/>
+                        <constraint firstItem="4gV-eK-MlA" firstAttribute="leading" secondItem="93t-pW-Wmg" secondAttribute="trailing" id="6AO-Ne-9Qt"/>
+                        <constraint firstAttribute="bottom" secondItem="4gV-eK-MlA" secondAttribute="bottom" id="E45-9D-Y6k"/>
+                        <constraint firstItem="4gV-eK-MlA" firstAttribute="top" secondItem="gQx-CJ-TN7" secondAttribute="top" id="KxN-3o-gCQ"/>
+                        <constraint firstItem="fgC-J4-d3E" firstAttribute="leading" secondItem="gQx-CJ-TN7" secondAttribute="leading" id="LaF-l6-lhR"/>
+                        <constraint firstItem="4gV-eK-MlA" firstAttribute="width" secondItem="93t-pW-Wmg" secondAttribute="width" id="N7H-2h-HVe"/>
+                        <constraint firstItem="LNI-qB-3Ol" firstAttribute="width" secondItem="fgC-J4-d3E" secondAttribute="width" id="R7e-c7-9D0"/>
+                        <constraint firstItem="93t-pW-Wmg" firstAttribute="top" secondItem="gQx-CJ-TN7" secondAttribute="top" id="UYZ-hk-uro"/>
+                        <constraint firstItem="UxU-Um-6M2" firstAttribute="top" secondItem="gQx-CJ-TN7" secondAttribute="top" id="ZRN-ZZ-YRZ"/>
+                        <constraint firstAttribute="bottom" secondItem="UxU-Um-6M2" secondAttribute="bottom" id="bez-DZ-eOk"/>
+                        <constraint firstAttribute="bottom" secondItem="LNI-qB-3Ol" secondAttribute="bottom" id="c9H-hq-6Hl"/>
+                        <constraint firstAttribute="bottom" secondItem="fgC-J4-d3E" secondAttribute="bottom" id="coL-Vi-XIi"/>
+                        <constraint firstItem="LNI-qB-3Ol" firstAttribute="leading" secondItem="fgC-J4-d3E" secondAttribute="trailing" id="eF8-D9-KeL"/>
+                        <constraint firstItem="93t-pW-Wmg" firstAttribute="width" secondItem="LNI-qB-3Ol" secondAttribute="width" id="erX-O0-qVb"/>
+                        <constraint firstItem="fgC-J4-d3E" firstAttribute="top" secondItem="gQx-CJ-TN7" secondAttribute="top" id="qNU-g8-Msy"/>
+                        <constraint firstItem="93t-pW-Wmg" firstAttribute="leading" secondItem="LNI-qB-3Ol" secondAttribute="trailing" id="ruo-eZ-OCi"/>
+                        <constraint firstAttribute="bottom" secondItem="93t-pW-Wmg" secondAttribute="bottom" id="s5A-n5-465"/>
+                        <constraint firstItem="UxU-Um-6M2" firstAttribute="width" secondItem="4gV-eK-MlA" secondAttribute="width" id="vh2-vJ-2Fz"/>
+                        <constraint firstAttribute="trailing" secondItem="UxU-Um-6M2" secondAttribute="trailing" id="vhA-HU-YaM"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="BL6-0e-mtK" secondAttribute="trailing" id="0g0-08-ivD"/>
+                <constraint firstAttribute="trailing" secondItem="gQx-CJ-TN7" secondAttribute="trailing" id="1Ju-Qw-9jY"/>
+                <constraint firstItem="gQx-CJ-TN7" firstAttribute="top" secondItem="dlH-Iu-v6A" secondAttribute="bottom" id="7Cd-nk-wnz"/>
+                <constraint firstItem="dlH-Iu-v6A" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="HyD-eC-EXM"/>
+                <constraint firstItem="gQx-CJ-TN7" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="JYK-uE-WJc"/>
+                <constraint firstAttribute="trailing" secondItem="dlH-Iu-v6A" secondAttribute="trailing" id="Mvm-79-G1A"/>
+                <constraint firstItem="BL6-0e-mtK" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="NHz-H4-jF4"/>
+                <constraint firstItem="dlH-Iu-v6A" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="edP-Op-Cew"/>
+                <constraint firstItem="BL6-0e-mtK" firstAttribute="top" secondItem="gQx-CJ-TN7" secondAttribute="bottom" id="oPS-fa-qWO"/>
+                <constraint firstAttribute="bottom" secondItem="BL6-0e-mtK" secondAttribute="bottom" id="qbO-c0-1LV"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="bannerView" destination="BL6-0e-mtK" id="hWM-iS-Ydl"/>
+                <outlet property="bantitleLbl" destination="Fkq-Nq-MMd" id="cEX-Hp-dFQ"/>
+                <outlet property="topImg" destination="dlH-Iu-v6A" id="hnX-Iz-hcj"/>
+                <outlet property="topVIew" destination="gQx-CJ-TN7" id="Q8f-PA-9Fv"/>
+                <outlet property="topimg_height" destination="idn-G7-cM1" id="VnP-d4-w9L"/>
+            </connections>
+            <point key="canvasLocation" x="197.5" y="389.5"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="shiji_dashi_Ico_d" width="24" height="41"/>
+        <image name="shiji_dashi_Ico_s" width="24" height="41"/>
+        <image name="shiji_fenlei_ico_d" width="24" height="41"/>
+        <image name="shiji_fenlei_ico_s" width="24" height="41"/>
+        <image name="shiji_mingjia_ico_d" width="24" height="41"/>
+        <image name="shiji_mingjia_ico_s" width="24" height="41"/>
+        <image name="shiji_mingxin_ico_d" width="44" height="41"/>
+        <image name="shiji_mingxin_ico_s" width="44" height="41"/>
+        <image name="shiji_shangpin_ico_d" width="24" height="41"/>
+        <image name="shiji_shangpin_ico_s" width="24" height="41"/>
+    </resources>
+</document>

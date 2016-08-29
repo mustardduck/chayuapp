@@ -1,0 +1,118 @@
+//
+//  CYBindingViewController.m
+//  TeaMall
+//
+//  Created by Chayu on 15/12/2.
+//  Copyright © 2015年 Chayu. All rights reserved.
+//
+
+#import "CYBindingViewController.h"
+#import "CYFindPasswordViewController.h"
+#import "NSString+Valid.h"
+#import "CYBindingPhoneViewController.h"
+@interface CYBindingViewController ()<UITextFieldDelegate>
+- (IBAction)goback:(id)sender;
+
+- (IBAction)findpassword_click:(id)sender;
+
+- (IBAction)binding_click:(id)sender;
+@property (weak, nonatomic) IBOutlet UITextField *accountTf;
+
+@property (weak, nonatomic) IBOutlet UITextField *passwordTf;
+@property (weak, nonatomic) IBOutlet UILabel *stateLbl;
+@property (weak, nonatomic) IBOutlet CYBorderButton *bingBtn;
+
+@end
+
+@implementation CYBindingViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.view.backgroundColor = [UIColor whiteColor];
+    if (_logType == LogInTypeWeiXin) {
+        _stateLbl.text = @"绑定后，你的微信和茶语账号都能登录茶语网";
+    }else if (_logType == LogInTypeSina ){
+        _stateLbl.text = @"绑定后，你的微博和茶语账号都能登录茶语网";
+    }else{
+        _stateLbl.text = @"绑定后，你的QQ和茶语账号都能登录茶语网";
+    }
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [MobClick beginLogPageView:@"第三方绑定"];
+}
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:@"第三方绑定"];
+}
+
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+
+- (void)creatRightItems
+{
+    
+}
+
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (IBAction)findpassword_click:(id)sender {
+    CYFindPasswordViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"CYFindPasswordViewController"];
+    [self.navigationController pushViewController:vc animated:YES];
+
+}
+
+- (IBAction)binding_click:(id)sender {
+//    Oauth_bind
+    if (![_accountTf.text isValidEmailAddress]&&![_accountTf.text isValidMobileNumber]) {
+        [Itost showMsg:@"请输入正确的邮箱或手机号码！" inView:self.view];
+        return;
+    }
+    
+    if (_passwordTf.text.length<6) {
+        [Itost showMsg:@"密码位数必须大于6位！" inView:self.view];
+        return;
+    }
+    _bingBtn.userInteractionEnabled = NO;
+    [CYWebClient Post:@"Oauth_bind" parametes:@{@"account":_accountTf.text,@"password":_passwordTf.text,@"sessionid":_sessionid} success:^(id responObject) {
+         _bingBtn.userInteractionEnabled = YES;
+        if ([responObject count]) {
+            NSDictionary *info = [responObject objectForJSONKey:@"user_info"];
+            ChaYuer *manager = [ChaYuManager getCurrentUser];
+            [manager updateUserInfo:info];
+            [self dismissViewControllerAnimated:YES completion:^{
+                
+            }];
+        }
+    } failure:^(id error) {
+         _bingBtn.userInteractionEnabled = YES;
+    }];
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    [self.view endEditing:YES];
+    return YES;
+}
+
+@end

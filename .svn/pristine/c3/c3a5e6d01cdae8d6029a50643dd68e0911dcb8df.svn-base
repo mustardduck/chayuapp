@@ -1,0 +1,64 @@
+//
+//  CYTeaCommentCell.m
+//  茶语
+//
+//  Created by 李峥 on 16/2/21.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYTeaCommentCell.h"
+#import "CYEvaCommentInfo.h"
+
+static CYTeaCommentCell *__cell = nil;
+@implementation CYTeaCommentCell
+
+- (void)parseData:(id)data
+{
+    CYEvaCommentInfo *info = [CYEvaCommentInfo objectWithKeyValues:data];
+    
+    [_mUserImageView sd_setImageWithURL:[NSURL URLWithString:info.avatar] placeholderImage:[UIImage imageNamed:@"zwt_width"]];
+    _mNameLabel.text = info.nickname;
+    _mDesLabel.text = info.content;
+    _mScoreLabel.text = info.score;
+    
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"YYYY-MM-dd"];
+    NSDate *confromTimesp = [NSDate dateWithTimeIntervalSince1970:[info.created floatValue]];
+    NSString *confromTimespStr = [formatter stringFromDate:confromTimesp];
+    
+    _mDateLabel.text = confromTimespStr;
+    _mZanLabel.text = info.favors;
+//    _mZanLabel.text = info.support;
+    if (info.imgUrl.length > 0) {
+        self.mImageConstraintHeight.constant = 100;
+        self.mImageTopConstraint.constant = 8;
+        [_mImageView sd_setImageWithURL:[NSURL URLWithString:info.imgUrl] placeholderImage:[UIImage imageNamed:@"zwt_width"]];
+    }else
+    {
+        self.mImageConstraintHeight.constant = 0;
+        self.mImageTopConstraint.constant = 0;
+    }
+    
+    _zanimg.highlighted = info.support;
+    _mZanLabel.textColor = info.support?MAIN_COLOR:LIGHTCOLOR;
+    
+    self.mClickData = info;
+}
+
++ (CGFloat)calcCellHeight:(id)data
+{
+    if (__cell == nil) {
+        __cell = [[[NSBundle mainBundle] loadNibNamed:@"CYTeaCommentCell" owner:nil options:nil] objectAtIndex:0];
+    }
+    
+    [__cell parseData:data];
+    
+    [__cell setNeedsUpdateConstraints];
+    [__cell updateConstraintsIfNeeded];
+    
+    CGFloat height = [__cell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height + 1;
+    
+    return height;
+}
+
+@end

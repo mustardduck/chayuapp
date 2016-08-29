@@ -1,0 +1,181 @@
+//
+//  CYRefundViewController.m
+//  TeaMall
+//  退款
+//  Created by Chayu on 15/11/6.
+//  Copyright © 2015年 Chayu. All rights reserved.
+//
+
+#import "CYRefundViewController.h"
+#import "CYRefundTableViewCell.h"
+#import "CYMoneyDetailViewController.h"
+#import "CYRefundDetailViewController.h"
+@interface CYRefundViewController ()<UITableViewDataSource,UITableViewDelegate,CYRefundTableViewCellDeletage>
+{
+    NSMutableArray *_dataArr;
+    NSInteger page;
+}
+
+- (IBAction)goback:(id)sender;
+
+@property (weak, nonatomic) IBOutlet UIView *emptyView;
+
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+
+@end
+
+@implementation CYRefundViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    //self.barStyle = NavBarStyleNoneMore;
+    page = 1;
+    _dataArr = [[NSMutableArray alloc] init];
+    __weak __typeof(self) weakSelf = self;
+    _tableView.header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        [weakSelf loadTableViewData:NO];
+        
+    }];
+    [_tableView.header beginRefreshing];
+    
+    
+    _tableView.footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+        [weakSelf loadTableViewData:YES];
+    }];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [MobClick beginLogPageView:self.title];
+}
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:self.title];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+-(void)loadTableViewData:(BOOL)loadMore
+{
+    if (loadMore) {
+        page ++;
+    }else{
+        page =1;
+        
+    }
+    __weak __typeof(self) weakSelf = self;
+    [CYWebClient Post:@"RefundList" parametes:@{@"p":@(page),@"pageSize":@"10"} success:^(id responObj) {
+        if (loadMore) {
+            [weakSelf.tableView.footer endRefreshing];
+        }else{
+            [weakSelf.tableView.header endRefreshing];
+            [_dataArr removeAllObjects];
+            [_tableView reloadData];
+        }
+        if ([responObj count]<10) {
+            weakSelf.tableView.footer = nil;
+        }else{
+            weakSelf.tableView.footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+                [weakSelf loadTableViewData:YES];
+            }];
+        }
+        if (![responObj isKindOfClass:[NSNull class]] && [responObj count] < PAGESIZE) {
+            [weakSelf.tableView.footer endRefreshingWithNoMoreData];
+        }
+        [_dataArr addObjectsFromArray:[CYRefundModel objectArrayWithKeyValuesArray:responObj]];
+        [weakSelf.tableView reloadData];
+        
+        if (_dataArr.count ==0) {
+            _emptyView.hidden = NO;
+        }else{
+            _emptyView.hidden = YES;
+        }
+        
+    } failure:^(id err) {
+        if (loadMore) {
+            [weakSelf.tableView.footer endRefreshing];
+        }else{
+            [weakSelf.tableView.header endRefreshing];
+        }
+    }];
+}
+
+/*
+ #pragma mark - Navigation
+ 
+ // In a storyboard-based application, you will often want to do a little preparation before navigation
+ - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+ // Get the new view controller using [segue destinationViewController].
+ // Pass the selected object to the new view controller.
+ }
+ */
+
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+#pragma mark -
+#pragma mark UITableViewDataSource method
+-(NSInteger )tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return [_dataArr count];
+}
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView{
+    return 1;
+}
+
+-(CGFloat )tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CYRefundModel  *model = _dataArr[indexPath.row];
+    NSInteger status = [model.status integerValue];
+    NSInteger type = [model.refundType integerValue];
+    NSInteger shippingStatus = [model.shippingStatus integerValue];
+    if (type == 1) {
+        if (status ==1) {
+            return 225;
+        }
+    }else{
+        if (shippingStatus == 6) {
+            return 225;
+        }
+    }
+    
+    return 185.;
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CYRefundTableViewCell *cell = [CYRefundTableViewCell cellWidthTableView:tableView];
+    CYRefundModel *model = _dataArr[indexPath.row];
+    cell.delegate = self;
+    cell.orderModel = model;
+    return cell;
+}
+
+#pragma mark -
+#pragma mark UITableViewDelegate method
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+    CYRefundDetailViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"CYRefundDetailViewController"];
+    vc.model = _dataArr[indexPath.row];
+    vc.refundcancelBlock = ^(){
+        [self loadTableViewData:NO];
+    };
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+#pragma mark -
+#pragma mark CYRefundTableViewCellDeletage method
+-(void)selectCell:(CYRefundTableViewCell *)cell andModel:(CYRefundModel *)model
+{
+    CYMoneyDetailViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"CYMoneyDetailViewController"];
+    vc.model = model;
+    [self.navigationController pushViewController:vc animated:YES];
+    
+}
+
+@end

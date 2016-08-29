@@ -1,0 +1,250 @@
+//
+//  CYEvaluationViewController.m
+//  TeaMall
+//  商品评价
+//  Created by Chayu on 15/11/5.
+//  Copyright © 2015年 Chayu. All rights reserved.
+//
+
+#import "CYEvaluationViewController.h"
+#import "CYcommentView.h"
+#import "CYPingJiaTableViewCell.h"
+@interface CYEvaluationViewController ()<UITableViewDelegate,UITableViewDataSource>{
+
+    NSMutableArray *_dataArr;
+    NSMutableArray *heightArr;
+
+}
+- (IBAction)goback:(id)sender;
+- (IBAction)leaveacomment_click:(id)sender;
+
+@property (weak, nonatomic) IBOutlet UIScrollView *contentView;
+
+
+
+@end
+
+
+#define COMMVIEWTAG  30000
+@implementation CYEvaluationViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+//     [_contentView registerAsDodgeViewForMLInputDodger];
+    _dataArr = [[NSMutableArray alloc] init];
+//    //self.barStyle = NavBarStyleNoneMore;
+    [CYWebClient Post:@"Comment" parametes:@{@"orderSn":_model.orderSn} success:^(id responObject) {
+        [_dataArr addObjectsFromArray:[CYShopTrolleyModel objectArrayWithKeyValuesArray:responObject]];
+//        [_tableView reloadData];
+        [self loadEvaluationView:_dataArr];
+        
+    } failure:^(id error) {
+        
+    }];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [MobClick beginLogPageView:self.title];
+}
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:self.title];
+}
+
+-(void)loadEvaluationView:(NSArray *)dataArr
+{
+    CGFloat allHeight= 0.0;
+    heightArr = [NSMutableArray arrayWithObject:@"0"];
+    for (int i = 0; i<[dataArr count]; i++) {
+        CYCommentView *view = [[[NSBundle mainBundle] loadNibNamed:@"CYCommentView" owner:nil options:nil] firstObject];
+        CYShopTrolleyModel *model = _dataArr[i];
+        view.albumView.contro = self;
+        if (!_isAppend) {
+            model.score = @"10";
+            [view.imgchooseView addSubview:view.albumView];
+        }
+        __weak __typeof(view) weakSelf = view;
+        view.albumView.imgcuntChangeBlock = ^(NSInteger imgcount){
+            if (imgcount <5) {
+                weakSelf.imgchooseheight_cons.constant = ceilf((imgcount+1)/4.)*82*SCREENBILI +58;
+            }else{
+                weakSelf.imgchooseheight_cons.constant = ceilf(imgcount/4.)*82*SCREENBILI +58;
+            }
+            CGFloat offect_y = [heightArr[i] floatValue];
+            offect_y -=138;
+            offect_y +=weakSelf.imgchooseheight_cons.constant;
+            [heightArr replaceObjectAtIndex:i withObject:@(offect_y)];
+            weakSelf.height = (367-138+weakSelf.imgchooseheight_cons.constant);
+
+        };
+
+         view.model = model;
+        CGFloat viewHeight = 367.0;
+        if (model.addReview.length) {
+            viewHeight +=([model.addReview heightWithFont:FONT(13.0) forWidth:SCREEN_WIDTH -20] +30);
+        }
+        
+        if (model.adminReview.length) {
+            viewHeight +=([model.adminReview heightWithFont:FONT(13.0) forWidth:SCREEN_WIDTH -20] +30);
+        }
+        allHeight +=viewHeight;
+        view.frame = CGRectMake(0,[heightArr[i] floatValue],SCREEN_WIDTH,viewHeight);
+        view.tag = i+COMMVIEWTAG;
+        [_contentView addSubview:view];
+        [heightArr addObject:@(allHeight)];
+    }
+    _contentView.contentSize = CGSizeMake(SCREEN_WIDTH,allHeight);
+}
+
+
+-(void)changeContentViewHeight{
+    CGFloat allHeight= 0.0;
+    for (int i =0; i<[heightArr count]; i++) {
+        CYCommentView *view = [_contentView viewWithTag:i+COMMVIEWTAG];
+        view.y = [heightArr[i] floatValue];
+        allHeight += view.height;
+    }
+    _contentView.contentSize = CGSizeMake(SCREEN_WIDTH,allHeight);
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+#pragma mark -
+#pragma mark UITableViewDataSource method
+-(NSInteger )tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return [_dataArr  count];
+}
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView{
+    return 1;
+}
+
+-(CGFloat )tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+   CYShopTrolleyModel *model = _dataArr[indexPath.row];
+    if (model.cellHeight == 0.0) {
+        return 367.;
+    }
+    return model.cellHeight;
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSString *pingjiaidentify = [NSString stringWithFormat:@"%@%d",@"CYPingJiaTableViewCell",(int)indexPath.row];
+    CYPingJiaTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:pingjiaidentify];
+    if (!cell) {
+        cell =[[[NSBundle mainBundle] loadNibNamed:@"CYPingJiaTableViewCell" owner:nil options:nil] firstObject];
+    }
+//    cell.albumView.contro = self;
+//    CYShopTrolleyModel *model = _dataArr[indexPath.row];
+//    __weak __typeof(cell) weakSelf = cell;
+//    cell.albumView.imgcuntChangeBlock = ^(NSInteger imgcount){
+//        model.imgArr = [NSMutableArray arrayWithArray:weakSelf.albumView.imageArr];
+//        if (imgcount <5) {
+//            weakSelf.imgchooseheight_cons.constant = ceilf((imgcount+1)/4.)*82*SCREENBILI +58;
+//        }else{
+//            weakSelf.imgchooseheight_cons.constant = ceilf(imgcount/4.)*82*SCREENBILI +58;
+//        }
+//        [weakSelf.ctnView layoutIfNeeded];
+//        model.cellHeight = 229 +weakSelf.imgchooseheight_cons.constant;
+//        [_dataArr replaceObjectAtIndex:indexPath.row withObject:model];
+//        [tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil] withRowAnimation:UITableViewRowAnimationNone];
+//    };
+// 
+//    if (!_isAppend) {
+//        model.score = @"10";
+//    }
+//    cell.model = model;
+
+    return cell;
+}
+
+#pragma mark -
+#pragma mark UITableViewDelegate method
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+}
+
+
+
+
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (IBAction)leaveacomment_click:(id)sender {
+    
+    NSMutableArray *specIdArr = [NSMutableArray array];
+    NSMutableArray *goodsIdArr = [NSMutableArray array];
+    NSMutableArray *contentArr = [NSMutableArray array];
+    NSMutableArray *scoreArr = [NSMutableArray array];
+    NSMutableArray *firstId = [NSMutableArray array];
+    for (int i= 0; i<[_dataArr count]; i++) {
+        CYCommentView *commentView = (CYCommentView *)[_contentView viewWithTag:i+COMMVIEWTAG];
+        CYShopTrolleyModel *model = _dataArr[i];
+        [specIdArr addObject:model.specdataId];
+        [goodsIdArr addObject:model.goods_id];
+        [contentArr addObject:commentView.evaTxt.text];
+        if (_isAppend) {
+            if (!model.commentId || !model.commentId.length) {
+                [firstId addObject:@""];
+            }else{
+                [firstId addObject:model.commentId];
+            }
+        
+        }
+        [scoreArr addObject:[NSNumber numberWithInteger:commentView.starView.show_star]];
+    }
+    NSMutableDictionary *param  =[NSMutableDictionary dictionary];
+    [param setObject:_model.orderSn forKey:@"orderSn"];
+    [param setObject:[specIdArr JSONString] forKey:@"specId"];
+    [param setObject:[goodsIdArr JSONString] forKey:@"goodsId"];
+    [param setObject:[contentArr JSONString] forKey:@"content"];
+    if (!_isAppend) {
+         [param setObject:[scoreArr JSONString] forKey:@"score"];
+    }else{
+        [param setObject:[firstId JSONString] forKey:@"pId"];
+    }
+   
+    
+    NSString *urlPath = @"CommentAgian";
+    if (!_isAppend) {
+        urlPath = @"GoodsComment";
+    }
+    [CYWebClient Post:urlPath parametes:param success:^(id responObject) {
+//        NSString *msg = [responObject objectForJSONKey:@"msg"];
+//        if ([[responObject objectForJSONKey:@"state"] integerValue] == 400) {
+        if (self.blockBack) {
+            self.blockBack();
+        }
+        
+//        if (responObject) {
+           [self performSelector:@selector(goback:) withObject:nil afterDelay:1.0f];
+//        }
+        
+//        }
+//        [SVProgressHUD showInfoWithStatus:msg];
+    } failure:^(id error) {
+        
+    }];
+    
+   
+}
+@end

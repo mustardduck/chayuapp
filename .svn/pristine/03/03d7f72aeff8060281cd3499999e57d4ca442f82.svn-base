@@ -1,0 +1,332 @@
+//
+//  CYTeaSampleDetailViewController.m
+//  茶语
+//
+//  Created by 李峥 on 16/2/20.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYTeaSampleDetailViewController.h"
+#import "CYTeaReviewImgCell.h"
+#import "CYTeaSampleNumCell.h"
+#import "CYTeaReviewInfoCell.h"
+#import "CYTeaReviewRatingCell.h"
+#import "CYTeaSampleRatingCell.h"
+#import "CYTeaReviewDetailFooterView.h"
+#import "CYTeaSampleInfo.h"
+#import "CYWriteCommentViewController.h"
+#import "CYTeaCommentListViewController.h"
+#import "CYExchangeTeaViewController.h"
+#import "CYTeaReviewInfo.h"
+#import "AppDelegate.h"
+#import "CYActionSheet.h"
+#import "CYTeaReviewComCell.h"
+#import "CYChaYangTopCell.h"
+#import "CYChaYangXinXiCell.h"
+@interface CYTeaSampleDetailViewController ()<UITableViewDataSource,UITableViewDelegate>
+{
+    //基本信息是否展开
+    BOOL isOpen;
+}
+
+
+@property (weak, nonatomic) IBOutlet UITableView *mTable;
+
+@property (nonatomic, strong) CYTeaSampleInfo *mSampleInfo;
+
+@property (nonatomic, strong) CYTeaReviewInfo *mDataInfo;
+
+
+- (IBAction)exchangeTeaSam_click:(id)sender;
+- (IBAction)shoucang_click:(id)sender;
+@property (weak, nonatomic) IBOutlet UIButton *shoucangBtn;
+
+@property (weak, nonatomic) IBOutlet UIButton *duihuanBtn;
+
+- (IBAction)goback:(id)sender;
+@end
+
+@implementation CYTeaSampleDetailViewController
+
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        self.hidesBottomBarWhenPushed = YES;
+    }
+    
+    return self;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
+    self.title = @"茶样详情";
+    isOpen = NO;
+    [self loadDetailData];
+}
+
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [MobClick beginLogPageView:self.title];
+}
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:self.title];
+}
+
+
+- (void)loadDetailData{
+    if (_mSampleid == nil) {
+        return;
+    }
+    self.mTable.hidden = YES;
+
+    [CYWebClient Post:@"sampleDetail" parametes:@{@"id":_mSampleid} success:^(id responObject) {
+        self.mSampleInfo = [CYTeaSampleInfo objectWithKeyValues:[responObject objectForKey:@"sample"]];
+        BOOL isfavor = [[responObject objectForKey:@"isfavor"] boolValue];
+        _shoucangBtn.selected = isfavor;
+        if (self.mSampleInfo != nil) {
+            [self loadTeaDetailData];
+        }
+        
+        
+    } failure:^(id error) {
+        
+    }];
+}
+
+- (void)loadTeaDetailData{
+    if (self.mSampleInfo == nil) {
+        return;
+    }
+
+    [CYWebClient Post:@"teaDetail" parametes:@{@"id":self.mSampleInfo.teaid} success:^(id responObject) {
+        self.mDataInfo = [CYTeaReviewInfo objectWithKeyValues:responObject];
+//        _shoucangimg.highlighted = self.mDataInfo.isfavor;
+        if (self.mDataInfo != nil) {
+            self.mTable.hidden = NO;
+            [self.mTable reloadData];
+        }
+        
+    } failure:^(id error) {
+        
+    }];
+}
+
+#pragma mark - UIButton Touch
+- (IBAction)clickWriteComment:(id)sender
+{
+    if (!MANAGER.isLoged) {
+        [APP_DELEGATE showLogView];
+        return;
+    }
+    CYWriteCommentViewController *comment = [[CYWriteCommentViewController alloc] initWithNibName:@"CYWriteCommentViewController" bundle: nil];
+    comment.mItemid = self.mDataInfo.teaid;
+    comment.bid = self.mDataInfo.bid;
+    [self.navigationController pushViewController:comment animated:YES];
+}
+
+
+
+#pragma mark - UITableView Delegate & Datarouce
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return 4;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return 1;
+}
+
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.section == 0) {
+        return 365;
+    }
+    else if (indexPath.section == 2){
+        return isOpen?365:55.;
+    }else if (indexPath.section == 3){
+        return 162.0;
+    }else {
+        
+        CGFloat height = 260.f;
+        if (_mSampleInfo.review.length>0) {
+             NSString *content =  [NSString stringWithFormat:@"总评：%@",_mSampleInfo.review];
+            NSDictionary *attribute = @{NSFontAttributeName: [UIFont systemFontOfSize:14.]};
+            CGSize lableSize = [content boundingRectWithSize:CGSizeMake(SCREEN_WIDTH-40,MAXFLOAT) options:NSStringDrawingTruncatesLastVisibleLine | NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:attribute context:nil].size;
+            height +=lableSize.height;
+            height -=17.0f;
+        }
+        return height;
+    }
+
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+    if (indexPath.section == 0) {
+        CYChaYangTopCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYChaYangTopCell"];
+        if (!cell) {
+            cell = [[[NSBundle mainBundle] loadNibNamed:@"CYChaYangTopCell" owner:nil options:nil] firstObject];
+        }
+        NSString *thumb = _mSampleInfo.thumb;
+        if (thumb.length>0) {
+            [cell.showImg sd_setImageWithURL:[NSURL URLWithString:thumb] placeholderImage:[UIImage imageNamed:@"750×563"]];
+        }
+        cell.titleLbl.text = [NSString stringWithFormat:@"|%@|%@",_mSampleInfo.brand,_mSampleInfo.title];
+        
+        return cell;
+    }else if(indexPath.section == 1){
+        CYChaYangXinXiCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYChaYangXinXiCell"];
+        if (!cell) {
+            cell =[[[NSBundle mainBundle] loadNibNamed:@"CYChaYangXinXiCell" owner:nil options:nil] firstObject];
+        }
+        
+        cell.chabiLbl.text = [NSString stringWithFormat:@"%@：个",_mSampleInfo.price];
+        cell.kucunLbl.text = [NSString stringWithFormat:@"库存：%@份",_mSampleInfo.remain];
+        cell.guigeLbl.text = [NSString stringWithFormat:@"规格：%@/份",_mSampleInfo.size];
+        cell.pinfenLbl.text = _mSampleInfo.score;
+        cell.zongpingLbl.text = [NSString stringWithFormat:@"总评：%@",_mSampleInfo.review];
+        
+        return cell;
+    }else if (indexPath.section == 2){
+        CYTeaReviewInfoCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYTeaReviewInfoCell"];
+        if (!cell) {
+              cell = [[[NSBundle mainBundle] loadNibNamed:@"CYTeaReviewInfoCell" owner:nil options:nil] firstObject];
+        }
+        if (isOpen) {
+            cell.dowImg.image = [UIImage imageNamed:@"daohang_up_row"];
+        }else{
+            cell.dowImg.image = [UIImage imageNamed:@"daohang_down_row"];
+        }
+        cell.pingpaiLbl.text = _mDataInfo.brand;
+        cell.chaleiLbl.text = _mDataInfo.chalei;
+        cell.shijianLbl.text = _mDataInfo.year;
+        cell.pingzhongLbl.text = _mDataInfo.variety;
+        cell.dengjiLbl.text = _mDataInfo.rank;
+        cell.guigeLbl.text = _mDataInfo.size;
+        cell.baozhuangLbl.text = _mDataInfo.baozhuang;
+        cell.cankaojiaLbl.text = _mDataInfo.price;
+        cell.baozhiqiLbl.text = _mDataInfo.shelflife;
+        cell.xukeLbl.text = _mDataInfo.license;
+        cell.biaozhunLbl.text = _mDataInfo.standard;
+        cell.renzhengLbl.text = _mDataInfo.certificate;
+        [cell.zhankaiBtn addTarget:self action:@selector(jibenxinxi_click:) forControlEvents:UIControlEventTouchUpInside];
+        
+        return cell;
+    }else{
+        CYTeaReviewRatingCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYTeaReviewRatingCell"];
+        if (!cell) {
+           cell = [[[NSBundle mainBundle] loadNibNamed:@"CYTeaReviewRatingCell" owner:nil options:nil] firstObject];
+        }
+        
+        [cell.teaView setImagesDeselected:@"eva03" partlySelected:@"eva02" fullSelected:@"eva01" andDelegate:nil];
+        [cell.zjView setImagesDeselected:@"eva03" partlySelected:@"eva02" fullSelected:@"eva01" andDelegate:nil];
+        [cell.drView setImagesDeselected:@"eva03" partlySelected:@"eva02" fullSelected:@"eva01" andDelegate:nil];
+        [cell.yhView setImagesDeselected:@"eva03" partlySelected:@"eva02" fullSelected:@"eva01" andDelegate:nil];
+        [cell.teaView displayRating:[self.mDataInfo.review_score_star floatValue]];
+        [cell.zjView displayRating:[self.mDataInfo.expert_scor_star floatValue]];
+        [cell.drView displayRating:[self.mDataInfo.daren_score_star floatValue]];
+        [cell.yhView displayRating:[self.mDataInfo.user_score_star floatValue]];
+        cell.mScodeLabel.text = [NSString stringWithFormat:@"%.1f", [self.mDataInfo.score doubleValue]];
+        
+        return cell;
+    }
+
+}
+
+-(void)jibenxinxi_click:(UIButton *)sender
+{
+    isOpen = !isOpen;
+    [_mTable reloadSections:[NSIndexSet indexSetWithIndex:2] withRowAnimation:UITableViewRowAnimationAutomatic];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+#pragma mark -
+#pragma mark 按钮点击事件 method
+
+//兑换茶样
+- (IBAction)exchangeTeaSam_click:(id)sender {
+    
+    if (!MANAGER.isLoged) {
+        [APP_DELEGATE showLogView];
+        return;
+    }
+    if (_mSampleid) {
+        CYExchangeTeaViewController *vc = viewControllerInStoryBoard(@"CYExchangeTeaViewController", @"Eva");
+        vc.goodsId = _mSampleid;
+        [self.navigationController pushViewController:vc animated:YES];
+    }
+
+}
+
+//收藏
+- (IBAction)shoucang_click:(id)sender {
+    
+    if (!MANAGER.isLoged) {
+        [APP_DELEGATE showLogView];
+        return;
+    }
+    [CYWebClient Post:@"do_favor" parametes:@{@"itemid":_mSampleid,@"type":@"6"} success:^(id responObject) {
+        BOOL is_favor = [[responObject objectForKey:@"is_favor"] boolValue];
+        _shoucangBtn.selected = is_favor;
+       
+    } failure:^(id error) {
+        
+    }];
+}
+
+//分享
+- (IBAction)clickShare:(id)sender
+{
+    NSString *imgUrl = @"";
+    
+    [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:[NSURL URLWithString:imgUrl] options:SDWebImageDownloaderUseNSURLCache progress:^(NSInteger receivedSize, NSInteger expectedSize) {
+        
+    } completed:^(UIImage *image, NSData *data, NSError *error, BOOL finished) {
+        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+        appDelegate.at = kAuthorizeTypeOpenShare;
+        OSMessage *message = [[OSMessage alloc] init];
+        message.title = self.mDataInfo.title;//@"通茶语，会知己";
+        if (!self.mDataInfo.desc) {
+            message.desc = @"m.chayu.com";
+        }else{
+            message.desc = self.mDataInfo.desc;
+        }
+        message.link = self.mSampleInfo.shareurl;
+        if (image) {
+            message.image = UIImageJPEGRepresentation(image, 0.1);
+            NSData *data  =UIImageJPEGRepresentation(image, 0.1);
+            if (data.length/1024>32) {
+                message.image = UIImagePNGRepresentation([UIImage imageNamed:@"AppIcon60x60@2x.png"]);
+            }
+        }else
+        {
+            message.image = UIImagePNGRepresentation([UIImage imageNamed:@"AppIcon60x60@2x.png"]);
+        }
+        CYActionSheet *sheet = [[CYActionSheet alloc] initWithTitles:nil iconNames:nil];
+        sheet.shareMessage = message;
+        [sheet showActionSheetWithClickBlock:^(int btnIndex) {
+            
+        } cancelBlock:^{
+            
+        }];
+    }];
+}
+
+
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+@end

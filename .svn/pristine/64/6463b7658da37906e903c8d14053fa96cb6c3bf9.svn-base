@@ -1,0 +1,244 @@
+//
+//  CYPersonalCenterViewController.m
+//  TeaMall
+//  个人中心
+//  Created by Chayu on 15/11/2.
+//  Copyright © 2015年 Chayu. All rights reserved.
+//
+
+#import "CYPersonalCenterViewController.h"
+#import "CYAddressListViewController.h"
+#import "CYChangePasswordController.h"
+#import "CYModifyNickViewController.h"
+@interface CYPersonalCenterViewController ()<UIActionSheetDelegate,UIImagePickerControllerDelegate, UINavigationControllerDelegate,UIAlertViewDelegate>
+- (IBAction)goback:(id)sender;
+
+@property (weak, nonatomic) IBOutlet UITextField *nicknameTf;
+
+@property (weak, nonatomic) IBOutlet UITextField *sexTf;
+@property (weak, nonatomic) IBOutlet UITextField *addressTf;
+@property (weak, nonatomic) IBOutlet UITextField *shengriTf;
+@property (weak, nonatomic) IBOutlet UITextField *calTf;
+
+- (IBAction)selectshengri_click:(id)sender;
+
+- (IBAction)quxiao_click:(id)sender;
+
+- (IBAction)selectSex_click:(id)sender;
+
+- (IBAction)bangdingshouji_click:(id)sender;
+@property (weak, nonatomic) IBOutlet UIButton *lijibangdingLbl;
+- (IBAction)queding_click:(id)sender;
+
+@end
+
+@implementation CYPersonalCenterViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [MobClick beginLogPageView:self.title];
+}
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:self.title];
+}
+-(void)loadUserMessage
+{
+    
+    ChaYuer *manager = [ChaYuManager getCurrentUser];
+      _nicknameTf.text = manager.nickname;
+    if ([manager.sex integerValue] == 1) {
+        _sexTf.text = @"男";
+    }else{
+        _sexTf.text = @"女";
+    }
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+//
+//#pragma mark - Table view data source
+//
+//-(CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+//{
+//    return 10;
+//}
+//-(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
+//{
+//    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 10)];
+//    view.backgroundColor = CLEARCOLOR;
+//    return view;
+//}
+//
+//-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+//{
+//     switch (indexPath.row) {
+//        case 0:
+//        {
+//            
+//            UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"拍照",@"我的相册", nil];
+//            [sheet showInView:self.view];
+//            break;
+//        }
+//        case 1:
+//        {
+//            break;
+//        }
+//        case 2:
+//        {
+//            CYAddressListViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"CYAddressListViewController"];
+//            vc.addressType = CYAddressTypeManager;
+//            [self.navigationController pushViewController:vc animated:YES];
+//            break;
+//            
+//           
+//        }
+//        case 3:{
+//         
+//            break;
+//        }
+//        case 4:{
+//            CYChangePasswordController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"CYChangePasswordController"];
+//            [self.navigationController pushViewController:vc animated:YES];
+//            break;
+//        }
+//         case 5:{
+//             UIAlertView *alt = [[UIAlertView alloc] initWithTitle:@"温馨提示" message:@"您是否要退出登录" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+//             [alt show];
+//         }
+//            
+//                default:
+//            break;
+//            }
+//
+//}
+
+
+- (IBAction)goback:(id)sender {
+    
+
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (IBAction)nickNameTf:(id)sender {
+}
+
+- (IBAction)sexTf:(id)sender {
+}
+
+
+#pragma mark -
+#pragma mark UIActionSheetDelegate method
+-(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (actionSheet.tag == 1600) {//选择性别
+        if (buttonIndex !=2) {
+            NSLog(@"buttonIndex = %d",(int)buttonIndex);
+            if (buttonIndex == 0) {
+                _sexTf.text = @"男";
+            }else if (buttonIndex == 1){
+                _sexTf.text = @"女";
+            }
+            [self modifyUserInfo];
+        }
+    
+    }else{
+        if (buttonIndex == 0) {
+            [self takePhoto];
+        }else if (buttonIndex == 1){
+            [self album];
+        }
+    }
+}
+
+#pragma mark 拍照
+- (void)takePhoto {
+    UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
+    imagePicker.delegate = self;
+    imagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
+    imagePicker.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+    imagePicker.allowsEditing = YES;
+    //媒体类型,默认情况下此数组包含kUTTypeImage，所以拍照时可以不用设置；但是当要录像的时候必须设置，可以设置为kUTTypeVideo（视频，但不带声音）或者kUTTypeMovie（视频并带有声音）
+    //    imagePicker.mediaTypes = @[(__bridge NSString *)kUTTypeMovie,(__bridge NSString *)kUTTypeImage];
+    //视频最大录制时长(s)
+    //    imagePicker.videoMaximumDuration = 15;
+    [imagePicker topViewController].view.frame = CGRectMake(0, 0, 320, 300);
+    [self presentViewController:imagePicker animated:YES completion:nil];
+}
+
+#pragma mark 从相册中选择
+- (void)album {
+    UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
+    imagePicker.delegate = self;
+    imagePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+    imagePicker.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+    imagePicker.allowsEditing = YES;
+    
+    [self presentViewController:imagePicker animated:YES completion:nil];
+}
+
+
+#pragma mark - UIImagePickerControllerDelegate
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
+{
+    //    long long size = [SharedInstance fileSizeAtPath:[info objectForKey:UIImagePickerControllerMediaURL]];
+    //    NSLog(@"size: %lld  chang:%@",size,[info objectForKey:@"_UIImagePickerControllerVideoEditingEnd"]);
+    
+//    UIImage *image = [info objectForKey:UIImagePickerControllerEditedImage];
+//    _showImg.image = image;
+//    [picker dismissViewControllerAnimated:YES completion:nil];
+//
+//    [CYWebClient Post:@"Usermodify" parametes:nil files:@{@"avatar":[NSArray arrayWithObject:image]} success:^(id responObject) {
+//        ChaYuer *manager = MANAGER;
+//        manager.avatar = [responObject objectForJSONKey:@"avatar"];
+//        [ChaYuManager archiveCurrentUser:manager];
+//        
+//    } failure:^(id error) {
+//        [SVProgressHUD showInfoWithStatus:@"请求失败"];
+//    }];
+    
+}
+
+-(void)modifyUserInfo
+{
+    NSString *sexStr = [_sexTf.text isEqualToString:@"男"]?@"1":@"2";
+    [CYWebClient Post:@"Usermodify" parametes:@{@"sex":sexStr} success:^(id responObj) {
+
+    } failure:^(id err) {
+        NSLog(@"%@",err);
+    }];
+}
+
+
+#pragma mark -
+#pragma mark UIAlertViewDelegate method
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+   
+}
+- (IBAction)selectshengri_click:(id)sender {
+}
+
+- (IBAction)quxiao_click:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (IBAction)selectSex_click:(id)sender {
+    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"男",@"女",nil];
+    sheet.tag = 1600;
+    [sheet showInView:self.view];
+}
+
+- (IBAction)bangdingshouji_click:(id)sender {
+}
+- (IBAction)queding_click:(id)sender {
+}
+@end

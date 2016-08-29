@@ -1,0 +1,317 @@
+//
+//  CYMyTeaViewController.m
+//  茶语
+//
+//  Created by Leen on 16/3/4.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYMyTeaViewController.h"
+#import "CYMyChaPingTableViewCell.h"
+#import "CYDuiHuanLiShiController.h"
+
+@interface CYMyTeaViewController ()<UITableViewDataSource,UITableViewDelegate>
+{
+    //我的评论
+    NSMutableArray *fabuArr;;
+    NSInteger page_chaping;
+    
+    //回复我的
+    NSMutableArray *shenheArr;;
+    NSInteger page_arc;
+    
+    NSInteger stauts;//0为已发布1为待审核
+}
+
+- (IBAction)goback:(id)sender;
+
+
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+
+
+- (IBAction)menu_click:(id)sender;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *lin_leading_cons;
+
+@property (weak, nonatomic) IBOutlet UIView *topBg;
+
+@property (weak, nonatomic) IBOutlet UIView *lineView;
+
+
+
+
+@property (weak, nonatomic) IBOutlet UITableView *daishenheTable;
+
+@end
+
+@implementation CYMyTeaViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    page_chaping = 1;
+    page_arc =1;
+    stauts = 0;
+    fabuArr =[NSMutableArray array];
+    shenheArr = [NSMutableArray array];
+    self.title = @"我的茶评";
+    hiddenSepretor(_tableView);
+    hiddenSepretor(_daishenheTable);
+    __weak __typeof(self) weakSelf = self;
+    _tableView.header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        [weakSelf loadwodepinglunData:NO];
+        
+    }];
+    [_tableView.header beginRefreshing];
+    _tableView.footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+        [weakSelf loadwodepinglunData:YES];
+    }];
+    
+    
+    
+    _daishenheTable.header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        [weakSelf loadHuifuwodeData:NO];
+        
+    }];
+    _daishenheTable.footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+        [weakSelf loadHuifuwodeData:YES];
+    }];
+}
+
+
+-(void)loadwodepinglunData:(BOOL)hasMore
+{
+    if (hasMore) {
+        page_chaping ++;
+    }else{
+        page_chaping =1 ;
+    }
+    __weak __typeof(self) weakSelf = self;
+    [CYWebClient Post:@"MyComment" parametes:@{@"p":@(page_chaping),@"pageSize":@"10",@"status":@"0"} success:^(id responObj) {
+        if (hasMore) {
+            [weakSelf.tableView.footer endRefreshing];
+        }else{
+            [weakSelf.tableView.header endRefreshing];
+            [fabuArr removeAllObjects];
+            [weakSelf.tableView reloadData];
+        }
+        NSArray *arr = [responObj objectForKey:@"items"];
+        if ([arr count]<10) {
+            [weakSelf.tableView.footer endRefreshingWithNoMoreData];
+            
+        }else{
+            [weakSelf.tableView.footer resetNoMoreData];
+        }
+        
+        [fabuArr addObjectsFromArray:arr];
+        [weakSelf.tableView reloadData];
+        
+        if (fabuArr.count<10) {
+            weakSelf.tableView.footer = nil;
+        }else{
+            [weakSelf.tableView.footer resetNoMoreData];
+        }
+        
+        
+    } failure:^(id err) {
+        if (hasMore) {
+            [weakSelf.tableView.footer endRefreshing];
+        }else{
+            [weakSelf.tableView.header endRefreshing];
+        }
+    }];
+    
+    
+}
+
+
+-(void)loadHuifuwodeData:(BOOL)hasMore{
+    //    2.0comment.article_reply
+    if (hasMore) {
+        page_arc ++;
+    }else{
+        page_arc =1 ;
+    }
+    __weak __typeof(self) weakSelf = self;
+    [CYWebClient Post:@"MyComment" parametes:@{@"p":@(page_chaping),@"pageSize":@"10",@"status":@"1"} success:^(id responObj) {
+        if (hasMore) {
+            [weakSelf.daishenheTable.footer endRefreshing];
+        }else{
+            [weakSelf.daishenheTable.header endRefreshing];
+            [shenheArr removeAllObjects];
+            [weakSelf.daishenheTable reloadData];
+            
+        }
+        NSArray *arr = [responObj objectForKey:@"items"];
+        if ([arr count]<10) {
+            [weakSelf.daishenheTable.footer endRefreshingWithNoMoreData];
+            
+        }else{
+            [weakSelf.daishenheTable.footer resetNoMoreData];
+        }
+        
+        [shenheArr addObjectsFromArray:arr];
+        [weakSelf.daishenheTable reloadData];
+        
+        if (shenheArr.count<10) {
+            weakSelf.daishenheTable.footer = nil;
+        }else{
+            [weakSelf.daishenheTable.footer resetNoMoreData];
+        }
+        
+        
+    } failure:^(id err) {
+        if (hasMore) {
+            [weakSelf.daishenheTable.footer endRefreshing];
+        }else{
+            [weakSelf.daishenheTable.header endRefreshing];
+        }
+    }];
+    
+}
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [MobClick beginLogPageView:self.title];
+}
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:self.title];
+}
+#pragma mark -
+#pragma mark UITableViewDataSource method
+-(NSInteger )tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    if (stauts == 0) {
+       return [fabuArr count];
+    }else{
+        return [shenheArr count];
+    }
+    
+}
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView{
+    return 1;
+}
+
+-(CGFloat )tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CGFloat cellheight = 125.0;
+     NSDictionary *info = nil;
+    if (stauts == 0) {
+        info = fabuArr[indexPath.row];
+    
+    }else{
+        info = shenheArr[indexPath.row];
+    }
+    
+    NSString *content = [info objectForJSONKey:@"content"];
+    NSDictionary *attribute = @{NSFontAttributeName: [UIFont systemFontOfSize:14.]};
+    CGSize lableSize = [content boundingRectWithSize:CGSizeMake(SCREEN_WIDTH-40,MAXFLOAT) options:NSStringDrawingTruncatesLastVisibleLine | NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:attribute context:nil].size;
+    cellheight-=17.0;
+    cellheight+=lableSize.height+1;
+    return cellheight;
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+    if (stauts == 0) {
+        CYMyChaPingTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYMyChaPingTableViewCell"];
+        NSDictionary *info = fabuArr[indexPath.row];
+        cell.titleLbl.text = [NSString stringWithFormat:@"[%@]%@",[info objectForKey:@"brand"],[info objectForKey:@"teaTitle"]];
+        cell.zongfenLbl.text =[info objectForKey:@"score"];
+        cell.contentLbl.text = [info objectForKey:@"content"];
+         cell.timeLbl.text = [self dataWithSince:[[info objectForKey:@"created"] doubleValue]];;
+        cell.statusLbl.hidden = YES;
+        return cell;
+    }else{
+        CYMyChaPingTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYMyChaPingDaiShenHe"];
+        NSDictionary *info = shenheArr[indexPath.row];
+        cell.titleLbl.text = [NSString stringWithFormat:@"[%@]%@",[info objectForKey:@"brand"],[info objectForKey:@"teaTitle"]];
+        cell.zongfenLbl.text =[info objectForKey:@"score"];
+        cell.contentLbl.text = [info objectForKey:@"content"];
+        cell.timeLbl.text = [self dataWithSince:[[info objectForKey:@"created"] doubleValue]];;
+        
+        return cell;
+    }
+   
+}
+
+
+- (NSString *)dataWithSince:(NSTimeInterval )dataString
+{
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"YYYY-MM-dd HH:mm"];
+    //    static dispatch_once_t onceToken;
+    //    dispatch_once(&onceToken, ^{
+    //        ];
+    //    });
+    NSDate *confromTimesp = [NSDate dateWithTimeIntervalSince1970:dataString];
+    NSLog(@"1296035591  = %@",confromTimesp);
+    NSString *confromTimespStr = [formatter stringFromDate:confromTimesp];
+    
+    return confromTimespStr;
+}
+
+#pragma mark -
+#pragma mark UITableViewDelegate method
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+}
+
+
+
+
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+- (IBAction)menu_click:(id)sender {
+    UIButton *selectButton = (UIButton *)sender;
+    for (int i = 6325; i<6327; i++) {
+        UIButton *button = (UIButton *)[_topBg viewWithTag:i];
+        if (button.tag == selectButton.tag) {
+            button.selected = YES;
+        }else{
+            button.selected = NO;
+        }
+    }
+    
+    
+    switch (selectButton.tag) {
+        case 6325://我的评论
+        {
+            stauts = 0;
+            _tableView.hidden = NO;
+            _daishenheTable.hidden = YES;
+            if ([fabuArr count]==0) {
+                [self loadwodepinglunData:NO];
+            }
+            break;
+        }
+        case 6326://回复我的
+        {
+            _tableView.hidden = YES;
+            _daishenheTable.hidden = NO;
+            stauts =1;
+            if ([shenheArr count]==0) {
+                [self loadHuifuwodeData:NO];
+            }
+            break;
+        }
+            
+        default:
+            break;
+    }
+    [UIView animateWithDuration:0.25 animations:^{
+        _lin_leading_cons.constant = selectButton.x;
+        [_topBg layoutIfNeeded];
+    }];
+    
+}
+@end

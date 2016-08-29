@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="CYClassView">
+            <rect key="frame" x="0.0" y="0.0" width="600" height="92"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vTi-JC-9vW">
+                    <rect key="frame" x="0.0" y="0.0" width="600" height="35"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="热门分类" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="U3P-Jd-YTP">
+                            <rect key="frame" x="15" y="8" width="64" height="20"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                            <color key="textColor" red="0.40000000000000002" green="0.40000000000000002" blue="0.40000000000000002" alpha="1" colorSpace="calibratedRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" red="0.93333333333333335" green="0.93333333333333335" blue="0.93333333333333335" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="35" id="002-Dg-ZRg"/>
+                        <constraint firstItem="U3P-Jd-YTP" firstAttribute="centerY" secondItem="vTi-JC-9vW" secondAttribute="centerY" id="9gq-fi-aXe"/>
+                        <constraint firstItem="U3P-Jd-YTP" firstAttribute="leading" secondItem="vTi-JC-9vW" secondAttribute="leading" constant="15" id="NN6-5L-46u"/>
+                    </constraints>
+                </view>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" scrollEnabled="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" style="grouped" separatorStyle="none" rowHeight="44" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="dVi-oT-fLd">
+                    <rect key="frame" x="0.0" y="35" width="600" height="57"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <color key="separatorColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                </tableView>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="dVi-oT-fLd" secondAttribute="bottom" id="0DB-zc-fWv"/>
+                <constraint firstItem="dVi-oT-fLd" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="0dA-hZ-eZA"/>
+                <constraint firstItem="vTi-JC-9vW" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="Utc-Gc-V14"/>
+                <constraint firstItem="dVi-oT-fLd" firstAttribute="top" secondItem="vTi-JC-9vW" secondAttribute="bottom" id="fYm-yg-ceW"/>
+                <constraint firstItem="vTi-JC-9vW" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="jN3-cK-6in"/>
+                <constraint firstAttribute="trailing" secondItem="dVi-oT-fLd" secondAttribute="trailing" id="sry-yc-JAJ"/>
+                <constraint firstAttribute="trailing" secondItem="vTi-JC-9vW" secondAttribute="trailing" id="xxa-7g-4Ni"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="sectionTitle" destination="U3P-Jd-YTP" id="0Xj-kr-FIV"/>
+                <outlet property="tableView" destination="dVi-oT-fLd" id="CP1-mK-ujZ"/>
+            </connections>
+            <point key="canvasLocation" x="322" y="288"/>
+        </view>
+    </objects>
+</document>

@@ -1,0 +1,185 @@
+//
+//  CYMyOrderTableViewCell.m
+//  TeaMall
+//
+//  Created by Chayu on 15/11/6.
+//  Copyright © 2015年 Chayu. All rights reserved.
+//
+
+#import "CYMyOrderTableViewCell.h"
+#import "CYOrderGoodsView.h"
+@interface CYMyOrderTableViewCell ()
+
+@property (weak, nonatomic) IBOutlet UIImageView *userImg;
+@property (weak, nonatomic) IBOutlet UILabel *userNameLbl;
+@property (weak, nonatomic) IBOutlet UILabel *orderTypeLbl;
+@property (weak, nonatomic) IBOutlet UILabel *allNumLbl;
+@property (weak, nonatomic) IBOutlet CYBorderButton *evaluationBtn;
+@property (weak, nonatomic) IBOutlet CYBorderButton *deleteBtn;
+
+- (IBAction)delete_click:(id)sender;
+- (IBAction)evaluation_click:(id)sender;
+@property (weak, nonatomic) IBOutlet UILabel *allPriceLbl;
+@property (weak, nonatomic) IBOutlet UIView *goodsBgView;
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *goodsbg_cons;
+
+- (IBAction)chakanwuliu_click:(id)sender;
+
+@end
+
+@implementation CYMyOrderTableViewCell
+
+- (void)awakeFromNib {
+    // Initialization code
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+
+
++(instancetype)cellWidthTableView:(UITableView*)tableView
+{
+    static NSString *myorderIdentify = @"CYMyOrderTableViewCell1";
+    CYMyOrderTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:myorderIdentify];
+    if (!cell) {
+        cell = [[[NSBundle mainBundle] loadNibNamed:@"CYMyOrderTableViewCell" owner:nil options:nil] firstObject];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    }
+    return cell;
+}
+
+-(void)setOrderModel:(CYOrderInfoModel *)orderModel
+{
+    _orderModel = orderModel;
+    if (_orderModel.sellerAvatar.length) {
+        NSURL *userUrl = [NSURL URLWithString:_orderModel.sellerAvatar];
+        [_userImg sd_setImageWithURL:userUrl placeholderImage:DEFAULTHEADER];
+    }
+    _userNameLbl.text = _orderModel.sellerName;
+    _goodsbg_cons.constant = [_orderModel.goodsList count]*88.0;
+    _allNumLbl.text = [NSString stringWithFormat:@"共%@件商品",_orderModel.commodityCount];
+    NSString *goodsprice = [NSString stringWithFormat:@"￥%.2f",[_orderModel.orderPrice floatValue]];
+    NSString *totalStr = [NSString stringWithFormat:@"实付款：%@(含运费：￥%@)",goodsprice,_orderModel.ship_price];
+    NSDictionary *attributeDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                                   [UIFont systemFontOfSize:14.0],NSFontAttributeName,
+                                   MAIN_COLOR,NSForegroundColorAttributeName,
+                                   nil];
+    NSMutableAttributedString *attr = [[NSMutableAttributedString alloc] initWithString:totalStr];
+    [attr setAttributes:attributeDict range:NSMakeRange(4, goodsprice.length)];
+    _allPriceLbl.attributedText = attr;
+    _deleteBtn.hidden = NO;
+    NSString *deleteStr = @"";
+    NSString *evaStr = @"";
+    _wuliuBtn.hidden = YES;
+    [_evaluationBtn setBackgroundColor:MAIN_COLOR];
+    _evaluationBtn.borderWidth = 0;
+    NSInteger status = [_orderModel.status integerValue];
+    //订单状态(string) [1待付款，2待发货，3待收货，5交易成功，6交易关闭]
+    
+    switch (status) {
+        case 1:
+        {
+            _orderTypeLbl.text = @"待付款";
+            deleteStr = @"取消订单";
+            evaStr = @"付款";
+            break;
+        }
+        case 2:
+        {
+            evaStr = @"退款";
+            _deleteBtn.hidden = YES;
+            _orderTypeLbl.text = @"待发货";
+            break;
+        }
+        case 3:
+        {
+            evaStr = @"确认收货";
+            deleteStr = @"查看物流";
+            _orderTypeLbl.text = @"待收货";
+            break;
+        }
+        case 5:
+        {
+            NSInteger comment_status = [_orderModel.comment_status integerValue];
+            _orderTypeLbl.text = @"交易完成";
+          
+            if (comment_status == 2) {
+                deleteStr = @"删除订单";
+                _deleteBtn.hidden = YES;
+                evaStr = @"删除订单";
+            }else if(comment_status == 0){
+                deleteStr = @"删除订单";
+                evaStr = @"评价";
+                _wuliuBtn.hidden = NO;
+                
+            }else{
+                deleteStr = @"删除订单";
+                evaStr = @"追加评价";
+                    _wuliuBtn.hidden = NO;
+            }
+            break;
+        }
+        case 6:
+        {
+            _deleteBtn.hidden = YES;
+            deleteStr = @"删除订单";
+            evaStr = @"删除订单";
+            _orderTypeLbl.text = @"交易关闭";
+            [_evaluationBtn setBackgroundColor:CLEARCOLOR];
+            _evaluationBtn.borderColor = [UIColor getColorWithHexString:@"cccccc"];
+            [_evaluationBtn setTitleColor:TITLECOLOR forState:UIControlStateNormal];
+            _evaluationBtn.borderWidth = 1;
+            break;
+        }
+            
+        default:
+            break;
+    }
+
+    
+    [_deleteBtn setTitle:deleteStr forState:UIControlStateNormal];
+    [_evaluationBtn setTitle:evaStr forState:UIControlStateNormal];
+    [self loadGoodsView:_orderModel.goodsList];
+}
+
+
+-(void)loadGoodsView:(NSArray *)arr
+{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.001 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        for (int i =0; i<[arr count]; i++) {
+            CYOrderGoodsView *goodsView = [[[NSBundle mainBundle] loadNibNamed:@"CYOrderGoodsView" owner:nil options:nil] firstObject];
+            goodsView.status = @"0";
+            goodsView.selectButton.hidden = YES;
+            goodsView.frame =CGRectMake(0,i*89,SCREEN_WIDTH, 88);
+            goodsView.goodsInfo = arr[i];
+            [_goodsBgView addSubview:goodsView];
+        }
+    });
+
+}
+
+
+- (IBAction)delete_click:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(deleteCell:WithModel:)]) {
+        [self.delegate deleteCell:self WithModel:_orderModel];
+    }
+}
+
+/**
+ *  评价 付款 退款等
+ */
+- (IBAction)evaluation_click:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(publicCell:AndModel:)]) {
+        [self.delegate publicCell:self AndModel:_orderModel];
+    }
+}
+- (IBAction)chakanwuliu_click:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(chakanwuliu:)]) {
+        [self.delegate chakanwuliu:_orderModel];
+    }
+}
+@end

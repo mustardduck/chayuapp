@@ -1,0 +1,25 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "6e13ffba-9928-4bd7-87d6-e512006f1142++1217",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+    "6e13ffba-9928-4bd7-87d6-e512006f1142++1217" : {
+
+    }
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "6e13ffba-9928-4bd7-87d6-e512006f1142++1217" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "4C79CA59-342A-496F-BF74-268B24F2A9B1",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "6e13ffba-9928-4bd7-87d6-e512006f1142++1217" : "%E8%8C%B6%E8%AF%ADV2\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "茶语",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "chayuV2\/茶语.xcworkspace",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/192.168.40.251:3690\/chayu-app-v2",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Subversion",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "6e13ffba-9928-4bd7-87d6-e512006f1142++1217"
+    }
+  ]
+}

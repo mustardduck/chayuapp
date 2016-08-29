@@ -1,0 +1,161 @@
+//
+//  CYCmmtTopicController.m
+//  茶语
+//
+//  Created by iXcoder on 16/2/20.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYCmmtTopicController.h"
+
+@interface CYCmmtTopicController ()
+
+@property (nonatomic, weak) IBOutlet UITextView *ctntView;
+@property (nonatomic, weak) IBOutlet UILabel *tipLbl;
+@property (nonatomic, weak) IBOutlet UIButton *replyBtn;
+- (IBAction)onSendReplyAction:(id)sender;
+
+@property (weak, nonatomic) IBOutlet UILabel *numLable;
+
+
+
+@end
+
+@implementation CYCmmtTopicController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    self.title = @"全部评论";
+    
+//    self.replyBtn.layer.borderColor = MAIN_COLOR.CGColor;
+//    self.replyBtn.layer.borderWidth = 2.0f;
+    self.replyBtn.layer.cornerRadius = 4.f;
+    self.replyBtn.layer.masksToBounds = YES;
+    [self.replyBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    self.replyBtn.titleLabel.font = [UIFont systemFontOfSize:14];
+    self.replyBtn.backgroundColor = MAIN_COLOR;
+    
+    self.ctntView.layer.borderColor = [UIColor getColorWithHexString:@"0xCCCCCC"].CGColor;
+    self.ctntView.layer.borderWidth = 1.0f;
+    self.ctntView.layer.cornerRadius = 4.f;
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textViewContentDidChanged:) name:UITextViewTextDidChangeNotification object:nil];
+}
+
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [MobClick beginLogPageView:@"发表回复"];
+}
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:@"发表回复"];
+}
+
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+#pragma mark - self defined method
+- (void)onSendReplyAction:(id)sender
+{
+    NSString *txt = self.ctntView.text;
+    if (txt.length == 0) {
+        [SVProgressHUD showErrorWithStatus:@"请输入回复内容!"];
+        return ;
+    }
+    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+    [params setObject:txt forKey:@"content"];
+    if (self.tid) {
+        [params setObject:self.tid forKey:@"tid"];
+    }
+    if (self.rpid) {
+        [params setObject:self.rpid forKey:@"rpid"];
+    }
+    
+    [CYWebClient Post:@"bbs_topic_reply" parametes:params success:^(id responObject) {
+        [SVProgressHUD showSuccessWithStatus:@"回复成功"];
+        if (self.callback) {
+            NSInteger count = 0;
+            if (self.rpid) {
+                count = [[responObject objectForKey:@"praises"] integerValue];
+            } else {
+                count = -1;
+            }
+            self.callback(count);
+        }
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1. * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self.navigationController popViewControllerAnimated:YES];
+        });
+    } failure:^(id error) {
+        
+    }];
+    
+}
+
+
+#define MAX_LIMIT_NUMS 500
+
+- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range
+ replacementText:(NSString *)text
+{
+    NSString *comcatstr = [textView.text stringByReplacingCharactersInRange:range withString:text];
+    
+    NSInteger caninputlen = MAX_LIMIT_NUMS - comcatstr.length;
+    
+    if (caninputlen >= 0)
+    {
+        return YES;
+    }
+    else
+    {
+        NSInteger len = text.length + caninputlen;
+        //防止当text.length + caninputlen < 0时，使得rg.length为一个非法最大正数出错
+        NSRange rg = {0,MAX(len,0)};
+        
+        if (rg.length > 0)
+        {
+            NSString *s = [text substringWithRange:rg];
+            
+            [textView setText:[textView.text stringByReplacingCharactersInRange:range withString:s]];
+        }
+        return NO;
+    }
+    
+}
+
+- (void)textViewDidChange:(UITextView *)textView
+{
+    
+ 
+    NSString  *nsTextContent = textView.text;
+    NSInteger existTextNum = nsTextContent.length;
+    
+    if (existTextNum > MAX_LIMIT_NUMS)
+    {
+        //截取到最大位置的字符
+        NSString *s = [nsTextContent substringToIndex:MAX_LIMIT_NUMS];
+        
+        [textView setText:s];
+    }
+    
+    //不让显示负数
+    self.numLable.text = [NSString stringWithFormat:@"%ld/%d字",existTextNum,MAX_LIMIT_NUMS];
+}
+
+
+
+
+- (void)textViewContentDidChanged:(NSNotification *)noti
+{
+    NSString *ctnt = self.ctntView.text;
+    self.tipLbl.hidden = ctnt.length > 0;
+}
+
+@end

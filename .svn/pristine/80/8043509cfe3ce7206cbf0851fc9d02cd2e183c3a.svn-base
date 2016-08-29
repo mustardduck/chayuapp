@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="KGk-i7-Jjw" customClass="CYTeaReviewImgCell">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="370"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="375" height="369"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" pagingEnabled="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qbN-zF-fHu">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="279"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <connections>
+                            <outlet property="delegate" destination="KGk-i7-Jjw" id="cHG-R9-zCy"/>
+                        </connections>
+                    </scrollView>
+                    <pageControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" numberOfPages="3" translatesAutoresizingMaskIntoConstraints="NO" id="LkW-S3-7bX">
+                        <rect key="frame" x="12" y="242" width="351" height="37"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="37" id="TLR-4k-pOg"/>
+                        </constraints>
+                    </pageControl>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="[剡茗茶业社] 越乡龙井 特级" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1eQ-Kk-1rn">
+                        <rect key="frame" x="20" y="279" width="335" height="90"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="90" id="Ckx-Fb-Bhk"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                        <color key="textColor" red="0.40000000000000002" green="0.40000000000000002" blue="0.40000000000000002" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="trailing" secondItem="1eQ-Kk-1rn" secondAttribute="trailing" constant="20" id="3NK-12-BnZ"/>
+                    <constraint firstItem="qbN-zF-fHu" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="4eQ-sd-PMO"/>
+                    <constraint firstItem="LkW-S3-7bX" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="12" id="Mgq-4u-c3P"/>
+                    <constraint firstItem="1eQ-Kk-1rn" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="20" id="ROr-0R-nXg"/>
+                    <constraint firstAttribute="bottom" secondItem="1eQ-Kk-1rn" secondAttribute="bottom" id="TcI-db-R7A"/>
+                    <constraint firstAttribute="trailing" secondItem="LkW-S3-7bX" secondAttribute="trailing" constant="12" id="c6R-Vn-kss"/>
+                    <constraint firstItem="LkW-S3-7bX" firstAttribute="bottom" secondItem="qbN-zF-fHu" secondAttribute="bottom" id="eh1-30-OxT"/>
+                    <constraint firstAttribute="trailing" secondItem="qbN-zF-fHu" secondAttribute="trailing" id="h0P-cr-HoD"/>
+                    <constraint firstItem="qbN-zF-fHu" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="iTZ-DX-wkF"/>
+                    <constraint firstItem="1eQ-Kk-1rn" firstAttribute="top" secondItem="qbN-zF-fHu" secondAttribute="bottom" id="mEj-Zq-0yF"/>
+                </constraints>
+            </tableViewCellContentView>
+            <color key="backgroundColor" red="0.97647058823529409" green="0.97647058823529409" blue="0.97647058823529409" alpha="1" colorSpace="calibratedRGB"/>
+            <inset key="separatorInset" minX="12" minY="0.0" maxX="12" maxY="0.0"/>
+            <connections>
+                <outlet property="mPageControl" destination="LkW-S3-7bX" id="Dih-po-B5c"/>
+                <outlet property="mScrollView" destination="qbN-zF-fHu" id="FeC-uU-SFd"/>
+                <outlet property="mTitleLabel" destination="1eQ-Kk-1rn" id="Mam-Fb-jTF"/>
+            </connections>
+            <point key="canvasLocation" x="290.5" y="304"/>
+        </tableViewCell>
+    </objects>
+</document>

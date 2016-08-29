@@ -1,0 +1,55 @@
+//
+//  HLActionSheet.h
+//  PracticeDemo
+//
+//  Created by Harvey on 15/11/11.
+//  Copyright © 2015年 Harvey. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+
+/**
+ *  OSMessage保存分享消息数据。
+ */
+@interface OSMessage : NSObject
+@property (nonatomic,copy) NSString* title;
+@property (nonatomic,copy)NSString* desc;
+@property (nonatomic,copy)NSString* link;
+@property (nonatomic,strong)NSData* image;
+@property (nonatomic,strong)NSData* thumbnail;
+@property (nonatomic,strong)NSString *imgUrl;
+//for 微信
+@property (nonatomic,copy)NSString* extInfo;
+@property (nonatomic,copy)NSString* mediaDataUrl;
+@property (nonatomic,copy)NSString* fileExt;
+
+/**
+ *  判断emptyValueForKeys的value都是空的，notEmptyValueForKeys的value都不是空的。
+ *
+ *  @param emptyValueForKeys    空值的key
+ *  @param notEmptyValueForKeys 非空值的key
+ *
+ *  @return YES／NO
+ */
+-(BOOL)isEmpty:(NSArray*)emptyValueForKeys AndNotEmpty:(NSArray*)notEmptyValueForKeys;
+
+@end
+
+
+
+typedef void(^ClickBlock)(int btnIndex);
+typedef void(^CancelBlock)(void);
+
+@interface CYActionSheet : UIWindow
+
+@property (nonatomic,strong)OSMessage *shareMessage;
+
+- (instancetype)initWithTitles:(NSArray *)titles iconNames:(NSArray *)iconNames;
+
+- (void)showActionSheetWithClickBlock:(ClickBlock)clickBlock cancelBlock:(CancelBlock)cancelBlock;
+
+@property (nonatomic,strong)UIViewController *altViewController;
+
+
+
+@end

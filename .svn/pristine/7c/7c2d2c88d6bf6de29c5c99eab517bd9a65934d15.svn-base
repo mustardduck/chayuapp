@@ -1,0 +1,336 @@
+//
+//  CYSouSuoHomeViewController.m
+//  茶语
+//
+//  Created by Chayu on 16/7/5.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYSouSuoHomeViewController.h"
+#import "CYSearchDefaultHeader.h"
+#import "CYSearchReMenFooter.h"
+#import "CYSouSuoZongHeViewController.h"
+#import "CYSouSuoLiShiHeader.h"
+#import "CYGengDuoLiShiViewController.h"
+#import "CYSouSuoFenLeiListController.h"
+@interface CYSouSuoHomeViewController ()<UITextFieldDelegate,UITableViewDelegate,UITableViewDataSource>
+{
+    NSInteger page;
+    NSMutableArray *dataArr;
+    NSMutableArray *sousuoLishiArr;
+}
+
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+
+@property (nonatomic,strong)CYSearchDefaultHeader *defaultHeader;
+
+@property (nonatomic,strong)CYSearchReMenFooter *remenFooter;
+
+@property (weak, nonatomic) IBOutlet UITextField *searchTf;
+
+- (IBAction)goback:(id)sender;
+
+
+@property (weak, nonatomic) IBOutlet UIView *searchBg;
+
+
+@end
+
+@implementation CYSouSuoHomeViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    UIView *view = _searchBg;
+    view.layer.cornerRadius = 3.0f;
+    dataArr = [NSMutableArray array];
+    page = 1;
+    sousuoLishiArr = [NSMutableArray array];
+    __weak __typeof(self) weakSelf = self;
+    self.remenFooter.block = ^(UIButton *button,NSString *string){
+        CYSouSuoZongHeViewController *vc = [weakSelf.storyboard instantiateViewControllerWithIdentifier:@"CYSouSuoZongHeViewController"];
+        vc.keyWord = string;
+        [weakSelf.navigationController pushViewController:vc animated:YES];
+    };
+    self.remenFooter.huanyipiBlock = ^(){
+        [weakSelf loadquanziListData:YES];
+    };
+    
+    _tableView.hidden = YES;
+    [self loadquanziListData:NO];
+    [self creatkongNavBar];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+
+-(void)loadquanziListData:(BOOL)loadMore
+{
+    if (loadMore) {
+        page ++;
+        if (page>3) {
+            page =1;
+        }
+    }else{
+        page = 1;
+    };
+    __weak __typeof(self) weakSelf = self;
+    NSString *servpath =@"2.0_search_word";
+    [CYWebClient basePost:servpath parametes:@{@"p":@(page)} success:^(id responObject) {
+        NSArray *list = [responObject objectForKey:@"list"];
+        if ([list isKindOfClass:[NSArray class]]) {
+            [dataArr removeAllObjects];
+            [dataArr addObjectsFromArray:list];
+            weakSelf.remenFooter.dataArr = dataArr;
+            weakSelf.defaultHeader.height = 125.0;
+            weakSelf.tableView.tableFooterView = weakSelf.remenFooter;
+            weakSelf.tableView.tableHeaderView = self.defaultHeader;
+            [weakSelf.tableView reloadData];
+            weakSelf.tableView.hidden = NO;
+        }
+        [weakSelf.tableView reloadData];
+    } failure:^(id error) {
+        
+    }];
+}
+
+-(void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    _searchTf.text = @"";
+    [sousuoLishiArr removeAllObjects];
+    _tableView.tableHeaderView = self.defaultHeader;
+    [_tableView reloadData];
+}
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+- (CYSearchDefaultHeader *)defaultHeader{
+    if (!_defaultHeader) {
+            __weak __typeof(self) weakSelf = self;
+        _defaultHeader = [[[NSBundle mainBundle] loadNibNamed:@"CYSearchDefaultHeader" owner:nil options:nil] firstObject];
+        _defaultHeader.frame = CGRectMake(0, 0, SCREEN_WIDTH,125);
+        _defaultHeader.selectMennuBlock = ^(NSInteger selectIndex){
+            CYSouSuoFenLeiListController *vc = [weakSelf.storyboard instantiateViewControllerWithIdentifier:@"CYSouSuoFenLeiListController"];
+            switch (selectIndex) {
+                case 0://茶评
+                {
+                    vc.searchType = SearchTypeChaPing;
+                    break;
+                }
+                case 1://市集
+                {
+                    vc.searchType = SearchTypeShiJi;
+                    break;
+                }
+                case 2://圈子
+                {
+                    vc.searchType = SearchTypeQuanZi;
+                    break;
+                }
+                case 3://文章
+                {
+                    vc.searchType = SearchTypeWenZhang;
+                    break;
+                }
+                    
+                default:
+                    break;
+            }
+            [weakSelf.navigationController pushViewController:vc animated:YES];
+        };
+
+    }
+    return _defaultHeader;
+}
+
+- (CYSearchReMenFooter *)remenFooter
+{
+    if (!_remenFooter) {
+        _remenFooter = [[[NSBundle mainBundle] loadNibNamed:@"CYSearchReMenFooter" owner:nil options:nil] firstObject];
+        _remenFooter.frame = CGRectMake(0, 0, SCREEN_WIDTH,SCREEN_HEIGHT-125-90*SCREENBILI);
+    }
+    
+    return _remenFooter;
+}
+
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+#pragma mark -
+#pragma mark UITableViewDataSource method
+-(NSInteger )tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return [sousuoLishiArr count];
+}
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView{
+    return 1;
+}
+
+-(CGFloat )tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 50.f;
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSString *sousuolishiIdextify = @"sousuolishiIdextify";
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:sousuolishiIdextify];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:sousuolishiIdextify];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    }
+    cell.textLabel.textColor = [UIColor getColorWithHexString:@"333333"];
+    cell.textLabel.font = FONT(14.0);
+    cell.textLabel.text = sousuoLishiArr[indexPath.row];
+    return cell;
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    if (sousuoLishiArr.count>0) {
+        return 50.0;
+    }
+    return 0.00000001;
+}
+-(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    if (sousuoLishiArr.count >0) {
+        CYSouSuoLiShiHeader *header = [[[NSBundle mainBundle] loadNibNamed:@"CYSouSuoLiShiHeader" owner:nil options:nil] firstObject];
+        header.shanchulishi = ^(){
+            [sousuoLishiArr removeAllObjects];
+            ChaYuer *user = [ChaYuManager getCurrentUser];
+            user.searchArr = sousuoLishiArr;
+            [ChaYuManager archiveCurrentUser:user];
+            [_tableView reloadData];
+        };
+        return header;
+    }else{
+        return nil;
+    }
+}
+
+
+-(CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+{
+    if (sousuoLishiArr.count >3) {
+        return 50;
+    }
+    return 0.0000001;
+}
+
+-(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
+{
+    if (sousuoLishiArr.count >3) {
+        UIView *footer = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 50)];
+        UIView *line = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 1)];
+        line.backgroundColor = MAIN_BGCOLOR;
+        [footer addSubview:line];
+        UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+        [button setTitle:@"更多搜索历史" forState:UIControlStateNormal];
+        [button setTitleColor:MAIN_COLOR forState:UIControlStateNormal];
+        [button addTarget:self action:@selector(gengduolishi_click:) forControlEvents:UIControlEventTouchUpInside];
+        [footer addSubview:button];
+        return footer;
+    }
+    return nil;
+}
+
+-(void)gengduolishi_click:(UIButton *)sender
+{
+    CYGengDuoLiShiViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"CYGengDuoLiShiViewController"];
+    vc.keywordBlock = ^(NSString *keyWord){
+        
+    };
+    [self.navigationController popViewControllerAnimated:YES];
+  
+}
+
+#pragma mark -
+#pragma mark UITableViewDelegate method
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    [_searchTf resignFirstResponder];
+    _searchTf.text = sousuoLishiArr[indexPath.row];
+    ChaYuer *user = [ChaYuManager getCurrentUser];
+    [sousuoLishiArr exchangeObjectAtIndex:indexPath.row withObjectAtIndex:0];
+    user.searchArr = sousuoLishiArr;
+    [ChaYuManager archiveCurrentUser:user];
+    [tableView reloadData];
+    CYSouSuoZongHeViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"CYSouSuoZongHeViewController"];
+    vc.keyWord = _searchTf.text;
+    [self.navigationController pushViewController:vc animated:YES];
+    
+}
+
+#pragma mark -
+#pragma mark UITextFieldDelegate  method
+-(BOOL)textFieldShouldBeginEditing:(UITextField *)textField
+{
+    _tableView.tableHeaderView = nil;
+    ChaYuer *manager =  MANAGER;
+    if (manager.searchArr.count) {
+        [sousuoLishiArr removeAllObjects];
+        [sousuoLishiArr addObjectsFromArray:manager.searchArr];
+        [_tableView reloadData];
+    }
+
+    return YES;
+}
+
+-(BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    NSString *strUrl = [textField.text stringByReplacingOccurrencesOfString:@" " withString:@""];
+    if (strUrl.length == 0) {
+        [Itost showMsg:@"输入的关键字不能为空" inView:self.view];
+        return NO;
+    }
+    [textField resignFirstResponder];
+    ChaYuer *user = [ChaYuManager getCurrentUser];
+    NSMutableArray *searchArr= [[NSMutableArray alloc] init];
+    [searchArr addObjectsFromArray:user.searchArr];
+    [searchArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([obj isEqualToString:textField.text]) {
+            [searchArr removeObject:obj];
+        }
+    }];
+    [searchArr insertObject:textField.text atIndex:0];
+    user.searchArr = searchArr;
+    [ChaYuManager archiveCurrentUser:user];
+    [sousuoLishiArr removeAllObjects];
+    [sousuoLishiArr addObjectsFromArray:user.searchArr];
+    [_tableView reloadData];
+    
+    CYSouSuoZongHeViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"CYSouSuoZongHeViewController"];
+    vc.keyWord = _searchTf.text;
+    [self.navigationController pushViewController:vc animated:YES];
+    
+    return YES;
+}
+
+-(BOOL)textFieldShouldEndEditing:(UITextField *)textField
+{
+    [_searchTf resignFirstResponder];
+    return YES;
+}
+
+-(BOOL)textFieldShouldClear:(UITextField *)textField
+{
+    [sousuoLishiArr removeAllObjects];
+        [_tableView reloadData];
+    _tableView.tableHeaderView = self.defaultHeader;
+
+    return YES;
+}
+
+@end

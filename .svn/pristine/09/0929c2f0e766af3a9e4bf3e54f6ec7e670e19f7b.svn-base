@@ -1,0 +1,209 @@
+//
+//  CYCmmtTopicController.m
+//  茶语
+//
+//  Created by iXcoder on 16/2/20.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYCmmtTopicController.h"
+#import "PlaceholderTextView.h"
+#import "NTAlbum.h"
+
+@interface CYCmmtTopicController ()<NTAlbumDelegate>
+
+@property (nonatomic, weak) IBOutlet PlaceholderTextView  *ctntView;
+
+
+- (IBAction)onSendReplyAction:(id)sender;
+
+
+- (IBAction)goback:(id)sender;
+
+@property (weak, nonatomic) IBOutlet UIScrollView *contentView;
+
+@property (weak, nonatomic) IBOutlet UIView *imageChooseView;
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *imgchoose_height_cons;
+@property (nonatomic,strong)NTAlbum *albumView;
+
+
+
+
+
+@end
+#define IMGCOUNT 9
+@implementation CYCmmtTopicController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    self.title = @"回复话题";
+     [CYTopWindow hide];
+    [_ctntView becomeFirstResponder];
+    _ctntView.placeholder = @"请输入回复内容，字数不少于5个字";
+    [self.imageChooseView addSubview:self.albumView];
+    
+    __weak __typeof(self) weakSelf = self;
+    weakSelf.albumView.imgcuntChangeBlock = ^(NSInteger imgcount){
+        if (imgcount <IMGCOUNT) {
+            _imgchoose_height_cons.constant = ceilf((imgcount+1)/4.)*82 +58;
+        }else{
+            _imgchoose_height_cons.constant = ceilf(imgcount/4.)*82 +58;
+        }
+        
+        [_contentView layoutIfNeeded];
+        
+    };
+    
+}
+
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [MobClick beginLogPageView:@"回复话题"];
+}
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:@"回复话题"];
+}
+
+
+
+- (NTAlbum *)albumView
+{
+    if (!_albumView) {
+        _albumView = [[[NSBundle mainBundle] loadNibNamed:@"NTAlbum" owner:nil options:nil] firstObject];
+        _albumView.delegate = self;
+        _albumView.frame = _imageChooseView.bounds;
+        _albumView.imageCountLimit = IMGCOUNT;
+        _albumView.contro = self;
+    }
+    return _albumView;
+}
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+#pragma mark - self defined method
+- (void)onSendReplyAction:(id)sender
+{
+    [_ctntView resignFirstResponder];
+    
+    NSString *txt = self.ctntView.text;
+    if (txt.length == 0) {
+        [SVProgressHUD showErrorWithStatus:@"请输入回复内容!"];
+        return ;
+    }
+    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+    [params setObject:txt forKey:@"content"];
+    if (self.tid) {
+        [params setObject:self.tid forKey:@"tid"];
+    }
+    if (self.rpid) {
+        [params setObject:self.rpid forKey:@"rpid"];
+    }
+    
+    NSMutableDictionary *files = [NSMutableDictionary dictionary];
+//    if (self.albumView.imageArr.count > 0)
+    {
+        [files setObject:self.albumView.imageArr forKey:@"photo"];
+        
+        [SVProgressHUD showWithStatus:@"正在提交" maskType:SVProgressHUDMaskTypeBlack];
+
+        [CYWebClient Post:@"bbs_topic_reply" parametes:params files:files  success:^(id responObject) {
+            NSInteger status = [[responObject objectForKey:@"state"] integerValue];
+            NSString *msg = [responObject objectForKey:@"msg"];
+            if (status == 400) {
+//                [SVProgressHUD showSuccessWithStatus:@"回复成功"];
+                [SVProgressHUD dismiss];
+                if (self.callback) {
+                    NSInteger count = 0;
+                    if (self.rpid) {
+                        count = [[responObject objectForKey:@"praises"] integerValue];
+                    } else {
+                        count = -1;
+                    }
+                    self.callback(count);
+                }
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1. * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    [self.navigationController popViewControllerAnimated:YES];
+                });
+            }else{
+                [SVProgressHUD showErrorWithStatus:msg];
+            }
+        } failure:^(id error) {
+            
+        }];
+    }
+    /*
+    else{
+        [SVProgressHUD showWithStatus:@"正在提交" maskType:SVProgressHUDMaskTypeBlack];
+
+        [CYWebClient basePost:@"bbs_topic_reply" parametes:params success:^(id responObject) {
+            NSInteger status = [[responObject objectForKey:@"state"] integerValue];
+            NSString *msg = [responObject objectForKey:@"msg"];
+            if (status == 400) {
+                [SVProgressHUD dismiss];
+                if (self.callback) {
+                    NSInteger count = 0;
+                    if (self.rpid) {
+                        count = [[responObject objectForKey:@"praises"] integerValue];
+                    } else {
+                        count = -1;
+                    }
+                    self.callback(count);
+                }
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1. * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    [self.navigationController popViewControllerAnimated:YES];
+                });
+            }else{
+                [SVProgressHUD showErrorWithStatus:msg];
+            }
+        } failure:^(id error) {
+            
+        }];
+    }
+  */
+    
+}
+
+
+
+
+- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range
+ replacementText:(NSString *)text
+{
+    return YES;
+    
+}
+
+- (void)textViewDidChange:(UITextView *)textView
+{
+    
+ 
+}
+
+
+
+
+- (void)textViewContentDidChanged:(NSNotification *)noti
+{
+    
+}
+
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (void)addImageClicked
+{
+    [_ctntView resignFirstResponder];
+}
+
+@end

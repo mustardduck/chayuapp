@@ -1,0 +1,135 @@
+//
+//  CYGonglueController.m
+//  茶语
+//
+//  Created by Chayu on 16/7/29.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYGonglueController.h"
+#import <JavaScriptCore/JavaScriptCore.h>
+#import "RPUUID.h"
+#import "CYProductDetViewController.h"
+#import "CYHongBaoViewController.h"
+#import "CYActionSheet.h"
+#import "CYBindingPhoneViewController.h"
+@interface CYGonglueController ()<UIWebViewDelegate>
+{
+    NSInteger page;
+    NSString *absoluteString;
+    BOOL isAdd;
+    NSMutableArray *urlArr;
+}
+@property (nonatomic,weak) JSContext * context;
+
+
+
+- (IBAction)goback:(id)sender;
+
+@property (weak, nonatomic) IBOutlet UILabel *titleLbl;
+
+@property (weak, nonatomic) IBOutlet UIWebView *webView;
+
+@end
+
+@implementation CYGonglueController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    _webView.delegate = self;
+    _titleLbl.text = _name;
+    NSString *token = @"";
+    if (MANAGER.loginssectionid.length>0) {
+        token = MANAGER.loginssectionid;
+    }
+    NSString *com = @"?";
+    NSString *requrl  = nil; //[NSString stringWithFormat:@"%@?imei=%@&token=%@",_requstUrl,[RPUUID UUID],token];;
+    NSRange rang = [_url rangeOfString:com];
+    //    NSString *requrl  = [NSString stringWithFormat:@"%@?imei=%@&token=%@",_requstUrl,[RPUUID UUID],token];;
+    if (rang.location != NSNotFound) {
+        requrl = [NSString stringWithFormat:@"%@&source=%@&sessionid=%@",_url,@"2",token];
+    }else{
+        requrl = [NSString stringWithFormat:@"%@?source=%@&sessionid=%@",_url,@"2",token];
+    }
+    NSURLRequest *requst = [NSURLRequest requestWithURL:[NSURL URLWithString:requrl]];
+    [_webView loadRequest:requst];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType{
+    
+    NSLog(@"request.URL.absoluteString = %@",request.URL.absoluteString);
+    
+//    if (isAdd) {
+//        page +=1;
+//        [urlArr addObject:request.URL.absoluteString];
+//        NSLog(@"page = %d",(int)page);
+//    }
+//    isAdd = YES;
+    
+    return YES;
+}
+- (void)webViewDidFinishLoad:(UIWebView *)webView{
+    _context=[webView valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"];
+    
+    _context[@"login"] = ^(){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [APP_DELEGATE showLogView];
+        });
+        NSLog(@"登录");
+    };
+    _context[@"appRegister"] = ^(){
+        NSLog(@"注册");
+    };
+    
+    _context[@"appMobileBind"] = ^(){
+        NSLog(@"绑定");
+        dispatch_async(dispatch_get_main_queue(), ^{
+            CYBindingPhoneViewController *vc = viewControllerInStoryBoard(@"CYBindingPhoneViewController", @"Log");
+            vc.backBlock = ^(NSString *phonenum){
+                
+            };
+            [self.navigationController pushViewController:vc animated:YES];
+        });
+ 
+        
+        
+    };
+    _context[@"appQuanzi"] = ^(){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.navigationController popToRootViewControllerAnimated:YES];
+            [[NSNotificationCenter defaultCenter] postNotificationName:tabBarIndex object:@{@"selectIndex":@"3"}];
+        });
+      
+
+    };
+    
+    _context[@"appChaping"] = ^(){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.navigationController popToRootViewControllerAnimated:YES];
+            [[NSNotificationCenter defaultCenter] postNotificationName:tabBarIndex object:@{@"selectIndex":@"1"}];
+        });
+      
+    };
+    
+}
+
+
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+@end

@@ -1,0 +1,160 @@
+//
+//  CYTeaMallHeaderView.m
+//  茶语
+//
+//  Created by taotao on 16/2/20.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYTeaMallHeaderView.h"
+#import "CYCarousel.h"
+@interface CYTeaMallHeaderView ()<ZZCarouselDelegate>
+{
+   
+}
+@property (weak, nonatomic) IBOutlet UIView *bannerView;
+@property (nonatomic,strong)CYCarousel *wheel;
+
+@property (weak, nonatomic) IBOutlet UILabel *bantitleLbl;
+@property (weak, nonatomic) IBOutlet UIImageView *topImg;
+- (IBAction)topMenu_click:(id)sender;
+@property (weak, nonatomic) IBOutlet UIView *topVIew;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *topimg_height;
+
+
+
+@end
+
+@implementation CYTeaMallHeaderView
+
+-(void)awakeFromNib
+{
+    
+    _topimg_height.constant = 200 *(SCREEN_WIDTH/375.);
+    [self layoutIfNeeded];
+    [self.bannerView addSubview:self.wheel];
+}
+
+- (void)setBannserArr:(NSArray *)bannserArr
+{
+    _bannserArr = bannserArr;
+    [self.wheel reloadData];
+}
+
+- (void)setTouPhotosArr:(NSDictionary *)touPhotosArr
+{
+    _touPhotosArr = touPhotosArr;
+    if (![_touPhotosArr isKindOfClass:[NSNull class]]) {
+        NSString *thumb = [_touPhotosArr objectForKey:@"thumb"];
+        [_topImg sd_setImageWithURL:[NSURL URLWithString:thumb] placeholderImage:[UIImage imageNamed:@"zwt_shiji_banner"]];
+    }
+
+}
+
+- (void)setBantitleInfo:(NSDictionary *)bantitleInfo
+{
+    _bantitleInfo = bantitleInfo;
+    _bantitleLbl.text = [_bantitleInfo objectForKey:@"title"];
+//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.01 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//       [_bannerView sendSubviewToBack:self.wheel];
+//    });
+    
+    
+}
+/**
+*  加载顶部banner
+*/
+- (CYCarousel *)wheel
+{
+    if (!_wheel) {
+    CGFloat banner_height = 145*(SCREEN_WIDTH/375.);
+    _wheel = [[CYCarousel alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH,banner_height)];
+    /*
+    *   carouseScrollTimeInterval  ---  此属性为设置轮播多长时间滚动到下一张
+    */
+    _wheel.carouseScrollTimeInterval = 3.0f;
+
+    // 代理
+    _wheel.delegate = self;
+
+    /*
+    *   isAutoScroll  ---  默认为NO，当为YES时 才能使轮播进行滚动
+    */
+    _wheel.isAutoScroll = YES;
+
+    /*
+    *   pageType  ---  设置轮播样式 默认为系统样式。ZZCarousel 中封装了 两种样式，另外一种为数字样式
+    */
+    _wheel.pageType = ZZCarouselPageTypeOfNone;
+
+    /*
+    *   设置UIPageControl 在轮播中的位置、系统默认的UIPageControl 的顶层颜色 和底层颜色已经背景颜色
+    */
+    _wheel.pageControlFrame = CGRectMake(0, banner_height - 30,SCREEN_WIDTH, 30);
+    _wheel.pageIndicatorTintColor = [UIColor lightGrayColor];
+    _wheel.currentPageIndicatorTintColor = [UIColor whiteColor];
+    _wheel.pageControlBackGroundColor = RGBA(0, 0, 0, 0.6);
+        
+        /*
+         *   设置数字样式的 UIPageControl 中的字体和字体颜色。 背景颜色仍然按照上面pageControlBackGroundColor属性来设置
+         */
+        //        _wheel.pageControlOfNumberFont = [UIFont fontWithName:@"Helvetica-Bold" size:18];
+        //        _wheel.pageContolOfNumberFontColor = [UIColor whiteColor];
+        
+        
+        
+    }
+    return _wheel;
+}
+
+
+#pragma mark -
+#pragma mark ZZCarouselDelegate method
+-(NSInteger)numberOfZZCarousel:(CYCarousel *)wheel
+{
+    return [_bannserArr count];
+}
+-(ZZCarouselView *)zzcarousel:(UICollectionView *)zzcarousel viewForItemAtIndex:(NSIndexPath *)index itemsIndex:(NSInteger)itemsIndex identifire:(NSString *)identifire
+{
+    /*
+     *  index参数         ※ 注意
+     */
+    ZZCarouselView *cell = [zzcarousel dequeueReusableCellWithReuseIdentifier:identifire forIndexPath:index];
+    
+    if (!cell) {
+        cell = [[ZZCarouselView alloc]init];
+    }
+    
+    CYSlideListModel *model = [_bannserArr objectAtIndex:itemsIndex];
+    NSURL *url = [NSURL URLWithString:model.thumb];
+    [cell.imageView  sd_setImageWithURL:url placeholderImage:[UIImage imageNamed:@"zwt_shiji"]];;
+    return cell;
+}
+
+-(void)zzcarouselScrollView:(CYCarousel *)zzcarouselScrollView didSelectItemAtIndex:(NSInteger)index
+{
+    CYSlideListModel *model = _bannserArr[index];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(bannerSelected:andModel:)]) {
+        [self.delegate bannerSelected:index andModel:model];
+    }
+    
+}
+
+
+
+
+- (IBAction)topMenu_click:(id)sender {
+    UIButton *selectBtn = (UIButton *)sender;
+    for (int i =0; i<5; i++) {
+        UIButton *button = [_topVIew viewWithTag:i+9000];
+        if (selectBtn.tag - 9000 == i) {
+            button.selected = YES;
+        }else{
+            button.selected = NO;
+        }
+    }
+    if (self.delegate && [self.delegate respondsToSelector:@selector(topMenuSelect:)]) {
+        [self.delegate topMenuSelect:selectBtn.tag - 9000];
+    }
+}
+@end

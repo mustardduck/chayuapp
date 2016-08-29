@@ -1,0 +1,287 @@
+//
+//  CYBuyerAllCategoryView.m
+//  茶语
+//
+//  Created by Leen on 16/6/28.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYBuyerAllCategoryView.h"
+#import "SKSTableView.h"
+#import "SKSTableViewCell.h"
+#import "CYBuyerAllCategorySubCell.h"
+#import "CYIndexPath.h"
+#import "UIColor+Additions.h"
+#import "CYTeaCategoryInfo.h"
+
+@interface CYBuyerAllCategoryView()<SKSTableViewDelegate, CYBuyerAllCategorySubCellDelegate>
+{
+    NSMutableArray * _dataArr;
+    
+    NSArray * _testArr;
+    
+    CYIndexPath * _currentIndexPath;
+    
+    BOOL _isSelected;
+    
+    BOOL isFirst;
+    
+}
+
+
+@property (weak, nonatomic) IBOutlet SKSTableView *mainTable;
+
+@end
+
+@implementation CYBuyerAllCategoryView
+
+-(instancetype)initWithFrame:(CGRect)frame
+{
+    if ([super initWithFrame:frame]) {
+        
+    }
+    return self;
+}
+
+-(void)awakeFromNib
+{
+    [super awakeFromNib];
+    [self initTableView];
+    isFirst = NO;
+    _dataArr = [NSMutableArray array];
+    [self loadData];
+    
+}
+
+- (void)setIsShiji:(BOOL)isShiji
+{
+    //    _isShiji = isShiji;
+    //    if (_isShiji) {
+    //        [_dataArr removeAllObjects];
+    //        [_dataArr addObjectsFromArray:_cateArr];
+    //        [_mainTable reloadData];
+    //        
+    //    }else{
+    //        
+    //    }
+    
+}
+
+- (void)loadData
+{
+    [CYWebClient Post:@"mingxingcat" parametes:nil success:^(id responObj) {
+        NSArray *catArr =[CYTeaCategoryInfo objectArrayWithKeyValuesArray:responObj];
+        
+        NSMutableArray * allArr = [NSMutableArray array];
+        
+        for(int i = 0; i < catArr.count; i ++)
+        {
+            NSMutableArray * arr = [NSMutableArray array];
+            
+            CYTeaCategoryInfo * info = catArr[i];
+            [arr addObject:info];
+            
+            [arr addObjectsFromArray:info.child];
+            
+            [allArr addObject:arr];
+        }
+        
+        [_dataArr addObject:allArr];
+        
+        [_mainTable reloadData];
+        
+        if (!isFirst) {
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+            [self selectCate:indexPath];
+        }
+        isFirst = YES;
+        
+        //        weakSelf.fenleiView.dataArr = category_list;
+    } failure:^(id err) {
+        NSLog(@"%@",err);
+    }];
+}
+
+- (void)selectCate:(NSIndexPath *)correspondingIndexPath
+{
+    if(!_currentIndexPath)
+    {
+        _currentIndexPath = [[CYIndexPath alloc] init];
+    }
+    
+    _isSelected = YES;
+    
+    _currentIndexPath.row = correspondingIndexPath.row;
+    _currentIndexPath.section = correspondingIndexPath.section;
+    _currentIndexPath.subRow = correspondingIndexPath.subRow;
+    
+    [_mainTable reloadData];
+    
+    
+    NSMutableDictionary * infoDic = [NSMutableDictionary dictionary];
+    
+    NSInteger subRowIndex = _currentIndexPath.subRow;
+    
+    if(_currentIndexPath.section == 0 && _currentIndexPath.row > 0 && _currentIndexPath.subRow == 1)
+    {
+        subRowIndex = 0;
+    }
+    
+    
+    CYTeaCategoryInfo * info = _dataArr[_currentIndexPath.section][_currentIndexPath.row][subRowIndex];
+    
+    [infoDic setObject:info.name forKey:@"selectedName"];
+    [infoDic setObject:info.catid forKey:@"selectedCateId"];
+    
+    if (isFirst) {
+        if([self.delegate respondsToSelector:@selector(selectSubCategory:)])
+        {
+            [self.delegate selectSubCategory:infoDic];
+        }
+    }
+    
+    
+    self.hidden = YES;
+}
+
+- (void)selectBuyerAllCategorySubCell:(CYBuyerAllCategorySubCell *)cell
+{
+    NSIndexPath *mIndexPath  = [_mainTable indexPathForCell:cell];
+    
+    NSIndexPath *correspondingIndexPath = [_mainTable correspondingIndexPathForRowAtIndexPath:mIndexPath];
+    
+    [self selectCate:correspondingIndexPath];
+}
+
+- (void)initTableView
+{
+    hiddenSepretor(_mainTable);
+    
+    _mainTable.shouldExpandOnlyOneCell = YES;
+    _mainTable.SKSTableViewDelegate = self;
+    
+}
+
+- (UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString *CellIdentifier = @"SKSTableViewCell";
+    
+    SKSTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    
+    if (!cell)
+        cell = [[SKSTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+    
+    CYTeaCategoryInfo * info = _dataArr[indexPath.section][indexPath.row][0];
+    
+    
+    NSString * titleName = info.name;
+    
+    cell.titleLbl.text = titleName;
+    [cell.icon sd_setImageWithURL:[NSURL URLWithString:info.thumb] placeholderImage:SQUARE];
+    //    cell.icon.image = [UIImage imageNamed:@"chayeIconTest"];
+    cell.backgroundColor = [UIColor whiteColor];
+    
+    if(_currentIndexPath.row == indexPath.row &&
+       _currentIndexPath.section == indexPath.section && _currentIndexPath.subRow == indexPath.subRow && _isSelected)
+    {
+        cell.titleLbl.textColor = [UIColor brownTitleColor];
+    }
+    else
+    {
+        cell.titleLbl.textColor = [UIColor blackTitleColor];
+    }
+    
+    UILabel* bottomLine = [[UILabel alloc] initWithFrame:CGRectMake(0, 49.5, tableView.frame.size.width, 0.5)];
+    [bottomLine setBackgroundColor:[UIColor grayTitleOrLineColor]];
+    [cell.contentView addSubview:bottomLine];
+    
+    cell.expandable = YES;
+    
+    if([_dataArr[indexPath.section][indexPath.row] count] == 1)
+    {
+        cell.expandable = NO;
+    }
+    
+    //    if ((indexPath.section == 0 && (indexPath.row == 2 || indexPath.row == 1 || indexPath.row == 3 || indexPath.row == 4)))
+    //        cell.expandable = YES;
+    //    else
+    //        cell.expandable = NO;
+    
+    return cell;
+    
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForSubRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CYBuyerAllCategorySubCell *cell = [CYBuyerAllCategorySubCell cellWidthTableView:tableView];
+    
+    CYTeaCategoryInfo * info = _dataArr[indexPath.section][indexPath.row][indexPath.subRow];
+    
+    NSString * subTitle = info.name;
+    
+    [cell.selectBtn setTitle:subTitle forState:UIControlStateNormal];
+    
+    [cell.iconImg sd_setImageWithURL:[NSURL URLWithString:info.thumb] placeholderImage:SQUARE];
+    
+    if(_currentIndexPath.row == indexPath.row &&
+       _currentIndexPath.section == indexPath.section &&
+       _currentIndexPath.subRow == indexPath.subRow && _isSelected)
+    {
+        cell.selectBtn.selected = YES;
+        cell.selectBtn.backgroundColor = [UIColor grayBackgroundColor];
+    }
+    else
+    {
+        cell.selectBtn.selected = NO;
+        cell.selectBtn.backgroundColor = [UIColor whiteColor];
+        
+    }
+    
+    cell.delegate = self;
+    
+    return cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 50;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForSubRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 50;
+}
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return [_dataArr count];
+}
+
+- (void)tableView:(SKSTableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    [self selectCate:indexPath];
+    
+    [_mainTable refreshData];
+}
+
+- (BOOL)tableView:(SKSTableView *)tableView shouldExpandSubRowsOfCellAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.section == _currentIndexPath.section && indexPath.row == _currentIndexPath.row && _isSelected)
+    {
+        return YES;
+    }
+    
+    return NO;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return [_dataArr[section] count];
+}
+
+- (NSInteger)tableView:(SKSTableView *)tableView numberOfSubRowsAtIndexPath:(NSIndexPath *)indexPath
+{
+    return [_dataArr[indexPath.section][indexPath.row] count] - 1;
+}
+
+@end

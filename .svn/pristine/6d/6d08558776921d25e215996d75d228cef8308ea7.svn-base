@@ -1,0 +1,63 @@
+//
+//  CYActiveHeader.m
+//  茶语
+//
+//  Created by Chayu on 16/3/24.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYActiveHeader.h"
+
+
+@interface CYActiveHeader ()<BBWebViewSizeAdjust>
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *img_height;
+
+
+@end
+
+
+
+
+@implementation CYActiveHeader
+
+/*
+// Only override drawRect: if you perform custom drawing.
+// An empty implementation adversely affects performance during animation.
+- (void)drawRect:(CGRect)rect {
+    // Drawing code
+}
+*/
+
+- (void)setDesc:(NSString *)desc
+{
+    _desc = desc;
+  
+    [_webView loadHTMLString:_desc baseURL:[NSURL URLWithString:@""]];
+}
+
+- (void)awakeFromNib
+{
+       _webView.sizeDelegate = self;
+//    _img_height.constant = 145*(SCREEN_WIDTH/375.);
+//    [self layoutIfNeeded];
+}
+
+#pragma mark -
+#pragma mark BBWebViewSizeAdjust delegate method
+- (void)bbweb:(BBWebView *)web didAdjustSizeTo:(CGSize)endSize from:(CGSize)startSize
+{
+    if (startSize.height<endSize.height) {
+        _webView.height = endSize.height;
+        CGFloat imgheight =250*(SCREEN_WIDTH/375);
+        CGFloat webHeight = endSize.height;
+        if (SCREEN_WIDTH <375) {
+            webHeight +=30;
+        }
+        self.height = 50+webHeight+imgheight;
+          [[NSNotificationCenter defaultCenter] postNotificationName:@"COLLECTIONHEADERHEIGHT" object:nil];
+    }
+    
+}
+
+@end

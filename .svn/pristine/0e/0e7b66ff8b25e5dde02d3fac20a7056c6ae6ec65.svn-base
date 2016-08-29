@@ -1,0 +1,519 @@
+//
+//  CYEvaHomeViewController.m
+//  茶语
+//
+//  Created by 李峥 on 16/3/28.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYEvaHomeViewController.h"
+#import "CYTeaCategoryInfo.h"
+#import "CYEvaHeaderCollectionView.h"
+#import "CYEvaFooterCollectionView.h"
+#import "CYChaPingTopCell.h"
+#import "CYBaseBannerView.h"
+#import "CYChaLeiView.h"
+#import "CYPingPaiView.h"
+#import "CYBangDanView.h"
+#import "CYEvaListViewController.h"
+#import "CYBrandLitViewController.h"
+#import "CYDaoHangViewController.h"
+#import "CYSouSuoHomeViewController.h"
+#import "CYMyViewController.h"
+#import "CYTeaReviewDetailViewController.h"
+#import "CYWenZhangDetailsController.h"
+#import "CYProductDetViewController.h"
+#import "CYQuanZiDetailController.h"
+#import "CYTopicDetailController.h"
+#import "CYTeaSampleDetailViewController.h"
+#import "CYMasterDetailViewController.h"
+#import "CYBuyerDetailVC.h"
+#import "CYTeaMallCollectionViewController.h"
+#import "CYBrandWebViewController.h"
+@interface CYEvaHomeViewController ()<UITableViewDelegate,UITableViewDataSource,CYChaPingTopCellDelegate,CYChaLeiViewDelegate>
+{
+
+    NSMutableArray *pingpaidataArr;
+    OSMessage *message;
+}
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottom_cons;
+
+
+@property (nonatomic, strong) NSArray *mCateList;
+@property (nonatomic, strong) NSArray *mHotList;
+
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+
+
+@property (nonatomic,strong)CYBaseBannerView *bannerView;
+
+@property (nonatomic,strong)CYChaLeiView *chaleiView;
+
+
+@property (nonatomic,strong)CYPingPaiView *pingpaiView;
+
+@property (nonatomic,strong)CYBangDanView  *bangdanView;
+
+
+- (IBAction)gotousercenter_click:(id)sender;
+
+
+@end
+
+@implementation CYEvaHomeViewController
+
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    _tableView.hidden = YES;
+    
+      _tableView.tableHeaderView = self.bannerView;
+    message = [[OSMessage alloc] init];
+     pingpaidataArr = [NSMutableArray array];
+     [self.chaleiView addObserver:self forKeyPath:@"height" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld  context:@"chalei"];
+    [self.pingpaiView addObserver:self forKeyPath:@"height" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld  context:@"pingpai"];
+    [self.bangdanView addObserver:self forKeyPath:@"height" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld  context:@"bangdan"];
+    hiddenSepretor(_tableView);
+//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.01 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    
+//    });
+       __weak __typeof(self) weakSelf = self;
+    self.bannerView.gotosomeViewBlock = ^(CYHomeSlideInfo * info){
+        NSInteger resource_type = [info.resource_type integerValue];
+        switch (resource_type) {
+            case 1:
+            {
+                CYWenZhangDetailsController *vc = viewControllerInStoryBoard(@"CYWenZhangDetailsController", @"WenZhang");
+                vc.wenzhangId = info.resource_id;
+                [weakSelf.navigationController pushViewController:vc animated:YES];
+                break;
+            }
+            case 2:
+            {
+                CYProductDetViewController *vc =viewControllerInStoryBoard(@"CYProductDetViewController", @"TeaMall");
+                vc.goodId = info.resource_id;
+                [weakSelf.navigationController pushViewController:vc animated:YES];
+                break;
+            }
+            case 3:
+            {
+                CYQuanZiDetailController *vc = viewControllerInStoryBoard(@"CYQuanZiDetailController", @"BBS");
+                vc.gid = info.resource_id;
+                [weakSelf.navigationController pushViewController:vc animated:YES];
+                break;
+            }
+            case 4:
+            {
+                CYTopicDetailController *vc = viewControllerInStoryBoard(@"CYTopicDetailController", @"BBS");
+                vc.tid = info.resource_id;
+                vc.gid = [[info.source objectForKey:@"gid"] description];
+                [weakSelf.navigationController pushViewController:vc animated:YES];
+                break;
+            }
+            case 5:
+            {
+                
+                break;
+            }
+            case 6:
+            {
+                CYTeaReviewDetailViewController *vc = [[CYTeaReviewDetailViewController alloc] initWithNibName:@"CYTeaReviewDetailViewController" bundle:nil];
+                vc.mTeaId = info.resource_id;
+                [weakSelf.navigationController pushViewController:vc animated:YES];
+                break;
+            }
+            case 7:
+            {
+                CYTeaSampleDetailViewController *vc =viewControllerInStoryBoard(@"CYTeaSampleDetailViewController", @"Eva");
+                vc.mSampleid = info.resource_id;
+                //                        vc.teaId = _mTeaId;
+                [weakSelf.navigationController pushViewController:vc animated:YES];
+                break;
+            }
+            case 8:
+            {
+                NSInteger type = [[info.source objectForKey:@"type"]integerValue];
+                if (type<11) {
+                    CYMasterDetailViewController *vc =viewControllerInStoryBoard(@"CYMasterDetailViewController", @"TeaMall");
+                    vc.uid = info.resource_id;
+                    if (type == 9) {
+                        vc.isMaster = YES;
+                    }else if(type == 10){
+                        vc.isMaster = NO;
+                    }
+                    
+                    [weakSelf.navigationController pushViewController:vc animated:YES];
+                }else{//茗星
+                    CYBuyerDetailVC * vc = viewControllerInStoryBoard(@"CYBuyerDetailVC", @"Buyer");
+                    vc.seller_uid = info.resource_id;
+                    [weakSelf.navigationController pushViewController:vc animated:YES];
+                }
+                break;
+            }
+            case 9:
+            {
+                NSInteger type = [[info.source objectForKey:@"type"]integerValue];
+                CYTeaMallCollectionViewController *vc= viewControllerInStoryBoard(@"CYTeaMallCollectionViewController", @"TeaMall");
+                
+                if (type == 1) {//聚合 商品
+                    vc.type = CYCollectionTypeCommodity;
+                }else{//聚合 人物
+                    vc.type = CYCollectionTypeCharacter;
+                }
+                vc.juhe_id = info.resource_id;;
+                //vc.hidesBottomBarWhenPushed = YES;
+                [weakSelf.navigationController pushViewController:vc animated:YES];
+                break;
+            }
+                
+            default:
+                break;
+        }
+
+    };
+    
+    [CYWebClient Post:@"tea" parametes:@{@"type":@""} success:^(id responObject) {
+        _tableView.hidden = NO;
+        NSDictionary *shareInfo = [responObject objectForKey:@"share"];
+        if ([shareInfo isKindOfClass:[NSDictionary class]] && [shareInfo count]>0) {
+            message.imgUrl = [shareInfo objectForKey:@"thumb"];
+            message.link = [shareInfo objectForKey:@"url"];
+            message.title = [shareInfo objectForKey:@"title"];
+            message.desc = [shareInfo objectForKey:@"description"];
+        }
+        NSArray *cateList = [CYTeaCategoryInfo objectArrayWithKeyValuesArray:[responObject objectForJSONKey:@"category_list"]];
+        for (CYTeaCategoryInfo *info in cateList) {
+            NSMutableArray *arr = [NSMutableArray arrayWithArray:info.children];
+            if (arr.count%3>0) {
+                CYTeaChildCategoryInfo *childInfo = [[CYTeaChildCategoryInfo alloc] init];
+                childInfo.name = @"";
+                childInfo.icoImg = @"";
+                NSInteger row = 3-[arr count]%3;
+                for (int i = 0;i<row; i++) {
+                    [arr addObject:childInfo];
+                }
+            }
+            info.children = [CYTeaChildCategoryInfo objectArrayWithKeyValuesArray:arr];
+        }
+        NSArray *banner = [CYHomeSlideInfo objectArrayWithKeyValuesArray:[responObject objectForKey:@"banner"]];//;
+        self.bannerView.bannserArr = banner;
+         self.bannerView.height = 170*SCREENBILI;
+        self.tableView.tableHeaderView = self.bannerView;
+       
+        CGFloat chaleiHeight = 0.0f;
+        chaleiHeight +=50*cateList.count;
+        self.chaleiView.height = chaleiHeight;
+        self.chaleiView.chaliData = cateList;
+        _tableView.tableFooterView = self.chaleiView;
+        
+        
+    } failure:^(id error) {
+        
+    }];
+    
+    [self creatkongNavBar];
+    _bottom_cons.constant = 65 * SCREENBILI;
+
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    [APP_DELEGATE setTabbarHidden:NO animated:animated];
+}
+
+-(void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+//    [APP_DELEGATE setTabbarHidden:YES animated:animated];
+}
+
+
+#pragma mark - 覆盖方法
+#pragma mark 重写observeValueForKeyPath方法，当属性变化后此处获得通知
+-(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
+    
+    if([keyPath isEqualToString:@"height"]){//这里只处理height属性
+        if ([object isKindOfClass:[CYChaLeiView class]]) {
+           _tableView.tableFooterView = self.chaleiView;
+        }else if ([object isKindOfClass:[CYPingPaiView class]]){
+            _tableView.tableFooterView = self.pingpaiView;
+        }else if([object isKindOfClass:[CYBangDanView class]]){
+            _tableView.tableFooterView = self.bangdanView;
+        }
+        
+    }
+}
+
+#pragma mark -
+#pragma mark  懒加载 method
+
+- (CYBaseBannerView *)bannerView
+{
+    if (!_bannerView) {
+            NSLog(@"WINDOW.bounds = %@",NSStringFromCGRect(WINDOW.bounds));
+        CGFloat bannerheight = 170*SCREENBILI;
+        NSLog(@"");
+        _bannerView = [[[NSBundle mainBundle] loadNibNamed:@"CYBaseBannerView" owner:nil options:nil] firstObject];
+        _bannerView.frame = CGRectMake(0, 0, SCREEN_WIDTH,bannerheight);
+        
+    }
+    return _bannerView;
+}
+
+
+- (CYChaLeiView *)chaleiView
+{
+    if (!_chaleiView) {
+        _chaleiView = [[[NSBundle mainBundle] loadNibNamed:@"CYChaLeiView" owner:nil options:nil] firstObject];
+        _chaleiView.frame = CGRectMake(0, 0, SCREEN_WIDTH,442);
+        _chaleiView.delegate = self;
+        
+    }
+    return _chaleiView;
+}
+
+- (CYPingPaiView *)pingpaiView
+{
+    if (!_pingpaiView) {
+        _pingpaiView = [[[NSBundle mainBundle] loadNibNamed:@"CYPingPaiView" owner:nil options:nil] firstObject];
+        _pingpaiView.frame = CGRectMake(0, 0, SCREEN_WIDTH,1);
+         __weak __typeof(self) weakSelf = self;
+        _pingpaiView.pingPaiSelectBlock = ^(NSString *pingpaiId,NSString *name){
+            CYEvaListViewController *vc = [weakSelf.storyboard instantiateViewControllerWithIdentifier:@"CYEvaListViewController"];
+            vc.teaCateStr = name;
+            vc.brandid = pingpaiId;
+            vc.isPingPai = YES;
+            [weakSelf.navigationController pushViewController:vc animated:YES];
+        };
+    }
+    return _pingpaiView;
+}
+
+- (CYBangDanView *)bangdanView
+{
+    if (!_bangdanView) {
+        _bangdanView = [[[NSBundle mainBundle] loadNibNamed:@"CYBangDanView" owner:nil options:nil] firstObject];
+        _bangdanView.frame = CGRectMake(0, 0, SCREEN_WIDTH,442);
+        __weak __typeof(self) weakSelf = self;
+        _bangdanView.selectitemBlock = ^(NSDictionary *info){
+            NSLog(@"info = %@",info);
+        
+            CYTeaReviewDetailViewController *vc = [[CYTeaReviewDetailViewController alloc] initWithNibName:@"CYTeaReviewDetailViewController" bundle:nil];
+            vc.mTeaId = [info objectForKey:@"id"];
+            [weakSelf.navigationController pushViewController:vc animated:YES];
+        };
+        
+        _bangdanView.selectMoreBlock = ^(NSDictionary *info){
+            NSLog(@"info = %@",info);
+            CYBrandLitViewController *vc = [weakSelf.storyboard instantiateViewControllerWithIdentifier:@"CYBrandLitViewController"];
+            vc.yearId = [info objectForKey:@"bid"];
+            vc.typeName = [NSString stringWithFormat:@"综合评分榜"];
+            NSString *title = [info objectForKey:@"title"];
+            vc.year = [[info objectForKey:@"year"] description];
+            if ([title hasSuffix:@"评分榜"]) {
+                NSRange rang = [title rangeOfString:@"评分榜"];
+                title =  [title substringToIndex:rang.location];
+                   vc.yearname = title;
+//                [title substringWithRange:rang];
+            }
+//            if (title.length >2) {
+//             
+//            }
+          
+            [weakSelf.navigationController pushViewController:vc animated:YES];
+        };
+    }
+    return _bangdanView;
+}
+
+#pragma mark -
+#pragma mark 按钮点击事件 method
+- (IBAction)gotousercenter_click:(id)sender {
+    if (!MANAGER.isLoged) {
+        [APP_DELEGATE showLogView];
+        return;
+    }
+    CYMyViewController *vc = viewControllerInStoryBoard(@"CYMyViewController", @"My");
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+
+- (IBAction)gotodaohang_click:(id)sender {
+    CYDaoHangViewController *vc = viewControllerInStoryBoard(@"CYDaoHangViewController", @"Home");
+    
+    //
+    //
+    //    [self.storyboard instantiateViewControllerWithIdentifier:@"CYDaoHangViewController"];
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (IBAction)sousuo_click:(id)sender {
+    CYSouSuoHomeViewController *vc = viewControllerInStoryBoard(@"CYSouSuoHomeViewController", @"SouSuo");
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (IBAction)share_click:(id)sender {
+    [self showActionSheet:message];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+//    [MobClick beginLogPageView:@"茶评首页"];
+    [MobClick beginLogPageView:@"茶评首页"];
+    [APP_DELEGATE setTabbarHidden:NO animated:animated];
+}
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+//    [MobClick endLogPageView:@"茶评首页"];
+    [MobClick endLogPageView:@"茶评首页"];
+}
+
+#pragma mark -
+#pragma mark UITableViewDataSource method
+-(NSInteger )tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return 1;
+}
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView{
+    return 1;
+}
+
+-(CGFloat )tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 61.f;
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CYChaPingTopCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYChaPingTopCell"];
+    cell.delegate = self;
+    return cell;
+}
+
+#pragma mark -
+#pragma mark UITableViewDelegate method
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+}
+
+#pragma mark -
+#pragma mark CYChaLeiViewDelegate method
+- (void)selectItem:(CYTeaChildCategoryInfo *)info andTeaCategoryInfo:(CYTeaCategoryInfo *)cateInfo
+{
+    CYEvaListViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"CYEvaListViewController"];
+    if (info) {
+        vc.sid = info.sid;
+        vc.teaCateStr = info.name;
+    }
+    vc.bid  = cateInfo.bid;
+   
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+#pragma mark -
+#pragma mark  CYChaPingTopCellDelegate method
+- (void)topSelect:(NSInteger)selecIndex
+{
+    switch (selecIndex) {
+        case 0:
+        {
+            _tableView.tableFooterView = self.chaleiView;
+            break;
+        }
+        case 1:
+        {
+            _tableView.tableFooterView = self.pingpaiView;
+            if (! self.pingpaiView.brand_list.count) {
+                [self loadpigpaiData];
+            }
+            break;
+        }
+        case 2:
+        {
+            __weak __typeof(self) weakSelf = self;
+            _tableView.tableFooterView = self.bangdanView;;
+            self.bangdanView.selectTopMenuBlock = ^(NSDictionary *info){
+                NSInteger type = [[info objectForKey:@"type"] integerValue];
+                if (type ==1) {
+                    CYBrandLitViewController *vc = [weakSelf.storyboard instantiateViewControllerWithIdentifier:@"CYBrandLitViewController"];
+                    vc.typeName = [NSString stringWithFormat:@"%@评分", [info objectForJSONKey:@"title"]];
+                    vc.orderId = [[info objectForKey:@"data"] description];
+                    [weakSelf.navigationController pushViewController:vc animated:YES];
+                }else{
+                    CYBrandWebViewController *vc = [weakSelf.storyboard instantiateViewControllerWithIdentifier:@"CYBrandWebViewController"];
+                    vc.webUrl = [[info objectForKey:@"data"] description];
+                    NSDictionary * dic = [info objectForJSONKey:@"share"];
+                    OSMessage * msg = [[OSMessage alloc] init];
+                    msg.title = [dic objectForJSONKey:@"title"];
+                    msg.desc = [dic objectForJSONKey:@"description"];
+                    msg.link = [dic objectForJSONKey:@"url"];
+                    msg.imgUrl = [dic objectForJSONKey:@"thumb"];
+                    
+                    vc.shareMsg = msg;
+                    [weakSelf.navigationController pushViewController:vc animated:YES];
+                }
+            
+            };
+            
+            if (!self.bangdanView.dataArr.count) {
+                [self lodBandData];
+            }
+            break;
+        }
+            
+        default:
+            break;
+    }
+}
+
+
+//
+-(void)loadpigpaiData
+{
+    
+    [CYWebClient Post:@"tea" parametes:@{@"type":@"brand"} success:^(id responObject) {
+        NSArray *hot_list = [responObject objectForKey:@"hot_list"];
+        NSArray *brand_list = [responObject objectForKey:@"brand_list"];
+        CGFloat height = 100.f;
+        NSInteger secnum = ceilf(brand_list.count/5.);
+        NSInteger firstnum = ceilf(hot_list.count/4.);
+        height += (95 * firstnum);
+        height += (50 *secnum);
+        self.pingpaiView.hot_list = hot_list;
+        self.pingpaiView.brand_list = [CYPingPaiInfo objectArrayWithKeyValuesArray:brand_list];
+        self.pingpaiView.height = height;
+    } failure:^(id error) {
+        
+    }];
+}
+
+-(void)lodBandData
+{
+    [CYWebClient Post:@"tea" parametes:@{@"type":@"top"} success:^(id responObject) {
+        NSArray *topArr = [responObject objectForKey:@"topArr"];
+        NSArray *topList = [responObject objectForKey:@"topList"];
+        CGFloat bandHeight = 0.0f;
+        bandHeight +=117.;
+        bandHeight +=(105*topList.count);
+        for (int i =0; i<[topList count]; i++) {
+            NSDictionary *info = topList[i];
+            NSArray *list = [info objectForKey:@"list"];
+            bandHeight+=list.count*30;
+        }
+        self.bangdanView.topMenuArr = topArr;
+        self.bangdanView.dataArr = topList;
+        
+        self.bangdanView.height = bandHeight;
+    } failure:^(id error) {
+        
+    }];
+}
+
+
+
+@end

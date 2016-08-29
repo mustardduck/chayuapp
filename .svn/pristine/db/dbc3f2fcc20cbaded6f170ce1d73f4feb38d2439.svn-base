@@ -1,0 +1,114 @@
+//
+//  CYProductDetailsModel.h
+//  TeaMall
+//
+//  Created by Chayu on 15/10/26.
+//  Copyright © 2015年 Chayu. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+
+@interface CYProductDetailsModel : NSObject
+
+/**
+ *  <#属性说明#>
+ */
+@property (nonatomic,strong)NSString *is_enjoy;
+
+/**
+ *  <#属性说明#>
+ */
+@property (nonatomic,strong)NSString *isFavorited;;
+
+/**
+ *  限购规则
+ */
+@property (nonatomic,strong)NSString *limitRuleTitle;
+
+/**
+ *  商品简介
+ */
+@property (nonatomic,strong)NSString *introduce;
+
+/**
+ *  banner列表
+ */
+@property (nonatomic,strong)NSArray *albumList;
+/**
+ *  商品名称
+ */
+@property (nonatomic,strong)NSString *name;
+
+@property (nonatomic, strong)NSString *desc;
+
+
+/**
+ *  商品ID
+ */
+@property (nonatomic,strong)NSString *goodsId;
+
+/**
+ *  已售数量
+ */
+@property (nonatomic,strong)NSString *salesBase;
+
+/**
+ *  大师ID
+ */
+@property (nonatomic,strong)NSString *sellerUid;
+
+/**
+ *  大师基本信息
+ */
+@property (nonatomic,strong)NSDictionary*seller;
+
+/**
+ *  规格
+ */
+@property (nonatomic,strong)NSArray *specList;
+
+/**
+ *  规格组合数据
+ */
+@property (nonatomic,strong)NSDictionary *comBine;
+
+/**
+ *  默认基本商品信息
+ */
+@property (nonatomic,strong)NSDictionary *specDataDef;
+
+/**
+ *  品论数
+ */
+@property (nonatomic,strong)NSString *commentCount;
+
+/**
+ *  基本信息
+ */
+@property (nonatomic,strong)NSArray *attrList;
+
+@property (nonatomic,strong)NSArray *guanliansale;
+
+@property (nonatomic,strong)NSDictionary *essenCeArr;
+
+//是否是自营
+@property (nonatomic,strong)NSString *is_self;
+
+
+@property (nonatomic,strong) NSString *title;
+
+@property (nonatomic, strong) NSString * type;//1市集商品 2茗星商品
+
+//客服电话
+@property (nonatomic,strong)NSString *OnlineService;
+
+//app比网页版价格少提示
+@property (nonatomic,strong)NSString *price_diff_app;
+
+@property (nonatomic,strong)NSString *selfAvatar;
+
+@property (nonatomic,strong)NSString *isSaleBySaleClient;
+
+@property (nonatomic,strong)NSString *sale_client;
+
+@end

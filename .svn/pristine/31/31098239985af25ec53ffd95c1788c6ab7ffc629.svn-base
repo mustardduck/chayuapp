@@ -1,0 +1,72 @@
+//
+//  CYBuyerInvoiceVC.m
+//  茶语
+//
+//  Created by Leen on 16/7/4.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYBuyerInvoiceVC.h"
+
+@interface CYBuyerInvoiceVC ()
+
+@property (weak, nonatomic) IBOutlet UIButton *notProvideBtn;
+
+@property (weak, nonatomic) IBOutlet UIButton *provideBtn;
+@property (weak, nonatomic) IBOutlet UIButton *okBtn;
+@property (weak, nonatomic) IBOutlet UIButton *normalInvoiceBtn;
+@property (weak, nonatomic) IBOutlet UIButton *taxInvoiceBtn;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *okBtnTopCons;
+@property (weak, nonatomic) IBOutlet UIView *invoiceView;
+
+@end
+
+@implementation CYBuyerInvoiceVC
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    
+    _invoiceView.hidden = YES;
+    _notProvideBtn.selected = YES;
+    
+    _okBtn.layer.cornerRadius = 2.5f;
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (IBAction)touchUpInsideOn:(id)sender
+{
+    UIButton * btn = (UIButton *)sender;
+    
+    if(btn == _notProvideBtn)
+    {
+        _notProvideBtn.selected = YES;
+        _provideBtn.selected = !_notProvideBtn.selected;
+    }
+    else if (btn == _provideBtn)
+    {
+        _provideBtn.selected = YES;
+        _notProvideBtn.selected = !_provideBtn.selected;
+    }
+    else if (btn == _normalInvoiceBtn)
+    {
+        _normalInvoiceBtn.selected = YES;
+        _taxInvoiceBtn.selected = !_normalInvoiceBtn.selected;
+    }
+    else if (btn == _taxInvoiceBtn)
+    {
+        _taxInvoiceBtn.selected = YES;
+        _normalInvoiceBtn.selected = !_taxInvoiceBtn.selected;
+    }
+    
+    _invoiceView.hidden = !_provideBtn.selected;
+    
+    _okBtnTopCons.constant = _provideBtn.selected ? _invoiceView.height : 20;
+
+}
+
+@end

@@ -1,0 +1,225 @@
+//
+//  CYHomeViewController.m
+//  茶语
+//
+//  Created by Chayu on 16/6/27.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYHomeViewController.h"
+#import "CYHomeBannerCell.h"
+#import "CYHomeChaPingCell.h"
+#import "CYHomeShiJiCell.h"
+#import "CYHomeQuanZiCell.h"
+#import "CYHomeWenZhangCell.h"
+#import "CYDaoHangViewController.h"
+#import "CYSouSuoHomeViewController.h"
+#import "CYMyViewController.h"
+#import "CYHomeInfo.h"
+#import "CYTeaCategoryInfo.h"
+#import "CYEvaListViewController.h"
+#import "CYProductDetViewController.h"
+#import "CYTopicDetailController.h"
+#import "CYWenZhangDetailsController.h"
+@interface CYHomeViewController ()<UITableViewDelegate,UITableViewDataSource>
+
+
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+@property (nonatomic, strong) CYHomeInfo *mHomeInfo;
+
+- (IBAction)gotodaohang_click:(id)sender;
+
+
+- (IBAction)sousuo_click:(id)sender;
+
+
+- (IBAction)usercenter_click:(id)sender;
+
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottom_cons;
+
+@end
+
+@implementation CYHomeViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    _bottom_cons.constant = 65*(SCREEN_WIDTH/375.);
+    [self creatkongNavBar];
+   [self loadHomeData];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+
+
+-(void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick beginLogPageView:@"茶语首页"];
+}
+
+-(void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:@"茶语首页"];
+}
+
+
+
+#pragma mark - self defined methods
+- (void)loadHomeData
+{
+    
+    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+    [params setObject:@"3" forKey:@"version"];
+    [CYWebClient Post:@"home_info" parametes:params success:^(id responObject) {
+        self.mHomeInfo = [CYHomeInfo objectWithKeyValues:responObject];
+        [self.tableView reloadData];
+    } failure:^(id error) {
+    }];
+
+}
+
+
+#pragma mark -
+#pragma mark UITableViewDataSource method
+-(NSInteger )tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return 5;
+}
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView{
+    return 1;
+}
+
+-(CGFloat )tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    switch (indexPath.row) {
+        case 0:
+            return 171.*SCREENBILI;
+            break;
+        case 1:
+            return 126.;
+            break;
+        case 2:
+            return 325.;
+            break;
+        case 3:
+            return 274.;
+            break;
+        case 4:
+            return 123.;
+            break;
+        default:
+            return 0.;
+            break;
+    }
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    switch (indexPath.row) {
+        case 0:
+        {
+            CYHomeBannerCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYHomeBannerCell"];
+            [cell parseData:self.mHomeInfo.slide];
+
+            cell.gotosomeViewBlock = ^(CYHomeSlideInfo *info){
+            
+            };
+            return cell;
+            break;
+        }
+        case 1:
+        {
+            __weak __typeof(self) weakSelf = self;
+            CYHomeChaPingCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYHomeChaPingCell"];
+            [cell parseData:self.mHomeInfo.chapingList];
+            cell.gotosomeViewBlock = ^(CYTeaCategoryInfo *info){
+                CYEvaListViewController *vc = viewControllerInStoryBoard(@"CYEvaListViewController", @"Eva");
+//                vc.teaCateStr = info.name;
+//                vc.brandid = info.bid;
+//                vc.isPingPai = YES;
+                [weakSelf.navigationController pushViewController:vc animated:YES];
+            };
+            return cell;
+            break;
+        }
+        case 2:
+        {
+            __weak __typeof(self) weakSelf = self;
+            CYHomeShiJiCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYHomeShiJiCell"];
+            [cell parseData:self.mHomeInfo.shiji];
+            cell.gotosomeViewBlock = ^(CYHomeMarkertInfo *info){
+                CYProductDetViewController *vc =viewControllerInStoryBoard(@"CYProductDetViewController", @"TeaMall");
+                vc.goodId = @"10149";//info.resource_id;
+                //vc.hidesBottomBarWhenPushed = YES;
+                [weakSelf.navigationController pushViewController:vc animated:YES];
+            };
+            return cell;
+            break;
+        }
+        case 3:
+        {
+            CYHomeQuanZiCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYHomeQuanZiCell"];
+            [cell parseData:self.mHomeInfo.group];
+            cell.gotosomeViewBlock = ^(CYHomeQuanInfo *info){
+                CYTopicDetailController *vc = viewControllerInStoryBoard(@"CYTopicDetailController", @"BBS");
+                vc.tid = @"455172";//[info objectForKey:@"tid"];
+                vc.gid = @"9";//[info objectForKey:@"gid"];
+                [self.navigationController pushViewController:vc animated:YES];
+            };
+            return cell;
+            break;
+        }
+        case 4:
+        {
+            CYHomeWenZhangCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYHomeWenZhangCell"];
+            [cell parseData:self.mHomeInfo.article];
+            cell.gotosomeViewBlock = ^(CYHomeToDayNewsInfo *info){
+                CYWenZhangDetailsController *vc = viewControllerInStoryBoard(@"CYWenZhangDetailsController", @"WenZhang");
+                vc.wenzhangId =@"195591";// [info objectForJSONKey:@"id"];
+                [self.navigationController pushViewController:vc animated:YES];
+            };
+            return cell;
+            break;
+        }
+            
+        default:
+            return nil;
+            break;
+    }
+
+}
+
+#pragma mark -
+#pragma mark UITableViewDelegate method
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+}
+
+
+- (IBAction)gotodaohang_click:(id)sender {
+    CYDaoHangViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"CYDaoHangViewController"];
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (IBAction)sousuo_click:(id)sender {
+    CYSouSuoHomeViewController *vc = viewControllerInStoryBoard(@"CYSouSuoHomeViewController", @"SouSuo");
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (IBAction)usercenter_click:(id)sender {
+    
+    if (!MANAGER.isLoged) {
+        [APP_DELEGATE showLogView];
+        return;
+    }
+    CYMyViewController *vc = viewControllerInStoryBoard(@"CYMyViewController", @"My");
+    [self.navigationController pushViewController:vc animated:YES];
+}
+@end

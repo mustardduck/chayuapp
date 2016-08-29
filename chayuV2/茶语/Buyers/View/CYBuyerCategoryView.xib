@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="Pwa-fs-kGI" customClass="CYBuyerCategoryView">
+            <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="F0p-3j-h8R">
+                    <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                    <subviews>
+                        <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MwL-Sq-lcZ">
+                            <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                        </scrollView>
+                    </subviews>
+                    <color key="backgroundColor" red="0.94117647059999998" green="0.94117647059999998" blue="0.94117647059999998" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstItem="MwL-Sq-lcZ" firstAttribute="leading" secondItem="F0p-3j-h8R" secondAttribute="leading" id="0dq-FR-bIU"/>
+                        <constraint firstItem="MwL-Sq-lcZ" firstAttribute="top" secondItem="F0p-3j-h8R" secondAttribute="top" id="H1Y-HF-G6e"/>
+                        <constraint firstItem="MwL-Sq-lcZ" firstAttribute="height" secondItem="F0p-3j-h8R" secondAttribute="height" id="JcG-1N-Cfy"/>
+                        <constraint firstItem="MwL-Sq-lcZ" firstAttribute="width" secondItem="F0p-3j-h8R" secondAttribute="width" id="jH9-go-yDZ"/>
+                        <constraint firstAttribute="trailing" secondItem="MwL-Sq-lcZ" secondAttribute="trailing" id="vaP-AB-vEq"/>
+                    </constraints>
+                    <variation key="default">
+                        <mask key="constraints">
+                            <exclude reference="vaP-AB-vEq"/>
+                        </mask>
+                    </variation>
+                </view>
+            </subviews>
+            <color key="backgroundColor" red="0.009765625" green="0.009765625" blue="0.009765625" alpha="0.5" colorSpace="calibratedRGB"/>
+            <constraints>
+                <constraint firstItem="F0p-3j-h8R" firstAttribute="top" secondItem="Pwa-fs-kGI" secondAttribute="top" id="8hD-EU-FBg"/>
+                <constraint firstAttribute="bottom" secondItem="F0p-3j-h8R" secondAttribute="bottom" id="SkN-PA-KeV"/>
+                <constraint firstItem="F0p-3j-h8R" firstAttribute="leading" secondItem="Pwa-fs-kGI" secondAttribute="leading" id="iPP-hu-LpW"/>
+                <constraint firstAttribute="trailing" secondItem="F0p-3j-h8R" secondAttribute="trailing" id="jfu-oJ-dUb"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <connections>
+                <outlet property="contentView" destination="MwL-Sq-lcZ" id="tfv-J2-be6"/>
+            </connections>
+            <point key="canvasLocation" x="415" y="257"/>
+        </view>
+    </objects>
+</document>

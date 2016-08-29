@@ -1,0 +1,303 @@
+//
+//  CYDaoHangViewController.m
+//  茶语
+//
+//  Created by Chayu on 16/7/4.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYDaoHangViewController.h"
+#import "CYDaoHangHeaderView.h"
+@interface CYDaoHangViewController ()<UITableViewDelegate,UITableViewDataSource>
+{
+    NSMutableArray *dataArr;
+    NSInteger selindex;
+}
+
+
+- (IBAction)goback:(id)sender;
+
+
+
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+
+@end
+
+@implementation CYDaoHangViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    dataArr = [NSMutableArray array];
+    [dataArr addObject:@{@"ico":@"daohang_home",@"title":@"首页",@"isOpen":@(NO)}];
+    [dataArr addObject:@{@"ico":@"daohang_chaping",@"title":@"茶评",@"isOpen":@(NO)}];
+    [dataArr addObject:@{@"ico":@"daohang_shiji",@"title":@"市集",@"isOpen":@(NO)}];
+    [dataArr addObject:@{@"ico":@"daohang_quanzi",@"title":@"圈子",@"isOpen":@(NO)}];
+    [dataArr addObject:@{@"ico":@"daohang_wenzhang",@"title":@"文章",@"isOpen":@(NO)}];
+    [_tableView reloadData];
+    [self creatkongNavBar];
+    selindex = -1;
+}
+
+
+-(void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick beginLogPageView:@"导航"];
+}
+
+-(void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:@"导航"];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+#pragma mark -
+#pragma mark UITableViewDataSource method
+-(NSInteger )tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    
+    NSDictionary *info = dataArr[section];
+    BOOL isOpen = [[info objectForKey:@"isOpen"] boolValue];
+    if (isOpen) {
+        switch (section) {
+            case 0:
+                return 0;
+                break;
+            case 1:
+                return 4;
+                break;
+            case 2:
+                return 6;
+                break;
+            case 3:
+                return 3;
+                break;
+            case 4:
+                return 4;
+                break;
+            default:
+                return 0;
+                break;
+        }
+    }else{
+        return 0;
+    }
+
+    
+   
+}
+-(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
+    return [dataArr count];
+}
+
+-(CGFloat )tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSDictionary *info = dataArr[indexPath.section];
+    BOOL isOpen = [[info objectForKey:@"isOpen"] boolValue];
+    if (isOpen) {
+        switch (indexPath.section) {
+            case 0:
+                return 0;
+                break;
+            case 1:
+            {
+                if (indexPath.row<3) {
+                    return 35;
+                }else{
+                    return 260;
+                }
+               
+            }
+                break;
+            case 2:
+            {
+                if (indexPath.row<5) {
+                    return 35;
+                }else{
+                    return 260;
+                }
+                
+            }
+                break;
+            case 3:
+            {
+                if (indexPath.row<2) {
+                    return 35;
+                }else{
+                    return 260;
+                }
+                
+            }
+                break;
+            case 4:
+            {
+                if (indexPath.row<3) {
+                    return 35;
+                }else{
+                    return 260;
+                }
+                
+            }
+                break;
+            default:
+                return 0;
+                break;
+        }
+    }else{
+        return 0;
+    }
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString *daohangcellidentify = @"daohangcell";
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:daohangcellidentify];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:daohangcellidentify];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    }else{
+        for (UIView * view in cell.contentView.subviews ) {
+            [view removeFromSuperview];
+        }
+    }
+    
+    NSDictionary *info = dataArr[indexPath.section];
+    BOOL isOpen = [[info objectForKey:@"isOpen"] boolValue];
+    if (isOpen) {
+        UILabel *titleLbl = [[UILabel alloc] initWithFrame:CGRectMake(46, 0, SCREEN_WIDTH-46,cell.contentView.height)];
+        titleLbl.textColor = CONTENTCOLOR;
+        titleLbl.text = @"二级菜单";
+        titleLbl.font = FONT(16.0);
+        
+        UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectMake(20,10,SCREEN_WIDTH-40,230)];
+        imgView.image = [UIImage imageNamed:@"zwt_shiji_list"];
+        switch (indexPath.section) {
+            case 0:
+            {
+
+                break;
+            }
+            case 1:
+            {
+                if (indexPath.row<3) {
+                    [cell.contentView addSubview:titleLbl];
+                }else{
+                    [cell.contentView addSubview:imgView];
+                }
+                break;
+            }
+            case 2:
+            {
+                if (indexPath.row<5) {
+                    [cell.contentView addSubview:titleLbl];
+                }else{
+                    [cell.contentView addSubview:imgView];
+                }
+                break;
+            }
+            case 3:
+            {
+                if (indexPath.row<2) {
+                    [cell.contentView addSubview:titleLbl];
+                }else{
+                    [cell.contentView addSubview:imgView];
+                }
+                break;
+            }
+            case 4:
+            {
+                if (indexPath.row<3) {
+                    [cell.contentView addSubview:titleLbl];
+                }else{
+                    [cell.contentView addSubview:imgView];
+                }
+                break;
+            }
+                
+            default:
+                break;
+        }
+    }
+    return cell;
+}
+
+-(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    CYDaoHangHeaderView *header = [[[NSBundle mainBundle] loadNibNamed:@"CYDaoHangHeaderView" owner:nil options:nil] firstObject];
+    NSDictionary *info = dataArr[section];
+     header.row_img.hidden = YES;
+    if (section >0) {
+        header.row_img.hidden = NO;
+    }
+    header.ico_img.image = [UIImage imageNamed:[info objectForKey:@"ico"]];
+    header.titleLbl.text = [info objectForKey:@"title"];
+    BOOL isOpen = [[info objectForKey:@"isOpen"] boolValue];
+    header.row_img.image = isOpen?[UIImage imageNamed:@"daohang_up_row"]:[UIImage imageNamed:@"daohang_down_row"];
+    if (section>0) {
+        UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+        button.frame = header.bounds;
+        button.tag = section +15000;
+        [button addTarget:self action:@selector(selectHeader:) forControlEvents:UIControlEventTouchUpInside];
+        [header addSubview:button];
+    }
+   
+    return header;
+    
+}
+
+
+-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 71.0;
+}
+
+
+
+#pragma mark -
+#pragma mark UITableViewDelegate method
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+}
+
+
+-(void)selectHeader:(UIButton *)sender
+{
+    
+    NSInteger selectIndex = sender.tag - 15000;
+    NSMutableDictionary *selectinfo = [NSMutableDictionary dictionaryWithDictionary:dataArr[selectIndex]];
+    BOOL isopen = [[selectinfo objectForKey:@"isOpen"] boolValue];
+    if (selectIndex != selindex && selindex>0) {
+        NSMutableDictionary *info = [NSMutableDictionary dictionaryWithDictionary:dataArr[selindex]];
+        [info setObject:[NSNumber numberWithBool:NO] forKey:@"isOpen"];
+        [dataArr replaceObjectAtIndex:selindex withObject:info];
+        [_tableView reloadSections:[NSIndexSet indexSetWithIndex:selindex] withRowAnimation:UITableViewRowAnimationAutomatic];
+    }
+
+    isopen = !isopen;
+    [selectinfo setObject:[NSNumber numberWithBool:isopen] forKey:@"isOpen"];
+    [dataArr replaceObjectAtIndex:selectIndex withObject:selectinfo];
+    [_tableView reloadSections:[NSIndexSet indexSetWithIndex:selectIndex] withRowAnimation:UITableViewRowAnimationAutomatic];
+    selindex = selectIndex;
+}
+
+
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+@end

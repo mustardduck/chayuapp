@@ -1,0 +1,146 @@
+//
+//  CYShiJiFenLeiView.m
+//  茶语
+//
+//  Created by Chayu on 16/7/16.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYShiJiFenLeiView.h"
+#import "CYShiJiFenLeiHeader.h"
+#import "CYShiJiFenLeiCellTableViewCell.h"
+
+@interface CYShiJiFenLeiView ()<UITableViewDelegate,UITableViewDataSource>
+{
+
+    NSMutableArray *cateArr;
+}
+
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+
+
+
+@end
+
+@implementation CYShiJiFenLeiView
+
+/*
+// Only override drawRect: if you perform custom drawing.
+// An empty implementation adversely affects performance during animation.
+- (void)drawRect:(CGRect)rect {
+    // Drawing code
+}
+*/
+
+
+- (void)setDataArr:(NSMutableArray *)dataArr
+{
+    _dataArr = dataArr;
+    cateArr = [NSMutableArray arrayWithArray:_dataArr];
+    [_tableView reloadData];
+}
+
+-(void)loadAllFenlei
+{
+    
+}
+
+-(void)awakeFromNib
+{
+  [super awakeFromNib];
+    _tableView.delegate = self;
+    _tableView.dataSource = self;
+    hiddenSepretor(_tableView);
+}
+
+
+#pragma mark -
+#pragma mark UITableViewDataSource method
+-(NSInteger )tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    CYTeaCategoryInfo *info = cateArr[section];
+    if (info.hasOpen) {
+        return info.child.count;
+    }
+    return 0;
+}
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView{
+    return [cateArr count];
+}
+
+-(CGFloat )tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 50.f;
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString *fenleiidentify = @"CYShiJiFenLeiCellTableViewCell";
+    CYShiJiFenLeiCellTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:fenleiidentify];
+    if (!cell) {
+        cell = [[[NSBundle mainBundle] loadNibNamed:@"CYShiJiFenLeiCellTableViewCell" owner:nil options:nil] firstObject];
+    }
+    CYTeaCategoryInfo *info = cateArr[indexPath.section];
+    CYTeaChildCategoryInfo *childInfo = info.child[indexPath.row];
+    if (childInfo.thumb.length) {
+        [cell.showImg sd_setImageWithURL:[NSURL URLWithString:childInfo.thumb] placeholderImage:SQUARE];
+    }
+    cell.titleLbl.text = childInfo.name;
+    
+    return cell;
+}
+
+
+-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 50;
+}
+
+-(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    CYShiJiFenLeiHeader *header = [[[NSBundle mainBundle] loadNibNamed:@"CYShiJiFenLeiHeader" owner:nil options:nil] firstObject];
+    CYTeaCategoryInfo *info = cateArr[section];
+    if (info.thumb.length) {
+        [header.showImg sd_setImageWithURL:[NSURL URLWithString:info.thumb] placeholderImage:SQUARE];
+    }
+    if (info.hasOpen) {
+        header.rightImg.transform = CGAffineTransformMakeRotation(-M_PI);
+    }
+    
+    header.titleLbl.text = info.name;
+    header.selectBtn.tag = 6000 +section;
+    [header.selectBtn addTarget:self action:@selector(selectHeader:) forControlEvents:UIControlEventTouchUpInside];
+    
+
+    header.frame = CGRectMake(0, 0, SCREEN_WIDTH, 50);
+    return header;
+}
+
+#pragma mark -
+#pragma mark UITableViewDelegate method
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (self.shijiCateBlock) {
+        CYTeaCategoryInfo *info = cateArr[indexPath.section];
+        CYTeaChildCategoryInfo *childInfo = info.child[indexPath.row];
+        self.shijiCateBlock(childInfo);
+    }
+}
+
+-(void)selectHeader:(UIButton *)sender
+{
+    NSInteger selectTag = sender.tag - 6000;
+    CYTeaCategoryInfo *info = [cateArr objectAtIndex:selectTag];
+    NSArray *chidData = info.children;
+    info.hasOpen = !info.hasOpen;
+    
+    if (info.hasOpen) {
+        self.height +=(ceilf(chidData.count/3.)*50);
+    }else{
+        self.height -=(ceilf(chidData.count/3.)*50);
+    }
+    [cateArr replaceObjectAtIndex:selectTag withObject:info];
+    [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:selectTag] withRowAnimation:UITableViewRowAnimationAutomatic];
+}
+
+@end

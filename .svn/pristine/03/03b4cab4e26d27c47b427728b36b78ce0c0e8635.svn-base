@@ -1,0 +1,40 @@
+//
+//  CYChaPingView.m
+//  茶语
+//
+//  Created by Chayu on 16/6/28.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYChaPingView.h"
+
+@interface CYChaPingView ()
+
+
+@property (weak, nonatomic) IBOutlet UIImageView *icoImg;
+
+@property (weak, nonatomic) IBOutlet UILabel *title;
+@property (weak, nonatomic) IBOutlet UIButton *selectBtn;
+
+
+@end
+
+@implementation CYChaPingView
+
+/*
+// Only override drawRect: if you perform custom drawing.
+// An empty implementation adversely affects performance during animation.
+- (void)drawRect:(CGRect)rect {
+    // Drawing code
+}
+*/
+
+
+- (void)setInfo:(CYTeaCategoryInfo *)info
+{
+    _info = info;
+    _title.text = info.name;
+    _icoImg.image = [UIImage imageNamed:info.icon];
+}
+
+@end

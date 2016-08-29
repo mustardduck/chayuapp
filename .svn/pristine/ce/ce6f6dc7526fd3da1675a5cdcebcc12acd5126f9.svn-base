@@ -1,0 +1,168 @@
+
+
+//
+//  CYFenLeiTopView.m
+//  茶语
+//
+//  Created by Chayu on 16/7/18.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYFenLeiTopView.h"
+
+@interface CYFenLeiTopView ()
+{
+    UIButton *selectBtn;
+}
+
+
+
+@end
+
+@implementation CYFenLeiTopView
+
+/*
+// Only override drawRect: if you perform custom drawing.
+// An empty implementation adversely affects performance during animation.
+- (void)drawRect:(CGRect)rect {
+    // Drawing code
+}
+*/
+
+-(void)setBiaoqianArr:(NSArray *)biaoqianArr
+{
+    _biaoqianArr = biaoqianArr;
+    for (UIView *view in _biaoqianContentView.subviews) {
+        [view removeFromSuperview];
+    }
+    CGFloat biaoqianheight = 0;
+    for (int i=0; i<_biaoqianArr.count; i++)
+    {
+        NSDictionary *info = _biaoqianArr[i];
+        NSString *name = [info objectForKey:@"title"];
+        static UIButton *beforeBtn = nil;
+        UIButton *button=[UIButton buttonWithType:UIButtonTypeCustom];
+        
+        button.backgroundColor=[UIColor clearColor];
+        [button setTitleColor:[UIColor getColorWithHexString:@"333333"] forState:UIControlStateNormal];
+        button.titleLabel.font = FONT(14.0);
+        CGRect rect=[name boundingRectWithSize:CGSizeMake(SCREEN_WIDTH-40, 32) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSForegroundColorAttributeName:[UIColor redColor],NSFontAttributeName:button.titleLabel.font} context:nil];
+        if (i==0)
+        {
+            button.frame=CGRectMake(20,10, rect.size.width+15, rect.size.height+15);
+            biaoqianheight +=(rect.size.height+35);
+        }
+        else
+        {
+            CGFloat leaveWidth=SCREEN_WIDTH-beforeBtn.frame.size.width-beforeBtn.frame.origin.x-40;
+            if (leaveWidth>=rect.size.width)
+            {
+                button.frame=CGRectMake(CGRectGetMaxX(beforeBtn.frame)+10, beforeBtn.frame.origin.y, rect.size.width+15, rect.size.height+15);
+                if (button.y != beforeBtn.y) {
+                     biaoqianheight +=(rect.size.height+35);
+                }
+            }
+            else
+            {
+                button.frame=CGRectMake(20, CGRectGetMaxY(beforeBtn.frame)+10, rect.size.width+15, rect.size.height+15);
+                biaoqianheight +=(rect.size.height+35);
+            }
+            
+        }
+        button.tag = i +8000;
+        button.layer.cornerRadius=3;
+        button.layer.borderColor = [UIColor getColorWithHexString:@"bbbbbb"].CGColor;
+        button.layer.borderWidth = 1.0f;
+        button.clipsToBounds=YES;
+        [button setTitle:name forState:UIControlStateNormal];
+        beforeBtn = button;
+        [button addTarget:self action:@selector(btnClick:) forControlEvents:UIControlEventTouchUpInside];
+        [_biaoqianContentView addSubview:button];
+    }
+    _biaoqian_height_cons.constant = biaoqianheight;
+    [self layoutIfNeeded];
+
+}
+
+
+-(void)btnClick:(UIButton *)sender
+{
+    [sender setTitleColor:MAIN_COLOR forState:UIControlStateNormal];
+    UIView *view = sender;
+    view.layer.borderColor = MAIN_COLOR.CGColor;
+    view.layer.borderWidth = 1.0f;
+    view.layer.cornerRadius = 3.0f;
+    
+    NSDictionary *info = _biaoqianArr[sender.tag - 8000];
+    if (self.selectblock ) {
+        self.selectblock(info);
+    }
+    if (selectBtn.tag == sender.tag) {
+        return;
+    }
+    if (selectBtn) {
+        [selectBtn setTitleColor:btnTitle_COLOR forState:UIControlStateNormal];
+        UIView *selectview = selectBtn;
+        selectview.layer.borderColor = btnBorder_COLOR.CGColor;
+        selectview.layer.borderWidth = 1.0f;
+        selectview.layer.cornerRadius = 3.0f;
+        
+    }
+
+    selectBtn = sender;
+    
+}
+
+- (IBAction)huanyiqi_click:(id)sender {
+    if (self.huanyipiBlock) {
+        self.huanyipiBlock();
+    }
+}
+
++ (CGFloat)fenleiTopViewHeightWithData:(NSArray *)hot_tag_list
+{
+    CGFloat heigt = 0;
+    CGFloat biaoqianheight = 0;
+    for (int i=0; i<hot_tag_list.count; i++)
+    {
+        NSDictionary *info = hot_tag_list[i];
+        
+        NSString *name=info[@"title"];
+        static UIButton *beforeBtn=nil;
+        UIButton *button=[UIButton buttonWithType:UIButtonTypeCustom];
+        button.backgroundColor=[UIColor clearColor];
+        [button setTitleColor:[UIColor getColorWithHexString:@"333333"] forState:UIControlStateNormal];
+        button.titleLabel.font = FONT(14.0);
+        CGRect rect=[name boundingRectWithSize:CGSizeMake(SCREEN_WIDTH-40, 32) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSForegroundColorAttributeName:[UIColor redColor],NSFontAttributeName:button.titleLabel.font} context:nil];
+        if (i==0)
+        {
+            button.frame=CGRectMake(20,10, rect.size.width+15, rect.size.height+15);
+            biaoqianheight +=(rect.size.height+30);
+        }
+        else
+        {
+            CGFloat leaveWidth=SCREEN_WIDTH-beforeBtn.frame.size.width-beforeBtn.frame.origin.x-20;
+            if (leaveWidth>=rect.size.width)
+            {
+                button.frame=CGRectMake(CGRectGetMaxX(beforeBtn.frame)+10, beforeBtn.frame.origin.y, rect.size.width+15, rect.size.height+15);
+                
+                if (button.y != beforeBtn.y) {
+                    biaoqianheight +=(rect.size.height+30);
+                }
+            }
+            else
+            {
+                button.frame=CGRectMake(20, CGRectGetMaxY(beforeBtn.frame)+10, rect.size.width+15, rect.size.height+15);
+                biaoqianheight +=(rect.size.height+30);
+            }
+            
+        }
+        
+           beforeBtn = button;
+    }
+    heigt = biaoqianheight-5;
+    
+    return heigt;
+}
+
+@end

@@ -1,0 +1,132 @@
+//
+//  CYPaySuccessTableViewController.m
+//  TeaMall
+//
+//  Created by Chayu on 15/11/23.
+//  Copyright © 2015年 Chayu. All rights reserved.
+//
+
+#import "CYPaySuccessTableViewController.h"
+#import "CYSelectGiftViewController.h"
+#import "CYMyOrderViewController.h"
+#import "CYMasterListViewController.h"
+#import "CYGiftListViewController.h"
+#import "CYSCartViewController.h"
+#import "CYOrderDetailViewController.h"
+#import "CYMyOrderViewController.h"
+#import "CYProductDetViewController.h"
+#import "CYPayTableViewController.h"
+#import "AppDelegate.h"
+@interface CYPaySuccessTableViewController ()
+{
+    BOOL hasGift;//是否可选择礼品
+    OSMessage *message;
+    NSString *orderId;
+}
+- (IBAction)goback:(id)sender;
+@property (weak, nonatomic) IBOutlet UILabel *priceLbl;
+- (IBAction)lingqudikouquan_click:(id)sender;
+- (IBAction)lingquchali_click:(id)sender;
+
+- (IBAction)chakandingdan_click:(id)sender;
+
+- (IBAction)jixugouwu_click:(id)sender;
+
+- (IBAction)chayushouye_click:(id)sender;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *linquchali_center_x_cons;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *fenxiang_center_x_cons;
+@property (weak, nonatomic) IBOutlet UILabel *statusLbl;
+//顶部高度
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *top_height_cons;
+
+
+@end
+
+@implementation CYPaySuccessTableViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    hasGift = NO;
+    message = [[OSMessage alloc] init];
+    _priceLbl.text = [NSString stringWithFormat:@"您已成功支付%@元",_price];
+    
+    [self webpostisSendGift];
+}
+
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [MobClick beginLogPageView:self.title];
+}
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:self.title];
+}
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+-(void)webpostisSendGift
+{
+    [CYWebClient Post:@"isSendGift" parametes:@{@"orderSn":_orderSign} success:^(id responObject) {
+        hasGift = [[responObject objectForKey:@"isSendGift"] boolValue];
+        message.title = [responObject objectForKey:@"shareTitle"];
+        message.desc = [responObject objectForKey:@"shareDesc"];
+        message.link =[responObject objectForKey:@"shareUrl"];
+        message.imgUrl = [responObject objectForKey:@"shareThumb"];
+        orderId = [responObject objectForKey:@"orderId"];
+        if (orderId.length == 0 && hasGift) {
+            _fenxiang_center_x_cons.constant = 0;
+        }
+       
+    } failure:^(id error) {
+        
+    }];
+}
+
+- (IBAction)goback:(id)sender {
+    
+    NSArray *vcArr = self.navigationController.viewControllers;
+    UIViewController *aimVC = nil;
+    for (NSInteger i=vcArr.count-1; i>=0; i--) {
+        if ([vcArr[i] isKindOfClass:[CYOrderDetailViewController class]] ||[vcArr[i] isKindOfClass:[CYSCartViewController class]] ||[vcArr[i] isKindOfClass:[CYMyOrderViewController class]]||[vcArr[i] isKindOfClass:[CYProductDetViewController class]]) {
+            aimVC = vcArr[i];
+            break;
+        }
+    }
+    if (aimVC) {
+        [self.navigationController popToViewController:aimVC animated:YES];
+    }
+    
+//    [self.navigationController popToRootViewControllerAnimated:NO];
+//    [[NSNotificationCenter defaultCenter] postNotificationName:tabBarIndex object:@{@"selectIndex":@"3"}];
+}
+- (IBAction)lingqudikouquan_click:(id)sender {
+}
+
+- (IBAction)lingquchali_click:(id)sender {
+    CYGiftListViewController *vc= viewControllerInStoryBoard(@"CYGiftListViewController", @"TeaMall");
+    vc.orderSign = _orderSign;
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (IBAction)chakandingdan_click:(id)sender {
+    CYMyOrderViewController *vc = viewControllerInStoryBoard(@"CYMyOrderViewController", @"My");
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (IBAction)jixugouwu_click:(id)sender {
+    [[NSNotificationCenter defaultCenter] postNotificationName:tabBarIndex object:@{@"selectIndex":@"2"}];
+    [self.navigationController popToRootViewControllerAnimated:NO];
+}
+
+- (IBAction)chayushouye_click:(id)sender {
+    [[NSNotificationCenter defaultCenter] postNotificationName:tabBarIndex object:@{@"selectIndex":@"0"}];
+    [self.navigationController popToRootViewControllerAnimated:NO];
+}
+@end

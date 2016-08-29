@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ICx-2P-rAE" customClass="CYBuyerProfileFooterView">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="235"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MaL-8d-Z75">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="45"/>
+                    <subviews>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="H89-QD-arh">
+                            <rect key="frame" x="0.0" y="0.0" width="375" height="1"/>
+                            <color key="backgroundColor" red="1" green="0.086771209109999997" blue="0.034194080279999997" alpha="1" colorSpace="calibratedRGB"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="0.5" id="J8a-Wq-1K9"/>
+                            </constraints>
+                        </view>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PR9-LM-Llh">
+                            <rect key="frame" x="0.0" y="44" width="375" height="1"/>
+                            <color key="backgroundColor" red="1" green="0.086771209109999997" blue="0.034194080279999997" alpha="1" colorSpace="calibratedRGB"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="0.5" id="HF4-3i-bkt"/>
+                            </constraints>
+                        </view>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mO2-Af-7Eo">
+                            <rect key="frame" x="0.0" y="0.0" width="375" height="45"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <inset key="contentEdgeInsets" minX="14" minY="0.0" maxX="0.0" maxY="0.0"/>
+                            <inset key="titleEdgeInsets" minX="5" minY="0.0" maxX="0.0" maxY="0.0"/>
+                            <state key="normal" title="添加描述" image="AddIconBtn">
+                                <color key="titleColor" red="0.53725490200000003" green="0.24313725489999999" blue="0.12549019610000001" alpha="1" colorSpace="calibratedRGB"/>
+                            </state>
+                            <connections>
+                                <action selector="addContentClicked:" destination="ICx-2P-rAE" eventType="touchUpInside" id="Noo-i7-n7h"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstItem="PR9-LM-Llh" firstAttribute="leading" secondItem="MaL-8d-Z75" secondAttribute="leading" id="3Yt-sb-uls"/>
+                        <constraint firstItem="mO2-Af-7Eo" firstAttribute="width" secondItem="MaL-8d-Z75" secondAttribute="width" id="RaY-4z-u1V"/>
+                        <constraint firstAttribute="trailing" secondItem="H89-QD-arh" secondAttribute="trailing" id="Wqx-rV-KDa"/>
+                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="45" id="a1e-WR-38x"/>
+                        <constraint firstAttribute="trailing" secondItem="PR9-LM-Llh" secondAttribute="trailing" id="f8W-5h-luM"/>
+                        <constraint firstAttribute="bottom" secondItem="PR9-LM-Llh" secondAttribute="bottom" id="gDF-z9-oSM"/>
+                        <constraint firstItem="mO2-Af-7Eo" firstAttribute="top" secondItem="MaL-8d-Z75" secondAttribute="top" id="m9K-6K-pb8"/>
+                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="45" id="njn-EA-Keo"/>
+                        <constraint firstItem="mO2-Af-7Eo" firstAttribute="height" secondItem="MaL-8d-Z75" secondAttribute="height" id="oBq-aG-D5c"/>
+                        <constraint firstAttribute="height" constant="45" id="tV4-Gi-wHg"/>
+                        <constraint firstItem="H89-QD-arh" firstAttribute="leading" secondItem="MaL-8d-Z75" secondAttribute="leading" id="w30-aj-doG"/>
+                        <constraint firstItem="mO2-Af-7Eo" firstAttribute="leading" secondItem="MaL-8d-Z75" secondAttribute="leading" id="x3X-eh-fRD"/>
+                        <constraint firstItem="H89-QD-arh" firstAttribute="top" secondItem="MaL-8d-Z75" secondAttribute="top" id="xFo-yi-LBT"/>
+                    </constraints>
+                    <variation key="default">
+                        <mask key="constraints">
+                            <exclude reference="njn-EA-Keo"/>
+                        </mask>
+                    </variation>
+                </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="T5R-qG-c5R">
+                    <rect key="frame" x="0.0" y="45" width="375" height="130"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="bottom" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="P1d-At-Fg4">
+                            <rect key="frame" x="112" y="15" width="150" height="100"/>
+                            <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="150" id="IpP-tt-NyI"/>
+                                <constraint firstAttribute="height" constant="100" id="Jxw-FK-7c7"/>
+                                <constraint firstAttribute="height" constant="212" id="TEJ-TR-MLf"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <inset key="titleEdgeInsets" minX="-50" minY="0.0" maxX="0.0" maxY="18"/>
+                            <inset key="imageEdgeInsets" minX="49" minY="0.0" maxX="11" maxY="40"/>
+                            <state key="normal" title="点击上传" image="addPhotoBtn">
+                                <color key="titleColor" red="0.59999999999999998" green="0.59999999999999998" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
+                            </state>
+                            <variation key="default">
+                                <mask key="constraints">
+                                    <exclude reference="TEJ-TR-MLf"/>
+                                </mask>
+                            </variation>
+                            <connections>
+                                <action selector="addImageClicked:" destination="ICx-2P-rAE" eventType="touchUpInside" id="pAj-xm-G2G"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstItem="P1d-At-Fg4" firstAttribute="centerY" secondItem="T5R-qG-c5R" secondAttribute="centerY" id="3mA-zp-CjM"/>
+                        <constraint firstAttribute="height" constant="130" id="GpA-cF-6Ga"/>
+                        <constraint firstItem="P1d-At-Fg4" firstAttribute="centerX" secondItem="T5R-qG-c5R" secondAttribute="centerX" id="WEc-6I-Gh4"/>
+                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="130" id="cbF-gC-Jxd"/>
+                    </constraints>
+                </view>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RqR-KD-GeW" customClass="BaseButton">
+                    <rect key="frame" x="14" y="175" width="347" height="45"/>
+                    <color key="backgroundColor" red="0.53725490200000003" green="0.24313725489999999" blue="0.12549019610000001" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="45" id="E8H-aG-SgU"/>
+                        <constraint firstAttribute="height" constant="45" id="Kse-o5-R7C"/>
+                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="347" id="PtH-c6-Oco"/>
+                        <constraint firstAttribute="width" constant="347" id="Qi9-Cp-JEH"/>
+                        <constraint firstAttribute="width" constant="347" id="mIC-OZ-oym"/>
+                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="45" id="o1I-9d-VeP"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <state key="normal" title="保存"/>
+                    <variation key="default">
+                        <mask key="constraints">
+                            <exclude reference="PtH-c6-Oco"/>
+                            <exclude reference="Qi9-Cp-JEH"/>
+                            <exclude reference="E8H-aG-SgU"/>
+                            <exclude reference="o1I-9d-VeP"/>
+                        </mask>
+                    </variation>
+                    <connections>
+                        <action selector="saveBtnClicked:" destination="ICx-2P-rAE" eventType="touchUpInside" id="7W5-4e-SYh"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="RqR-KD-GeW" firstAttribute="leading" secondItem="ICx-2P-rAE" secondAttribute="leading" constant="14" id="4cT-x3-MV7"/>
+                <constraint firstItem="MaL-8d-Z75" firstAttribute="leading" secondItem="ICx-2P-rAE" secondAttribute="leading" id="63X-fT-puM"/>
+                <constraint firstItem="MaL-8d-Z75" firstAttribute="width" secondItem="ICx-2P-rAE" secondAttribute="width" id="8BS-LW-iio"/>
+                <constraint firstItem="MaL-8d-Z75" firstAttribute="top" secondItem="ICx-2P-rAE" secondAttribute="top" id="X6f-PN-asT"/>
+                <constraint firstItem="T5R-qG-c5R" firstAttribute="leading" secondItem="ICx-2P-rAE" secondAttribute="leading" id="bHQ-fr-aGY"/>
+                <constraint firstAttribute="height" constant="235" id="c0l-jN-PSz"/>
+                <constraint firstItem="T5R-qG-c5R" firstAttribute="top" secondItem="MaL-8d-Z75" secondAttribute="bottom" id="ctq-Cn-aZc"/>
+                <constraint firstItem="T5R-qG-c5R" firstAttribute="width" secondItem="ICx-2P-rAE" secondAttribute="width" id="sTR-mc-r3A"/>
+                <constraint firstAttribute="bottom" secondItem="RqR-KD-GeW" secondAttribute="bottom" constant="15" id="vEX-R5-VXI"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="AddIconBtn" width="16" height="16"/>
+        <image name="addPhotoBtn" width="48" height="37"/>
+    </resources>
+</document>

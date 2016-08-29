@@ -1,0 +1,133 @@
+//
+//  CYcommentView.m
+//  TeaMall
+//
+//  Created by Chayu on 15/11/11.
+//  Copyright © 2015年 Chayu. All rights reserved.
+//
+
+#import "CYCommentView.h"
+
+
+@interface CYCommentView ()<LDXScoreDelegate>
+
+@property (weak, nonatomic) IBOutlet UIImageView *showImg;
+
+@property (weak, nonatomic) IBOutlet UILabel *priceLbl;
+@property (weak, nonatomic) IBOutlet UILabel *titleLbl;
+@property (weak, nonatomic) IBOutlet UILabel *standardLbl;
+
+@property (weak, nonatomic) IBOutlet UILabel *fractionLbl;
+
+@property (weak, nonatomic) IBOutlet UIView *evaBg;
+
+/**
+ *  第一次评价
+ */
+@property (nonatomic,strong)UILabel *firstEvaLbl;
+
+
+/**
+ *  卖家回复
+ */
+@property (nonatomic,strong)UILabel *sellerReply;
+
+
+@end
+
+@implementation CYCommentView
+
+- (void)awakeFromNib
+{
+    _starView.delegate = self;
+    //    _starView.show_star =5;
+    _evaBg.layer.cornerRadius = 3.0f;
+    _evaBg.layer.borderColor = LINECOLOR.CGColor;
+    _evaBg.layer.borderWidth = 1.0f;
+    _showImg.layer.borderWidth = 1.0f;
+    _showImg.layer.borderColor = LINECOLOR.CGColor;
+    _evaTxt.placeholder = @"亲，写点什么吧，您的意见对其他茶友帮助很大！";
+}
+/*
+ // Only override drawRect: if you perform custom drawing.
+ // An empty implementation adversely affects performance during animation.
+ - (void)drawRect:(CGRect)rect {
+ // Drawing code
+ }
+ */
+
+
+- (UILabel *)firstEvaLbl
+{
+    if (!_firstEvaLbl) {
+        _firstEvaLbl = [[UILabel alloc] initWithFrame:CGRectMake(10,_starView.y+_starView.height +10, SCREEN_WIDTH-20, 1)];
+        _firstEvaLbl.font = FONT(13.0f);
+        _firstEvaLbl.numberOfLines = 0;
+        _firstEvaLbl.textColor = CONTENTCOLOR;
+        _firstEvaLbl.backgroundColor  =CLEARCOLOR;
+        
+    }
+    return _firstEvaLbl;
+}
+
+- (UILabel *)sellerReply
+{
+    if (!_sellerReply) {
+        _sellerReply = [[UILabel alloc] initWithFrame:CGRectMake(10,self.firstEvaLbl.height+self.firstEvaLbl.y +10, SCREEN_WIDTH -20, 0)];
+        _sellerReply.numberOfLines = 0;
+        _sellerReply.font = FONT(13.0);
+        _sellerReply.textColor = CONTENTCOLOR;
+    }
+    return _sellerReply;
+}
+
+
+
+- (void)setModel:(CYShopTrolleyModel *)model
+{
+    _model = model;
+    if (_model.thumb.length) {
+        NSURL *url = [NSURL URLWithString:_model.thumb];
+        [_showImg sd_setImageWithURL:url placeholderImage:nil];
+        
+    }
+    _starView.show_star = [model.score integerValue];
+    _priceLbl.text = [NSString stringWithFormat:@"￥%@",_model.commodityPrice];
+    _titleLbl.text = _model.name;
+    _standardLbl.text = _model.spec;
+    
+    if (_model.addReview.length) {
+        
+        self.firstEvaLbl.text = _model.addReview;
+        CGFloat height = [_model.addReview heightWithFont:FONT(13.0) forWidth:SCREEN_WIDTH -30];
+        height +=20;
+        
+        UIView *firstBg = [[UIView alloc] initWithFrame:CGRectMake(10, _starView.height + _starView.y +10, SCREEN_WIDTH-20, height)];
+        firstBg.backgroundColor = [UIColor getColorWithHexString:@"fafafa"];
+        [firstBg addSubview:self.firstEvaLbl];;
+        firstBg.layer.borderColor = LINECOLOR.CGColor;
+        firstBg.layer.borderWidth = 1.0f;
+        firstBg.layer.cornerRadius = 3.0f;
+        self.firstEvaLbl.frame = CGRectMake(5, 0, firstBg.width-10,firstBg.height);
+        [firstBg addSubview:self.firstEvaLbl];
+        [self addSubview:firstBg];
+    }
+    _fractionLbl.text = [NSString stringWithFormat:@"%d分",(int)[model.score integerValue]];
+    if (_model.adminReview.length) {
+        [self addSubview:self.sellerReply];
+        self.sellerReply.text = [NSString stringWithFormat:@"[卖家回复]:%@",_model.adminReview];
+        CGFloat height = [self.sellerReply.text heightWithFont:FONT(13.0) forWidth:SCREEN_WIDTH -20];
+        height +=10;
+        self.sellerReply.height = height;
+        self.sellerReply.y = _starView.height + _starView.y +10+self.firstEvaLbl.height +10;
+        
+    }
+}
+
+
+
+- (void)showStarCount:(NSInteger)count
+{
+    _fractionLbl.text = [NSString stringWithFormat:@"%d分",(int)count*2];
+}
+@end

@@ -1,0 +1,27 @@
+//
+//  CYTeaReviewCell.h
+//  茶语
+//
+//  Created by 李峥 on 16/2/19.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "BaseCell.h"
+#import "CYTeaReviewInfo.h"
+
+@interface CYTeaReviewCell : BaseCell
+
+@property (weak, nonatomic) IBOutlet UIImageView *mImageView;
+@property (weak, nonatomic) IBOutlet UILabel *mTitleLabel;
+@property (weak, nonatomic) IBOutlet UILabel *mComplexLabel;
+@property (weak, nonatomic) IBOutlet UILabel *mOfficialLabel;
+@property (weak, nonatomic) IBOutlet UILabel *mTypeLabel;
+@property (weak, nonatomic) IBOutlet UILabel *mAddressLabel;
+
+@property (weak, nonatomic) IBOutlet UIButton *duihuanBtn;
+
+@property (weak, nonatomic) IBOutlet UILabel *kucunLbl;
+
+@property(nonatomic,copy)void (^duiHuanClickBlock)(NSString *);
+
+@end

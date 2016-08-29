@@ -1,0 +1,82 @@
+//
+//  CYLogisticsHeaderView.m
+//  TeaMall
+//
+//  Created by Chayu on 16/1/21.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYLogisticsHeaderView.h"
+#import "CYOrderGoodsView.h"
+@interface CYLogisticsHeaderView ()
+
+@property (weak, nonatomic) IBOutlet UILabel *logisticsNameLbl;
+
+@property (weak, nonatomic) IBOutlet UIImageView *logoImg;
+@property (weak, nonatomic) IBOutlet UILabel *numLbl;
+
+@property (weak, nonatomic) IBOutlet UILabel *statusLbl;
+@property (weak, nonatomic) IBOutlet UIView *goodsBgView;
+- (IBAction)unfoldcell_click:(id)sender;
+@property (weak, nonatomic) IBOutlet UIButton *uofoldBtn;
+
+@end
+
+@implementation CYLogisticsHeaderView
+
+/*
+// Only override drawRect: if you perform custom drawing.
+// An empty implementation adversely affects performance during animation.
+- (void)drawRect:(CGRect)rect {
+    // Drawing code
+}
+*/
+
+- (IBAction)unfoldcell_click:(id)sender {
+    
+    
+}
+
+-(void)setModel:(CYLogisticsModel *)model
+{
+    _model = model;
+    if (!_ischayang) {
+//        [self loadGoodsView:_model.goodsList];
+        _logisticsNameLbl.text = _model.logisticsName;
+        if (_model.logisticsLogo.length) {
+            NSURL *url  =[NSURL URLWithString:model.logisticsLogo];
+            [_logoImg sd_setImageWithURL:url placeholderImage:SQUARE];
+        }
+        
+        _numLbl.text = _model.logisticsNu;
+        _statusLbl.text = _model.logisticsStatus;
+    }else{
+        _logisticsNameLbl.text = _model.company_name;
+        if (_model.logisticsLogo.length) {
+            NSURL *url  =[NSURL URLWithString:model.logo];
+            [_logoImg sd_setImageWithURL:url placeholderImage:SQUARE];
+        }
+        
+        _numLbl.text = _model.waybill;
+        _statusLbl.text = _model.status_description;
+    }
+ 
+    
+}
+
+
+-(void)loadGoodsView:(NSArray *)arr
+{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.001 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        for (int i =0; i<[arr count]; i++) {
+            CYOrderGoodsView *goodsView = [[[NSBundle mainBundle] loadNibNamed:@"CYOrderGoodsView" owner:nil options:nil] firstObject];
+            goodsView.status = @"0";
+            goodsView.frame =CGRectMake(0,i*89,SCREEN_WIDTH, 88);
+            goodsView.goodsInfo = arr[i];
+            [_goodsBgView addSubview:goodsView];
+        }
+    });
+    
+}
+
+@end

@@ -1,0 +1,71 @@
+//
+//  CYWenZhangCell.m
+//  茶语
+//
+//  Created by Chayu on 16/6/28.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYHomeWenZhangCell.h"
+
+@interface CYHomeWenZhangCell ()
+
+@property (weak, nonatomic) IBOutlet UIScrollView *contentScro;
+
+
+@end
+
+@implementation CYHomeWenZhangCell
+
+- (void)awakeFromNib {
+    [super awakeFromNib];
+    // Initialization code
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+
+
+- (void)parseData:(id)data
+{
+//    self.mClickData = data;
+    if ([self.mClickData count]>0) {
+        return;
+    }
+    for (UIView *view in _contentScro.subviews) {
+        [view removeFromSuperview];
+    }
+    self.mClickData = data;
+    [self loadScroData];
+}
+
+-(void)loadScroData
+{
+    for (int i = 0; i<[self.mClickData count]; i++) {
+        CYHomeToDayNewsInfo  *info = self.mClickData[i];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.01 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            CYHomeWenZhangView *wenzhangView = [[[NSBundle mainBundle] loadNibNamed:@"CYHomeWenZhangView" owner:self options:nil] firstObject];
+            wenzhangView.frame = CGRectMake(i *(_contentScro.width-10), 0,(_contentScro.width-20),_contentScro.height *(SCREEN_WIDTH/375.));
+            wenzhangView.newsInfo = info;
+            [_contentScro addSubview:wenzhangView];
+            wenzhangView.tag = 800 +i;
+            UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(selectTea:)];
+            [wenzhangView addGestureRecognizer:tap];
+        });
+      
+    }
+    _contentScro.contentSize = CGSizeMake((SCREEN_WIDTH - 20) * [self.mClickData count],0);
+}
+
+-(void)selectTea:(UITapGestureRecognizer *)sender
+{
+    UIView *view = sender.view;
+    if (self.gotosomeViewBlock) {
+        self.gotosomeViewBlock(self.mClickData[view.tag -800]);
+    }
+}
+
+@end

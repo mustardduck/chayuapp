@@ -1,0 +1,339 @@
+//
+//  CYCOrderTableViewCell.m
+//  TeaMall
+//  确认订单cell
+//  Created by Chayu on 15/11/24.
+//  Copyright © 2015年 Chayu. All rights reserved.
+//
+
+#import "CYCOrderTableViewCell.h"
+#import "CYOrderGoodsView.h"
+#import "CYInvoiceModel.h"
+
+@interface CYCOrderTableViewCell ()<CYOrderGoodsViewDelegate, UITextFieldDelegate>
+{
+    CYInvoiceModel * _invoiceModel;
+}
+
+@property (weak, nonatomic) IBOutlet UILabel *sellerNameLbl;
+@property (weak, nonatomic) IBOutlet UIImageView *showImg;
+
+@property (weak, nonatomic) IBOutlet UILabel *shipmentLbl;
+@property (weak, nonatomic) IBOutlet UILabel *totalPriceLbl;
+@property (weak, nonatomic) IBOutlet UILabel *totalNumLbl;
+@property (weak, nonatomic) IBOutlet UILabel *invoiceMessageLbl;
+
+@property (weak, nonatomic) IBOutlet UIView *goodsContentView;
+- (IBAction)selectInvoive_click:(id)sender;
+
+- (IBAction)fillInTheMessage_click:(id)sender;
+- (IBAction)selectCoupon_click:(id)sender;
+//@property (weak, nonatomic) IBOutlet UILabel *couponLbl;
+
+@property (weak, nonatomic) IBOutlet UIView *invVie;
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *inv_height_cons;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *invoiceBtnTopCons;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *bg_prod_height_cons;
+@property (weak, nonatomic) IBOutlet UIButton *couponBtn;
+
+@end
+
+
+@implementation CYCOrderTableViewCell
+
+- (void)awakeFromNib {
+    // Initialization code
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+
++(instancetype)cellWidthTableView:(UITableView*)tableView{
+    static NSString *corderIdentify = @"CYCOrderTableViewCell";
+    CYCOrderTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:corderIdentify];
+    if (!cell) {
+        cell = [[[NSBundle mainBundle] loadNibNamed:@"CYCOrderTableViewCell" owner:nil options:nil] firstObject];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    }
+    return cell;
+}
+
+- (void)textFieldDidEndEditing:(UITextField *)textField
+{
+    _corderModel.invPayee = textField.text;
+}
+
+- (void)setCorderModel:(CYOrderDetailModel *)corderModel
+{
+    _corderModel = corderModel;
+//    _bg_prod_height_cons.constant = [_corderModel.goodsList count] * 88.0;
+    [self showGoodsSView:_corderModel.goodsList];
+    _sellerNameLbl.text = [_corderModel.seller objectForJSONKey:@"sellerName"];
+    NSString *sellerimgUrl = [_corderModel.seller objectForJSONKey:@"sellerAvatar"];
+    if (sellerimgUrl.length) {
+        NSURL *url = [NSURL URLWithString:sellerimgUrl];
+        [_showImg sd_setImageWithURL:url placeholderImage:DEFAULTHEADER];
+    }
+    
+    NSDictionary *info = _corderModel.seller;
+    if ([[info objectForKey:@"sellerUid"] isEqualToString:@"1"]) {
+        _sellerNameLbl.text = @"茶语市集自营";
+//        _showImg.image =[UIImage imageNamed:@"chayu_logo"];
+    }
+    
+    _totalPriceLbl.text = [NSString stringWithFormat:@"￥%.2f",[_corderModel.orderPrice floatValue]];
+    _totalNumLbl.text = [NSString stringWithFormat:@"共%@件商品",_corderModel.commodityCount];
+    
+    _invoiceModel = _corderModel.invoiceModel;
+    
+    _invoiceBtn.enabled = [_invoiceModel.issueinvoice intValue];//是否可以开发票
+    
+    if(_invoiceBtn.enabled)
+    {
+        _invoiceBtn.hidden = NO;
+        _invoiceLbl.hidden = NO;
+        
+        if(![_invoiceModel.sellerId isEqualToString:@"1"])
+            //茗星卖家如果可开发票，要有说明
+            //市集自营都可开发票，没有说明
+        {
+            NSString * invoiceDes = _invoiceModel.invoiceCopy;
+            _invoiceLbl.text = invoiceDes;
+        }
+        else
+        {
+            _invoiceLbl.text = @"";
+        }
+
+        if(_invoiceModel.invoiceBtnState == 2)
+        {
+            _invoiceBtn.enabled = YES;
+            _invoiceBtn.selected = YES;
+            
+            _invoiceView.hidden = NO;
+        }
+        else if (_invoiceModel.invoiceBtnState == 3)
+        {
+            _invoiceBtn.enabled = YES;
+            _invoiceBtn.selected = NO;
+            
+            _invoiceView.hidden = YES;
+        }
+        else
+        {
+            _invoiceBtn.selected = NO;
+            _invoiceView.hidden = YES;
+        }
+    }
+    else
+    {
+        _invoiceBtn.selected = NO;
+        _invoiceBtn.hidden = YES;
+        _invoiceLbl.hidden = YES;
+        _invoiceView.hidden = YES;
+
+    }
+    
+    if(!_invoiceBtn.selected)
+    {
+        _corderModel.invPayee = @"";
+    }
+
+    if(_corderModel.invPayee.length)
+    {
+        _invoiceTxtField.text = _corderModel.invPayee;
+    }
+    else
+    {
+        _invoiceTxtField.text = @"";
+    }
+    
+    if (_corderModel.buyersMessage.length) {
+        [_messageBtn setTitle:_corderModel.buyersMessage forState:UIControlStateNormal];
+    }
+    else
+    {
+        [_messageBtn setTitle:@"" forState:UIControlStateNormal];
+    }
+    
+//    NSString * invoiceDes = @"（此卖家不可提供发票）";
+    
+//    invoiceDes = @"（卖家可提供税率 17% 的增值税专用发票）";
+//    
+//    invoiceDes = @"（卖家可提供税率 8% 的普通发票）";
+
+
+}
+-(void)showGoodsSView:(NSArray *)goodsList
+{
+    for(UIView * view in [_goodsContentView subviews])
+    {
+        [view removeFromSuperview];
+    }
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.0001 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^
+                   {
+                       for (int i = 0; i<[goodsList count]; i++)
+                       {
+                           CYOrderGoodsView *view = [[[NSBundle mainBundle] loadNibNamed:@"CYOrderGoodsView" owner:nil options:nil] firstObject];
+                           view.delegate = self;
+                           view.frame = CGRectMake(10,88*i, SCREEN_WIDTH - 20,88);
+                           [_goodsContentView addSubview:view];
+                           view.goodsInfo = _corderModel.goodsList[i];
+                           view.status = @"0";
+                       }
+                       
+                   });
+}
+- (void)setInvoiceStr:(NSString *)invoiceStr
+{
+    _invoiceStr = invoiceStr;
+    _invoiceMessageLbl.text = invoiceStr;
+}
+
+- (void)setMessageStr:(NSString *)messageStr
+{
+    _messageStr = messageStr;
+    [_messageBtn setTitle:messageStr forState:UIControlStateNormal];
+}
+
+- (void)setCouponinfo:(NSDictionary *)couponinfo
+{
+    _couponinfo = couponinfo;
+    
+    if (_couponinfo.count>0) {
+        _inv_height_cons.constant = 50.0f;
+        _invoiceBtnTopCons.constant = 50.f;
+        
+        if (_invoiceBtn.selected)
+        {
+            _messageTopCons.constant = 150;
+            _foot_height_cons.constant = 250;
+        }
+        else if(_invoiceBtn.hidden)
+        {
+            _messageTopCons.constant = 50;
+            _foot_height_cons.constant = 150;
+        }
+        else
+        {
+            _messageTopCons.constant = 100;
+            _foot_height_cons.constant = 200;
+        }
+        
+        if(_corderModel.couponTitle.length)
+        {
+            [_couponBtn setTitle:_corderModel.couponTitle forState:UIControlStateNormal];
+//            _couponLbl.text = _corderModel.couponTitle;
+        }
+        else
+        {
+//            _couponLbl.text = [_couponinfo objectForKey:@"title"];
+            [_couponBtn setTitle:[NSString stringWithFormat:@"抵扣券 - ￥%.2f", [[_couponinfo objectForKey:@"money"] floatValue]] forState:UIControlStateNormal];
+    
+        }
+        
+        _totalPriceLbl.text = [NSString stringWithFormat:@"￥%.2f",[_corderModel.orderPrice floatValue]];
+    }
+    else
+    {
+        _inv_height_cons.constant = 0;
+        _invoiceBtnTopCons.constant = 0;
+        
+        if (_invoiceBtn.selected)
+        {
+            _messageTopCons.constant = 100;
+            _foot_height_cons.constant = 200;
+        }
+        else if(_invoiceBtn.hidden)
+        {
+            _messageTopCons.constant = 0;
+            _foot_height_cons.constant = 100;
+        }
+        else
+        {
+            _messageTopCons.constant = 50;
+            _foot_height_cons.constant = 150;
+        }
+    }
+    
+
+}
+
+-(void) setShipPrice:(NSString *)shipPrice
+{
+    _shipPrice = shipPrice;
+    
+    if (!_shipPrice) {
+        _shipmentLbl.text = @"免运费";
+    }else{
+        CGFloat shipprice = [_shipPrice floatValue];
+        if (shipprice > 0) {
+            _shipmentLbl.text = [NSString stringWithFormat:@"运费：%@",shipPrice];
+        }else{
+            _shipmentLbl.text = @"免运费";
+        }
+        
+    }
+}
+
+- (IBAction)selectInvoive_click:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(selectinvoiceCell:andModel:)]) {
+        [self.delegate selectinvoiceCell:self andModel:_corderModel];
+    }
+}
+
+- (IBAction)fillInTheMessage_click:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(fillinthemessage:WithModel:)]) {
+        [self.delegate fillinthemessage:self WithModel:_corderModel];
+    }
+}
+
+- (IBAction)selectCoupon_click:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(selectOrderCell:andModel:)]) {
+        [self.delegate selectOrderCell:self andModel:_corderModel];
+    }
+}
+
+-(void)showgoodsdetails:(CYShopTrolleyModel *)model
+{
+    if ([self.delegate respondsToSelector:@selector(goodsdetails:)]) {
+        [self.delegate goodsdetails:model];
+    }
+}
+
+- (IBAction)invoiceBtn_click:(id)sender {
+    
+    ((UIButton *)sender).selected = !((UIButton *)sender).selected;
+    
+    _invoiceView.hidden = !((UIButton *)sender).selected;
+    
+    if(((UIButton *)sender).selected)
+    {
+        _messageTopCons.constant = _couponinfo.count ? 150 : 100;
+        
+        _foot_height_cons.constant = _couponinfo.count ? 250 : 200;
+        
+    }
+    else if(!((UIButton *)sender).enabled)
+    {
+        _messageTopCons.constant = _couponinfo.count ? 50 : 0;
+        
+        _foot_height_cons.constant = _couponinfo.count ? 150 : 100;
+    }
+    // 0 enable 为 NO  1 未选中 2 选中
+    NSInteger btnState = ((UIButton *)sender).selected ? 2 : 1;
+    
+    _corderModel.invoiceModel.invoiceBtnState = btnState;
+    
+    if ([self.delegate respondsToSelector:@selector(invoiceBtn_click:WithModel:)]) {
+        [self.delegate invoiceBtn_click:self WithModel:_corderModel];
+    }
+}
+
+
+@end

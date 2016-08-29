@@ -1,0 +1,32 @@
+//
+//  CYPublicPostCardController.h
+//  茶语
+//
+//  Created by Chayu on 16/7/15.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYBaseViewController.h"
+
+@interface CYPublicPostCardController : CYBaseViewController
+
+/**
+ *  内容id，文章id
+ */
+@property (nonatomic, copy) NSString *mItemid;
+
+/**
+ *  上级评论id
+ */
+@property (nonatomic, copy) NSString *pid;
+
+/**
+ *  回复用户id
+ */
+@property (nonatomic, copy) NSString *touid;
+
+@property (nonatomic,assign)BOOL isTea;//是否是茶评茶样
+
+@property (nonatomic,copy)void(^postcardbackBlock)();
+
+@end

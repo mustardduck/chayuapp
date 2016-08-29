@@ -1,0 +1,64 @@
+//
+//  Color.h
+//  TeaMall
+//
+//  Created by Chayu on 15/10/21.
+//  Copyright © 2015年 Chayu. All rights reserved.
+//
+
+#ifndef Color_h
+#define Color_h
+
+/**
+ *  边框线颜色
+ */
+#define BORDERCOLOR [UIColor getColorWithHexString:@"FaFaFa"]
+#define MAIN_COLOR  [UIColor getColorWithHexString:@"894732"]
+
+
+#define TITLECOLOR  [UIColor getColorWithHexString:@"#444444"]
+#define CONTENTCOLOR [UIColor getColorWithHexString:@"#666666"]
+#define LIGHTCOLOR [UIColor getColorWithHexString:@"#999999"]
+#define LINECOLOR [UIColor getColorWithHexString:@"#dddddd"]
+
+//nav titleColor
+#define NAVTITLECOLOR [UIColor getColorWithHexString:@"893e20"]
+
+/**
+ *  主背景色调
+ */
+#define MAIN_BGCOLOR   [UIColor getColorWithHexString:@"f9f9f9"]
+
+/**
+ *  茗星-分类筛选界面
+ */
+#define btnBorder_COLOR [UIColor getColorWithHexString:@"#bbbbbb"]// 按钮边框颜色
+#define btnBorderSelected_COLOR [UIColor getColorWithHexString:@"#893e20"]// 按钮边框选中颜色
+#define btnTitle_COLOR [UIColor getColorWithHexString:@"#333333"]// 按钮标题颜色
+#define placeHolderCOLOR [UIColor getColorWithHexString:@"aaaaaa"]
+
+
+/* */
+#define COLOR_DROPDOWN_BG [UIColor colorWithRed:217.0f/255.0f green:199.0f/255.0f blue:182.0f/255.0f alpha:1.0f]
+#define COLOR_DROPDOWN_SELECTIOM [UIColor colorWithRed:165.0f/255.0f green:115.0f/255.0f blue:78.0f/255.0f alpha:1.0f]
+#define COLOR_DROPDOWN_TEXT [UIColor colorWithRed:91.0f/255.0f green:50.0f/255.0f blue:41.0f/255.0f alpha:1.0f]
+#define COLOR_DROPDOWN_HLTEXT [UIColor colorWithRed:255.0f/255.0f green:255.0f/255.0f blue:255.0f/255.0f alpha:1.0f]
+
+/**
+ *文字
+ */
+
+#define COLOR_LABAL_SECTIONTEXT [UIColor colorWithRed:217.0f/255.0f green:199.0f/255.0f blue:182.0f/255.0f alpha:1.0f]
+#define COLOR_LABAL_SUBSECTIONTEXT [UIColor colorWithRed:217.0f/255.0f green:199.0f/255.0f blue:182.0f/255.0f alpha:1.0f]
+#define COLOR_LABAL_TITLETEXT [UIColor colorWithRed:217.0f/255.0f green:199.0f/255.0f blue:182.0f/255.0f alpha:1.0f]
+#define COLOR_LABAL_NODETEXT [UIColor colorWithRed:153.f/255.0f green:153.f/255.0f blue:153.f/255.0f alpha:1.0f]
+#define COLOR_LABAL_CONTENTTEXT [UIColor colorWithRed:217.0f/255.0f green:199.0f/255.0f blue:182.0f/255.0f alpha:1.0f]
+
+//黑色字
+#define COLOR_LABAL_NAMETEXT [UIColor colorWithRed:51.f/255.0f green:51.f/255.0f blue:51.f/255.0f alpha:1.0f]
+#define COLOR_LABAL_BRADGETEXT [UIColor colorWithRed:1 green:1 blue:1 alpha:1.0f]
+
+
+
+
+#endif /* color_h */

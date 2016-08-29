@@ -1,0 +1,285 @@
+//
+//  CYArticleDetailViewController.m
+//  茶语
+//
+//  Created by 李峥 on 16/2/20.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYArticleDetailViewController.h"
+#import "CYWriteArticelCommentViewController.h"
+#import "CYTeaCommentListViewController.h"
+#import "AppDelegate.h"
+#import "CYActionSheet.h"
+
+@interface CYArticleDetailViewController ()<UIWebViewDelegate>
+
+
+
+@property (weak, nonatomic) IBOutlet UIWebView *mWebView;
+@property (weak, nonatomic) IBOutlet UIView *mToolsBtn;
+@property (strong, nonatomic) UIButton *mCommentTeaBtn;
+@property (strong, nonatomic) UIButton *mCommentNumBtn;
+@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *mActivityView;
+- (IBAction)shoucang_click:(id)sender;
+- (IBAction)zan_click:(id)sender;
+@property (weak, nonatomic) IBOutlet UIImageView *shoucangimg;
+@property (weak, nonatomic) IBOutlet UILabel *shoucangLbl;
+
+@property (weak, nonatomic) IBOutlet UILabel *zanLbl;
+
+
+@property (weak, nonatomic) IBOutlet UIImageView *zanimg;
+@end
+
+@implementation CYArticleDetailViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
+    self.title = @"文章详情";
+    
+//    [self setup];
+    [self loadDetailData];
+    
+    UIButton *shareBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [shareBtn setImage:[UIImage imageNamed:@"fx"] forState:UIControlStateNormal];
+    shareBtn.frame = CGRectMake(0, 0, 44, 44);
+    [shareBtn addTarget:self action:@selector(clickShare:) forControlEvents:UIControlEventTouchUpInside];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:shareBtn];
+    self.mWebView.scrollView.backgroundColor = [UIColor whiteColor];
+    [self hasZan];
+}
+
+-(void)hasZan
+{
+    NSUserDefaults *user = [NSUserDefaults standardUserDefaults];
+    NSMutableArray *list = [NSMutableArray arrayWithArray:[user objectForKey:@"zan"]];
+    [list enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSData *data = obj;
+        NSDictionary *info = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+        if ([[info objectForKey:@"id"] isEqualToString:_mArticleInfo.itemid]) {
+            _zanimg.highlighted = YES;
+            _zanLbl.textColor = MAIN_COLOR;
+        }
+    }];
+}
+
+
+- (void)clickShare:(id)sender
+{
+    if(_mArticleInfo.desc.length + _mArticleInfo.shareurl.length >= 140)
+    {
+        NSString * desc = [_mArticleInfo.desc substringToIndex:(139 - _mArticleInfo.shareurl.length)];
+        
+        _mArticleInfo.desc = desc;
+    }
+    
+    [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:[NSURL URLWithString:_mArticleInfo.thumb] options:SDWebImageDownloaderUseNSURLCache progress:^(NSInteger receivedSize, NSInteger expectedSize) {
+        
+    } completed:^(UIImage *image, NSData *data, NSError *error, BOOL finished) {
+        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+        appDelegate.at = kAuthorizeTypeOpenShare;
+        OSMessage *message = [[OSMessage alloc] init];
+        message.title = self.mArticleInfo.title; //@"通茶语，会知己";
+        if (!self.mArticleInfo.desc) {
+             message.desc = @"m.chayu.com";
+        }else{
+             message.desc = self.mArticleInfo.desc;
+        }
+       
+        message.link = self.mArticleInfo.shareurl;
+        if (image) {
+            message.image = UIImageJPEGRepresentation(image, 0.1);
+        }else
+        {
+            message.image = UIImagePNGRepresentation([UIImage imageNamed:@"AppIcon60x60@2x.png"]);
+        }
+        CYActionSheet *sheet = [[CYActionSheet alloc] initWithTitles:nil iconNames:nil];
+        sheet.shareMessage = message;
+        [sheet showActionSheetWithClickBlock:^(int btnIndex) {
+            
+        } cancelBlock:^{
+            
+        }];
+    }];
+    
+
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [MobClick beginLogPageView:@"文章详情"];
+}
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:@"文章详情"];
+}
+
+
+
+#pragma mark - UIButton Touch
+- (void)clickWriteComment:(id)sender
+{
+    if (!MANAGER.isLoged) {
+        [APP_DELEGATE showLogView];
+        return;
+    }
+    CYWriteArticelCommentViewController *comment = [[CYWriteArticelCommentViewController alloc] initWithNibName:@"CYWriteArticelCommentViewController" bundle: nil];
+    comment.mItemid = _mArticleInfo.itemid;
+    [self.navigationController pushViewController:comment animated:YES];
+}
+
+- (IBAction)clickCommentNum:(id)sender
+{
+    CYTeaCommentListViewController *comment = [[CYTeaCommentListViewController alloc] initWithNibName:@"CYTeaCommentListViewController" bundle:nil];
+    comment.mType = CommentListType_article;
+    comment.mItemId = _mArticleInfo.itemid;
+    [self.navigationController pushViewController:comment animated:YES];
+}
+
+- (void)loadDetailData
+{
+    if (_mArticleInfo.itemid) {
+        [CYWebClient Post:@"ArticleDetail" parametes:@{@"itemid":_mArticleInfo.itemid} success:^(id responObject) {
+            [self.mActivityView stopAnimating];
+            BOOL isSuported = [[responObject objectForKey:@"isSuported"] boolValue];
+            BOOL isFavorate = [[responObject objectForKey:@"isFavorate"] boolValue];
+            if (isSuported) {
+                _zanimg.highlighted = YES;
+                _zanLbl.textColor = MAIN_COLOR;
+            }
+            
+            if (isFavorate) {
+                _shoucangimg.highlighted = YES;
+                _shoucangLbl.textColor = MAIN_COLOR;
+            }
+            self.mArticleInfo.title = [responObject objectForKey:@"title"];
+            self.mArticleInfo.shareurl = [responObject objectForKey:@"shareurl"];
+            self.mArticleInfo.desc = [responObject objectForKey:@"desc"];
+            self.mArticleInfo.thumb= [responObject objectForKey:@"thumb"];
+            [_mWebView loadHTMLString:[responObject objectForKey:@"html"] baseURL:nil];
+            
+        } failure:^(id error) {
+            
+        }];
+    }
+  
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (IBAction)shoucang_click:(id)sender {
+    if (!MANAGER.isLoged) {
+        [APP_DELEGATE showLogView];
+        return;
+    }
+    [CYWebClient Post:@"favorite" parametes:@{@"itemid":_mArticleInfo.itemid,@"type":@"1"} success:^(id responObject) {
+        
+        if ([[responObject objectForKey:@"do"] integerValue] ==0) {
+            _shoucangimg.highlighted = NO;
+            _shoucangLbl.textColor = CONTENTCOLOR;
+        }else{
+            _shoucangimg.highlighted = YES;
+            _shoucangLbl.textColor = MAIN_COLOR;
+        }
+    } failure:^(id error) {
+        
+    }];
+    
+}
+
+- (IBAction)zan_click:(id)sender {
+    
+//    if (!MANAGER.isLoged) {
+//        [APP_DELEGATE showLogView];
+//        return;
+//    }
+    [SVProgressHUD show];
+    [SVProgressHUD setBackgroundColor:CLEARCOLOR];
+    NSString *class = _zanimg.highlighted?@"0":@"1";
+    [CYWebClient Post:@"do_suport" parametes:@{@"itemid":_mArticleInfo.itemid,@"type":@"1",@"class":class} success:^(id responObject) {
+        NSUserDefaults *user = [NSUserDefaults standardUserDefaults];
+        NSMutableArray *list = [NSMutableArray arrayWithArray:[user objectForKey:@"zan"]];
+        if ([[responObject objectForKey:@"do"] integerValue] ==0) {
+            _zanimg.highlighted = NO;
+            _zanLbl.textColor = CONTENTCOLOR;
+            [list enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                NSData *data = obj;
+                NSDictionary *info = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+                if ([[info objectForKey:@"id"] isEqualToString:_mArticleInfo.itemid]) {
+                    [list removeObjectAtIndex:idx];
+                }
+            }];
+            
+        }else{
+            NSMutableDictionary *info = [NSMutableDictionary dictionary];
+            [info setObject:_mArticleInfo.itemid forKey:@"id"];
+            NSData *data = [NSKeyedArchiver archivedDataWithRootObject:info];
+            [list addObject:data];
+            _zanimg.highlighted = YES;
+            _zanLbl.textColor = MAIN_COLOR;
+        }
+        
+        
+        NSArray *resList = [NSArray arrayWithArray:list];
+        [user setObject:resList forKey:@"zan"];
+
+    } failure:^(id error) {
+        
+    }];
+}
+
+
+- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
+{
+    NSLog(@"request.URL =%@",request.URL.absoluteString);
+    if ([request.URL.absoluteString isEqualToString:@"about:blank"]) {
+        return YES;
+    }else{
+        
+        
+        if ([[UIApplication sharedApplication] canOpenURL:request.URL])
+        {
+            [[UIApplication sharedApplication] openURL:request.URL];
+        }
+        else
+        {
+            NSLog(@"can not open");
+        }
+        return NO;
+    }
+    
+}
+
+/*!
+ *@description 点赞效果
+ *@function showPraiseAnimation:andDuration
+ *@param view
+ *@param duration
+ *@return (void)
+ */
+- (void)showPraiseAnimation:(UIView *)view andDuration:(CGFloat)duration
+{
+    CABasicAnimation *scaleAnimation = [CABasicAnimation animationWithKeyPath:@"transform"];
+    
+    scaleAnimation.toValue = [NSValue valueWithCATransform3D:CATransform3DMakeScale(2, 2, 1)];
+    
+    CABasicAnimation *opacityAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+    opacityAnimation.toValue = [NSNumber numberWithFloat:0.25f];
+    
+    CAAnimationGroup *groupAnimation = [CAAnimationGroup animation];
+    groupAnimation.animations = [NSArray arrayWithObjects:scaleAnimation,opacityAnimation, nil];
+    groupAnimation.duration = duration;
+    groupAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    groupAnimation.removedOnCompletion = YES;
+    [view.layer addAnimation:groupAnimation forKey:nil];
+}
+
+
+@end

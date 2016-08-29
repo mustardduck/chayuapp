@@ -1,0 +1,59 @@
+//
+//  CYQuanZiListCell.m
+//  茶语
+//
+//  Created by Chayu on 16/7/6.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYQuanZiListCell.h"
+#import "CYRoundLbl.h"
+@interface CYQuanZiListCell ()
+
+@property (weak, nonatomic) IBOutlet UIImageView *showimg;
+
+@property (weak, nonatomic) IBOutlet UILabel *titleLbl;
+
+
+@property (weak, nonatomic) IBOutlet UILabel *guanzhuLbl;
+
+@property (weak, nonatomic) IBOutlet UILabel *tieziLbl;
+
+@property (weak, nonatomic) IBOutlet UIButton *guanzhuBtn;
+
+@property (weak, nonatomic) IBOutlet CYRoundLbl *brageNumLbl;
+
+
+
+@end
+
+@implementation CYQuanZiListCell
+
+- (void)awakeFromNib {
+    [super awakeFromNib];
+    // Initialization code
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+
+- (void)setInfo:(NSDictionary *)info
+{
+    _info = info;
+    NSString *imgurl = [_info objectForKey:@"logo"];
+    [_showimg sd_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:SQUARE];
+    _titleLbl.text = [_info objectForKey:@"name"];
+    _guanzhuLbl.text =[_info objectForJSONKey:@"attentionnum"];
+    _tieziLbl.text = [_info objectForJSONKey:@"topics"];
+    BOOL isattention = [[_info objectForJSONKey:@"isattention"] boolValue];
+    if (isattention) {
+        _guanzhuBtn.selected = YES;
+    }
+}
+
+- (IBAction)attention_click:(id)sender {
+}
+@end

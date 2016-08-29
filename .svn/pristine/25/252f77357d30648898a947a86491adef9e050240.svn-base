@@ -1,0 +1,13 @@
+//
+//  CYHuaTiDetContentCell.h
+//  茶语
+//
+//  Created by Chayu on 16/7/7.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+
+@interface CYHuaTiDetContentCell : UITableViewCell
+
+@end

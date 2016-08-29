@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" restorationIdentifier="CYBuyerShipAreaSubCell" selectionStyle="default" indentationWidth="10" reuseIdentifier="CYBuyerShipAreaSubCell" id="IdI-7f-Kqh" customClass="CYBuyerShipAreaSubCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="IdI-7f-Kqh" id="lTY-Jp-aep">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="49"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bc5-WT-RDn">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="80" id="6Zr-xh-Qa6"/>
+                            <constraint firstAttribute="height" constant="50" id="MDl-13-ZMG"/>
+                        </constraints>
+                        <inset key="contentEdgeInsets" minX="51" minY="17" maxX="0.0" maxY="0.0"/>
+                        <state key="normal" image="icon_correct_empty"/>
+                        <state key="selected" image="icon_correct"/>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="6Zr-xh-Qa6"/>
+                            </mask>
+                        </variation>
+                        <connections>
+                            <action selector="selectBtnClicked:" destination="IdI-7f-Kqh" eventType="touchUpInside" id="SDl-m1-1u4"/>
+                        </connections>
+                    </button>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="绿茶" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Qnb-zQ-0cY">
+                        <rect key="frame" x="75" y="0.0" width="245" height="49"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="Qnb-zQ-0cY" firstAttribute="top" secondItem="lTY-Jp-aep" secondAttribute="top" id="2So-RH-msf"/>
+                    <constraint firstAttribute="bottom" secondItem="Qnb-zQ-0cY" secondAttribute="bottom" id="2oh-nn-V30"/>
+                    <constraint firstItem="bc5-WT-RDn" firstAttribute="top" secondItem="lTY-Jp-aep" secondAttribute="top" id="EKU-7M-27y"/>
+                    <constraint firstAttribute="trailing" secondItem="bc5-WT-RDn" secondAttribute="trailing" id="NTs-MF-JQA"/>
+                    <constraint firstAttribute="trailing" secondItem="Qnb-zQ-0cY" secondAttribute="trailing" id="YZ6-yG-Q2z"/>
+                    <constraint firstItem="bc5-WT-RDn" firstAttribute="leading" secondItem="lTY-Jp-aep" secondAttribute="leading" id="bDy-Fr-R8B"/>
+                    <constraint firstItem="Qnb-zQ-0cY" firstAttribute="leading" secondItem="lTY-Jp-aep" secondAttribute="leading" constant="75" id="jxp-Qh-lZ7"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="selectBtn" destination="bc5-WT-RDn" id="WJ5-aw-bc0"/>
+                <outlet property="titleLbl" destination="Qnb-zQ-0cY" id="7cI-Du-gMh"/>
+            </connections>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="icon_correct" width="16" height="16"/>
+        <image name="icon_correct_empty" width="16" height="16"/>
+    </resources>
+</document>

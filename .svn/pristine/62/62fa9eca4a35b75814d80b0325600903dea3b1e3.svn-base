@@ -1,0 +1,174 @@
+//
+//  CYBuyerPDTopView.m
+//  茶语
+//
+//  Created by Leen on 16/6/16.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYBuyerPDTopView.h"
+#import "CYCarousel.h"
+#import "AppDelegate.h"
+#import "CYActionSheet.h"
+#import "CYEvaluationCell.h"
+#import "CYBaseLineLable.h"
+#import "CYEvaluationView.h"
+#import "UILabel+Utilities.h"
+
+@interface CYBuyerPDTopView ()
+{
+    CYEvaluationModel *evaModel;
+    
+    NSString * _goodId;
+}
+
+@property (weak, nonatomic) IBOutlet UILabel *goods_insLbl;
+
+@property (weak, nonatomic) IBOutlet UILabel *priceLbl;
+@property (weak, nonatomic) IBOutlet CYBaseLineLable *listLbl;
+@property (weak, nonatomic) IBOutlet UILabel *salesLbl;
+- (IBAction)sharegoods_click:(id)sender;
+
+@property (weak, nonatomic) IBOutlet UIView *evaTitleView;
+@property (weak, nonatomic) IBOutlet UILabel *stockLbl;
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *goods_details_height;
+
+
+/**
+ *  评价view
+ */
+@property (nonatomic,strong)CYEvaluationView *evaluationView;
+
+- (IBAction)alleva_click:(id)sender;
+
+- (IBAction)like_click:(id)sender;
+
+@property (weak, nonatomic) IBOutlet UILabel *limitRuleTitle;
+
+@property (weak, nonatomic) IBOutlet UILabel *productDesLbl;
+
+@property (weak, nonatomic) IBOutlet UILabel *commentCountLbl;
+
+@end
+
+@implementation CYBuyerPDTopView
+
+-(void)awakeFromNib
+{
+
+}
+
+- (IBAction)sharegoods_click:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(shareGoods)]) {
+        [self.delegate shareGoods];
+    }
+    
+}
+
+- (void)setProductModel:(CYProductDetailsModel *)productModel{
+    _productModel = productModel;    
+    
+    if (MANAGER.isLoged) {
+        if ([_productModel.is_enjoy boolValue]) {
+            _xihuanImg.highlighted = YES;
+        }
+    }
+    
+    _commentCountLbl.text = [NSString stringWithFormat:@"（%@）",_productModel.commentCount];
+//    [_evaTitleView layoutIfNeeded];
+    
+    _goods_insLbl.text = _productModel.name;
+    _priceLbl.text = [NSString stringWithFormat:@"￥%@",_productModel.specDataDef[@"pricePromote"]];
+    NSString *proPrice = [NSString stringWithFormat:@"￥%@",_productModel.specDataDef[@"price"]];
+    NSMutableAttributedString *attrStr = [[NSMutableAttributedString alloc] initWithString:proPrice];
+    [attrStr addAttribute:NSStrikethroughStyleAttributeName value:@(YES) range:NSMakeRange(0,proPrice.length)];
+    [attrStr addAttribute:NSStrikethroughColorAttributeName value:CONTENTCOLOR range:NSMakeRange(0, proPrice.length)];
+    _listLbl.attributedText = attrStr;
+    
+    NSInteger isPromote = [_productModel.specDataDef[@"isPromote"] integerValue];
+    if (isPromote == 0) {
+        _listLbl.hidden = YES;
+        _priceLbl.text = [NSString stringWithFormat:@"￥%@",_productModel.specDataDef[@"price"]];
+    }
+    
+    _salesLbl.text = [NSString stringWithFormat:@"已售 %@",_productModel.salesBase];
+    NSInteger stock = [[productModel.specDataDef objectForJSONKey:@"stock"] integerValue];
+    _stockLbl.text = [NSString stringWithFormat:@"库存 %ld", stock];
+    
+    
+    _limitRuleTitle.text = _productModel.limitRuleTitle;
+    
+    if (_productModel.limitRuleTitle.length) {
+        _goods_details_height.constant = 145.;
+    }else{
+        _goods_details_height.constant = 101.0f;
+    }
+    
+    _productDesLbl.text = _productModel.desc;
+    
+    
+    self.endHeight = _goods_details_height.constant + 55 + _productDesLbl.boundingRectWithHeight ;
+
+}
+
+
+- (void)setEndHeight:(CGFloat)endHeight
+{
+    _endHeight = endHeight;
+    self.height = _endHeight;
+    
+}
+
+
+#pragma mark -
+#pragma mark 按钮点击事件 method
+
+- (IBAction)alleva_click:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(allevaluation)]) {
+        [self.delegate allevaluation];
+    }
+}
+
+- (IBAction)like_click:(id)sender {
+    ChaYuer *manager = [ChaYuManager  getCurrentUser];
+    if (!manager.isLoged) {
+        [APP_DELEGATE showLogView];
+        return;
+    }
+    [CYWebClient Post:@"userdoEnjoy" parametes:@{@"goods_id":_productModel.goodsId} success:^(id responObject) {
+        _xihuanImg.highlighted = !_xihuanImg.highlighted;
+        if(self.delegate && [self.delegate respondsToSelector:@selector(PDTopViewlikeClicked)])
+        {
+            [self.delegate PDTopViewlikeClicked];
+        }
+        
+    } failure:^(id error) {
+        
+    }];
+}
+
+- (IBAction)understandTheMaster_click:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(understandTheMaster)]) {
+        [self.delegate understandTheMaster];
+    }
+}
+
+- (IBAction)attention_click:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(attention)]) {
+        [self.delegate attention];
+    }
+}
+
+-(void)changeButtonColor:(UIButton *)sender Select:(BOOL)select
+{
+    if (select) {
+        sender.backgroundColor = MAIN_COLOR;
+        [sender setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    }else{
+        sender.backgroundColor = [UIColor getColorWithHexString:@"FFF7F2"];
+        [sender setTitleColor:MAIN_COLOR forState:UIControlStateNormal];
+    }
+}
+
+@end

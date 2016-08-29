@@ -1,0 +1,68 @@
+//
+//  CYSelectGiftSuccessViewController.m
+//  茶语
+//
+//  Created by Chayu on 16/3/22.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYSelectGiftSuccessViewController.h"
+#import "CYMyOrderViewController.h"
+#import "CYPayTableViewController.h"
+#import "AppDelegate.h"
+@interface CYSelectGiftSuccessViewController ()
+
+
+- (IBAction)chakandingdan_click:(id)sender;
+
+- (IBAction)jixugouwu_click:(id)sender;
+
+@end
+
+@implementation CYSelectGiftSuccessViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
+}
+
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [MobClick beginLogPageView:self.title];
+}
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:self.title];
+}
+
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+- (IBAction)chakandingdan_click:(id)sender {CYMyOrderViewController *vc = viewControllerInStoryBoard(@"CYMyOrderViewController", @"My");
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (IBAction)jixugouwu_click:(id)sender {
+    [[NSNotificationCenter defaultCenter] postNotificationName:tabBarIndex object:@{@"selectIndex":@"2"}];
+    [self.navigationController popToRootViewControllerAnimated:NO];
+}
+@end

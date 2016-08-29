@@ -1,0 +1,311 @@
+//
+//  CYDropListMenuView.m
+//  茶语
+//
+//  Created by 李峥 on 16/3/23.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYDropListMenuView.h"
+#import "CYTeaCateCell.h"
+
+@interface CYDropListMenuView ()<UITableViewDataSource,UITableViewDelegate>
+
+@property (nonatomic, strong) UITableView *mLeftTable;
+@property (nonatomic, strong) UITableView *mRightTable;
+
+@property (nonatomic, assign) DropType mType;
+
+
+
+@property (nonatomic, strong) NSIndexPath *mLeftSelectPath;
+
+@end
+
+@implementation CYDropListMenuView
+
+
+
+- (void)setMRatingList:(NSMutableArray *)mRatingList
+{
+    _mRatingList = mRatingList;
+    [_mLeftTable reloadData];
+}
+
+-(void)setMYearsList:(NSMutableArray *)mYearsList
+{
+    _mYearsList = mYearsList;
+    [_mLeftTable reloadData];
+    
+    
+}
+
+- (UITableView *)mLeftTable
+{
+    if (_mLeftTable == nil) {
+        _mLeftTable = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+        _mLeftTable.delegate = self;
+        _mLeftTable.dataSource = self;
+        [_mLeftTable setSeparatorInset:UIEdgeInsetsZero];
+        [_mLeftTable setLayoutMargins:UIEdgeInsetsZero];
+        _mLeftTable.backgroundColor = [UIColor clearColor];
+        _mLeftTable.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+        _mLeftTable.separatorColor = [UIColor getColorWithHexString:@"e5e5e5"];
+        
+        _mLeftTable.layer.borderColor = [UIColor getColorWithHexString:@"e5e5e5"].CGColor;
+        _mLeftTable.layer.borderWidth = 0.5;
+        hiddenSepretor(_mLeftTable);
+        [self addSubview:_mLeftTable];
+    }
+    
+    return _mLeftTable;
+}
+
+- (UITableView *)mRightTable
+{
+    if (_mRightTable == nil) {
+        _mRightTable = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+        _mRightTable.delegate = self;
+        _mRightTable.dataSource = self;
+        [_mRightTable setSeparatorInset:UIEdgeInsetsZero];
+        [_mRightTable setLayoutMargins:UIEdgeInsetsZero];
+        _mRightTable.rowHeight = 50;
+        _mRightTable.backgroundColor = [UIColor getColorWithHexString:@"f9f9f9"];
+        _mRightTable.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+        _mRightTable.separatorColor = [UIColor getColorWithHexString:@"e5e5e5"];
+        _mRightTable.layer.borderColor = [UIColor getColorWithHexString:@"e5e5e5"].CGColor;
+        _mRightTable.layer.borderWidth = 0.5;
+        hiddenSepretor(_mRightTable);
+        [self addSubview:_mRightTable];
+    }
+    
+    return _mRightTable;
+}
+
+
+- (void)setMCateList:(NSMutableArray *)mCateList
+{
+    _mCateList = mCateList;
+    [self.mLeftTable reloadData];
+    
+}
+
+- (id)initWithFrame:(CGRect)frame listType:(DropType)type
+{
+    self = [super initWithFrame:frame];
+    
+    if (self) {
+        self.mType = type;
+        //   [self loadCateData];
+        self.backgroundColor = [UIColor whiteColor];
+        [self setup];
+    }
+    return self;
+}
+
+- (void)show
+{
+    self.hidden = NO;
+}
+
+- (void)hide
+{
+    self.hidden = YES;
+}
+
+- (void)setup
+{
+    
+    
+    CGRect leftFrame = self.mLeftTable.frame;
+    leftFrame.size.height = CGRectGetHeight(self.bounds) - 10;
+    
+    if (_mType == DropType_TeaCategory) {
+        leftFrame.size.width = CGRectGetWidth(self.bounds)/2;
+        CGRect rightFrame = self.mRightTable.frame;
+        rightFrame.origin.x = CGRectGetMaxX(leftFrame);
+        rightFrame.size.width = CGRectGetWidth(self.bounds) - CGRectGetMaxX(leftFrame);
+        rightFrame.size.height = CGRectGetHeight(self.bounds) - 10;
+        self.mRightTable.frame = rightFrame;
+    }else
+    {
+        leftFrame.size.width = CGRectGetWidth(self.bounds);
+    }
+    
+    self.mLeftTable.frame = leftFrame;
+    
+    [self.mLeftTable reloadData];
+}
+
+
+
+#pragma mark - UITableView Delegate & Datasource
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    switch (self.mType) {
+        case DropType_TeaCategory:
+        {
+            if (tableView == self.mLeftTable) {
+                return self.mCateList.count;
+            }else
+            {
+                CYTeaCategoryInfo *info = [_mCateList objectAtIndex:self.mLeftSelectPath.row];
+                
+                return info.children == nil ? 0 : info.children.count;
+            }
+        }
+        case DropType_TeaYear:
+        {
+            return _mYearsList.count;
+        }
+        case DropType_Rating:
+        {
+            return _mRatingList.count;
+        }
+        default:
+            break;
+    }
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 50;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (self.mType == DropType_TeaCategory) {
+        if (tableView == self.mLeftTable) {
+            
+            CYTeaCateCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYTeaCateCell"];
+            if (!cell) {
+                cell = [[[NSBundle mainBundle] loadNibNamed:@"CYTeaCateCell" owner:nil options:nil] objectAtIndex:0];
+                
+                UIView *selView = [[UIView alloc] init];
+                selView.backgroundColor = [UIColor getColorWithHexString:@"f9f9f9"];
+                [cell setSelectedBackgroundView:selView];
+            }
+            
+            CYTeaCategoryInfo *info = [_mCateList objectAtIndex:indexPath.row];
+            if (indexPath.row == 0) {
+                cell.mImageView.image = [UIImage imageNamed:@"all"];
+            }else{
+                [cell.mImageView sd_setImageWithURL:[NSURL URLWithString:info.ico] placeholderImage:SQUARE];
+            }
+            
+            cell.mNameLabel.text = info.name;
+            
+            return cell;
+        }else
+        {
+            UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYChildTeaCateCell"];
+            if (!cell) {
+                cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"CYChildTeaCateCell"];
+                
+                cell.textLabel.font = [UIFont systemFontOfSize:14.0f];
+                cell.textLabel.textColor = [UIColor getColorWithHexString:@"666666"];
+            }
+            //            
+            //            if (indexPath.row == 0) {
+            //                cell.textLabel.text = @"不限";
+            //            }else
+            //            {
+            CYTeaCategoryInfo *info = [_mCateList objectAtIndex:self.mLeftSelectPath.row];
+            
+            CYTeaChildCategoryInfo *childInfo = [info.children objectAtIndex:indexPath.row];
+            cell.textLabel.text = childInfo.name;
+            //            }
+            
+            return cell;
+        }
+    }else
+    {
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYChildTeaCateCell"];
+        if (!cell) {
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"CYChildTeaCateCell"];
+            
+            cell.textLabel.font = [UIFont systemFontOfSize:14.0f];
+            cell.textLabel.textColor = [UIColor getColorWithHexString:@"666666"];
+            
+            UIView *selView = [[UIView alloc] init];
+            selView.backgroundColor = [UIColor getColorWithHexString:@"f9f9f9"];
+            [cell setSelectedBackgroundView:selView];
+        }
+        
+        if (self.mType == DropType_TeaYear) {
+            NSDictionary *info = [_mYearsList objectAtIndex:indexPath.row];
+            
+            cell.textLabel.text = [info objectForKey:@"name"];
+        }else if (self.mType == DropType_Rating)
+        {
+            NSDictionary *info = [_mRatingList objectAtIndex:indexPath.row];
+            
+            cell.textLabel.text = [info objectForKey:@"name"];
+        }
+        
+        return cell;
+    }
+    
+    return nil;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (tableView == self.mLeftTable) {
+        if (self.mType == DropType_TeaCategory) {
+            CYTeaCategoryInfo *info = [self.mCateList objectAtIndex:indexPath.row];
+            if ([info.children count]==0) {
+                //选择全部
+                [_delegate dropListDidSelectData:nil forType:self.mType addit:nil superId:nil];
+                self.mRightTable.hidden = YES;
+                [self hide];
+            }else
+            {
+                self.mRightTable.hidden = NO;
+                self.mLeftSelectPath = indexPath;
+                [self.mRightTable reloadData];
+            }
+        }else if (self.mType == DropType_TeaYear)
+        {
+            NSDictionary *info = [_mYearsList objectAtIndex:indexPath.row];
+            [_delegate dropListDidSelectData:info forType:self.mType addit:nil superId:nil];
+            [self hide];
+        }else if (self.mType == DropType_Rating)
+        {
+            NSDictionary *info = [_mRatingList objectAtIndex:indexPath.row];
+            [_delegate dropListDidSelectData:info forType:self.mType addit:nil superId:nil];
+            [self hide];
+        }
+        
+    }else
+    {
+        if (self.mType == DropType_TeaCategory) {
+            CYTeaCategoryInfo *info = [self.mCateList objectAtIndex:self.mLeftSelectPath.row];
+            if (indexPath.row == 0) {
+                [_delegate dropListDidSelectData:info forType:self.mType addit:nil superId:nil];
+                [self hide];
+            }else
+            {
+                CYTeaChildCategoryInfo *childInfo = [info.children objectAtIndex:indexPath.row - 1];
+                if (childInfo.sid.length == 0) {
+                    return;
+                }
+                [self hide];
+                [_delegate dropListDidSelectData:childInfo forType:self.mType addit:info.name superId:info.bid];
+            }
+        }
+        
+        [self hide];
+    }
+}
+
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    [cell setLayoutMargins:UIEdgeInsetsZero];
+    [cell setSeparatorInset:UIEdgeInsetsZero];
+    if (tableView == self.mRightTable) {
+        cell.backgroundColor = [UIColor clearColor];
+    }
+}
+
+@end

@@ -1,0 +1,422 @@
+//
+//  CYTeaSampleDetailViewController.m
+//  茶语
+//
+//  Created by 李峥 on 16/2/20.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYTeaSampleDetailViewController.h"
+#import "CYTeaReviewImgCell.h"
+#import "CYTeaSampleNumCell.h"
+#import "CYTeaReviewInfoCell.h"
+#import "CYTeaReviewRatingCell.h"
+#import "CYTeaSampleRatingCell.h"
+#import "CYTeaReviewDetailFooterView.h"
+#import "CYTeaSampleInfo.h"
+#import "CYWriteCommentViewController.h"
+#import "CYTeaCommentListViewController.h"
+#import "CYExchangeTeaViewController.h"
+#import "CYTeaReviewInfo.h"
+#import "AppDelegate.h"
+#import "CYActionSheet.h"
+#import "CYTeaReviewComCell.h"
+@interface CYTeaSampleDetailViewController ()<UITableViewDataSource,UITableViewDelegate>
+@property (weak, nonatomic) IBOutlet UITableView *mTable;
+
+@property (nonatomic, strong) CYTeaReviewImgCell *mImgCell;
+@property (nonatomic, strong) CYTeaSampleNumCell *mNumCell;
+@property (nonatomic, strong) CYTeaReviewInfoCell *mInfoCell;
+@property (nonatomic, strong) CYTeaSampleRatingCell *mSmpRatingCell;
+@property (nonatomic, strong) CYTeaReviewRatingCell *mRatingCell;
+@property (nonatomic, strong) CYTeaReviewDetailFooterView *mFooterView;
+@property (nonatomic, strong) CYTeaReviewComCell *mCommentCell;
+
+@property (nonatomic, strong) CYTeaSampleInfo *mSampleInfo;
+
+@property (nonatomic, strong) CYTeaReviewInfo *mDataInfo;
+
+- (IBAction)exchangeTeaSam_click:(id)sender;
+- (IBAction)shoucang_click:(id)sender;
+@property (weak, nonatomic) IBOutlet UIImageView *shoucangimg;
+@property (weak, nonatomic) IBOutlet UILabel *shoucangLbl;
+
+@end
+
+@implementation CYTeaSampleDetailViewController
+
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        self.hidesBottomBarWhenPushed = YES;
+    }
+    
+    return self;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
+    self.title = @"茶样详情";
+
+    UIButton *shareBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [shareBtn setImage:[UIImage imageNamed:@"fx"] forState:UIControlStateNormal];
+    shareBtn.frame = CGRectMake(0, 0, 44, 44);
+    [shareBtn addTarget:self action:@selector(clickShare:) forControlEvents:UIControlEventTouchUpInside];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:shareBtn];
+    
+    [self loadDetailData];
+}
+
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [MobClick beginLogPageView:self.title];
+}
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:self.title];
+}
+
+
+- (void)loadDetailData{
+    if (_mSampleid == nil) {
+        return;
+    }
+    self.mTable.hidden = YES;
+
+    [CYWebClient Post:@"sampleDetail" parametes:@{@"sampleid":_mSampleid} success:^(id responObject) {
+        self.mSampleInfo = [CYTeaSampleInfo objectWithKeyValues:responObject];
+        BOOL isfavor = [[responObject objectForKey:@"isfavor"] boolValue];
+        _shoucangimg.highlighted = isfavor;
+        if (isfavor) {
+            _shoucangLbl.textColor = MAIN_COLOR;
+        }
+        
+        if (self.mSampleInfo != nil) {
+            [self loadTeaDetailData];
+        }
+        
+    } failure:^(id error) {
+        
+    }];
+}
+
+- (void)loadTeaDetailData{
+    if (self.mSampleInfo == nil) {
+        return;
+    }
+
+    [CYWebClient Post:@"teaDetail" parametes:@{@"teaid":self.mSampleInfo.teaid} success:^(id responObject) {
+        self.mDataInfo = [CYTeaReviewInfo objectWithKeyValues:responObject];
+//        _shoucangimg.highlighted = self.mDataInfo.isfavor;
+        if (self.mDataInfo != nil) {
+            self.mTable.hidden = NO;
+            [self.mTable reloadData];
+        }
+        
+    } failure:^(id error) {
+        
+    }];
+}
+
+#pragma mark - UIButton Touch
+- (void)clickWriteComment:(id)sender
+{
+    if (!MANAGER.isLoged) {
+        [APP_DELEGATE showLogView];
+        return;
+    }
+    CYWriteCommentViewController *comment = [[CYWriteCommentViewController alloc] initWithNibName:@"CYWriteCommentViewController" bundle: nil];
+    comment.mItemid = self.mDataInfo.teaid;
+    comment.bid = self.mDataInfo.bid;
+    [self.navigationController pushViewController:comment animated:YES];
+}
+
+- (IBAction)clickCommentNum:(id)sender
+{
+    CYTeaCommentListViewController *vc = [[CYTeaCommentListViewController alloc] initWithNibName:@"CYTeaCommentListViewController" bundle:nil];
+    vc.mItemId = self.mDataInfo.teaid;
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (void)clickShare:(id)sender
+{
+    NSString *imgUrl = @"";
+//    if ([_mDataInfo.focus count]) {
+//        imgUrl = _mDataInfo.focus[0];
+//    }
+    [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:[NSURL URLWithString:imgUrl] options:SDWebImageDownloaderUseNSURLCache progress:^(NSInteger receivedSize, NSInteger expectedSize) {
+        
+    } completed:^(UIImage *image, NSData *data, NSError *error, BOOL finished) {
+        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+        appDelegate.at = kAuthorizeTypeOpenShare;
+        OSMessage *message = [[OSMessage alloc] init];
+        message.title = self.mDataInfo.title;//@"通茶语，会知己";
+        if (!self.mDataInfo.desc) {
+            message.desc = @"m.chayu.com";
+        }else{
+            message.desc = self.mDataInfo.desc;
+        }
+        message.link = self.mSampleInfo.shareurl;
+        if (image) {
+            message.image = UIImageJPEGRepresentation(image, 0.1);
+            NSData *data  =UIImageJPEGRepresentation(image, 0.1);
+            if (data.length/1024>32) {
+                message.image = UIImagePNGRepresentation([UIImage imageNamed:@"AppIcon60x60@2x.png"]);
+            }
+        }else
+        {
+            message.image = UIImagePNGRepresentation([UIImage imageNamed:@"AppIcon60x60@2x.png"]);
+        }
+        CYActionSheet *sheet = [[CYActionSheet alloc] initWithTitles:nil iconNames:nil];
+        sheet.shareMessage = message;
+        [sheet showActionSheetWithClickBlock:^(int btnIndex) {
+            
+        } cancelBlock:^{
+            
+        }];
+    }];
+}
+
+#pragma mark - UITableView Delegate & Datarouce
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    if (self.mDataInfo == nil) {
+        return 0;
+    }else
+    {
+        return 1;
+    }
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    if (self.mDataInfo == nil) {
+        return 0;
+    }
+    
+    return 5;
+}
+
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    switch (indexPath.row) {
+        case 0:
+            return 244*(SCREEN_WIDTH/320);
+        case 1:
+            return 90;
+        case 2:
+          return [self.mCommentCell.contentView systemLayoutSizeFittingSize:UILayoutFittingExpandedSize].height+1;
+        case 3:
+            return 369;
+        case 4:
+            return 162;
+//        case 5:
+//            return 162;
+    }
+    
+    return 44;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    switch (indexPath.row) {
+        case 0:
+            return self.mImgCell;
+        case 1:
+            return self.mNumCell;
+        case 2:
+           return self.mCommentCell;
+        case 3:
+             return self.mInfoCell;
+        case 4:
+            return self.mRatingCell;
+    }
+    
+    return nil;
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+#pragma mark -
+- (CYTeaReviewImgCell *)mImgCell
+{
+    if (_mImgCell == nil) {
+        _mImgCell = [[[NSBundle mainBundle] loadNibNamed:@"CYTeaReviewImgCell" owner:nil options:nil] objectAtIndex:0];
+//        
+//        for (NSInteger i = 0;i < self.mDataInfo.focus.count; i++) {
+//            UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectZero];
+//            imgView.frame = CGRectMake(CGRectGetWidth(_mImgCell.mScrollView.frame)*i, 0, CGRectGetWidth(_mImgCell.mScrollView.frame), CGRectGetHeight(_mImgCell.mScrollView.frame));
+//            [imgView sd_setImageWithURL:[NSURL URLWithString:[self.mDataInfo.focus objectAtIndex:i]] placeholderImage:[UIImage imageNamed:@"zwt_chaping"]];
+//            imgView.contentMode = UIViewContentModeScaleAspectFit;
+//            imgView.autoresizesSubviews = YES;
+//            imgView.autoresizingMask = UIViewAutoresizingFlexibleHeight|UIViewAutoresizingFlexibleHeight|UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleRightMargin|UIViewAutoresizingFlexibleTopMargin|UIViewAutoresizingFlexibleWidth;
+//            
+//            [_mImgCell.mScrollView addSubview:imgView];
+//        }
+//        
+//         _mImgCell.mPageControl.numberOfPages = self.mDataInfo.focus.count;
+//        
+//        [_mImgCell.mScrollView setContentSize:CGSizeMake(SCREEN_WIDTH*self.mDataInfo.focus.count, 0)];
+        
+        _mImgCell.mTitleLabel.text = self.mDataInfo.title;
+    }
+    
+    return _mImgCell;
+}
+
+- (CYTeaSampleNumCell *)mNumCell
+{
+    if (_mNumCell == nil) {
+        _mNumCell = [[[NSBundle mainBundle] loadNibNamed:@"CYTeaSampleNumCell" owner:nil options:nil] objectAtIndex:0];
+        
+//         _mScoreCell.mReviewScodeLabel.text = self.mDataInfo.review_score;
+        _mNumCell.mPriceLabel.text = self.mSampleInfo.price;
+        _mNumCell.mSizelabel.text = self.mSampleInfo.size;
+        _mNumCell.mPingLable.text = self.mDataInfo.review_score;
+        _mNumCell.mStackLabel.text = [NSString stringWithFormat:@"%@ 份",self.mSampleInfo.number];
+        
+        if ([self.mSampleInfo.number integerValue] ==0 ) {
+            _mNumCell.mStackLabel.text = @"无";
+        }
+        
+        _mNumCell.mDuihuanLable.text =[NSString stringWithFormat:@"%@ 份",self.mSampleInfo.user];
+    }
+    
+    return _mNumCell;
+}
+
+- (CYTeaReviewInfoCell *)mInfoCell
+{
+    if (_mInfoCell == nil) {
+        _mInfoCell = [[[NSBundle mainBundle] loadNibNamed:@"CYTeaReviewInfoCell" owner:nil options:nil] objectAtIndex:0];
+        _mInfoCell.pingpaiLbl.text = _mDataInfo.brand;
+        _mInfoCell.chaleiLbl.text = _mDataInfo.chalei;
+        _mInfoCell.shijianLbl.text = _mDataInfo.year;
+        _mInfoCell.pingzhongLbl.text = _mDataInfo.variety;
+        _mInfoCell.dengjiLbl.text = _mDataInfo.rank;
+        _mInfoCell.guigeLbl.text = _mDataInfo.size;
+        _mInfoCell.baozhuangLbl.text = _mDataInfo.baozhuang;
+        _mInfoCell.cankaojiaLbl.text = _mDataInfo.price;
+        _mInfoCell.baozhiqiLbl.text = _mDataInfo.shelflife;
+        _mInfoCell.xukeLbl.text = _mDataInfo.license;
+        _mInfoCell.biaozhunLbl.text = _mDataInfo.standard;
+        _mInfoCell.renzhengLbl.text = _mDataInfo.certificate;
+    }
+    return _mInfoCell;
+}
+
+- (CYTeaReviewRatingCell *)mRatingCell
+{
+    if (_mRatingCell == nil) {
+        _mRatingCell = [[[NSBundle mainBundle] loadNibNamed:@"CYTeaReviewRatingCell" owner:nil options:nil] objectAtIndex:0];
+        
+//        _mRatingCell.mScodeLabel.text = self.mDataInfo.review_score;
+//        
+//        _mRatingCell.mTeaReviewLabel.text = [self calStar:self.mDataInfo.stars.score/10.];
+//        _mRatingCell.mDRLabel.text = [self calStar:self.mDataInfo.stars.daren_score/10.];
+//        _mRatingCell.mZJLabel.text = [self calStar:self.mDataInfo.stars.expert_score/10.];
+//        _mRatingCell.mUserLabel.text = [self calStar:self.mDataInfo.stars.user_score/10.];
+        
+        
+        [_mRatingCell.teaView setImagesDeselected:@"eva03" partlySelected:@"eva02" fullSelected:@"eva01" andDelegate:nil];
+        [_mRatingCell.zjView setImagesDeselected:@"eva03" partlySelected:@"eva02" fullSelected:@"eva01" andDelegate:nil];
+        [_mRatingCell.drView setImagesDeselected:@"eva03" partlySelected:@"eva02" fullSelected:@"eva01" andDelegate:nil];
+        [_mRatingCell.yhView setImagesDeselected:@"eva03" partlySelected:@"eva02" fullSelected:@"eva01" andDelegate:nil];
+        
+        [_mRatingCell.teaView displayRating:self.mDataInfo.stars.review_score/10./2];
+        [_mRatingCell.zjView displayRating:self.mDataInfo.stars.expert_score/10./2];
+        [_mRatingCell.drView displayRating:self.mDataInfo.stars.daren_score/10./2];
+        [_mRatingCell.yhView displayRating:self.mDataInfo.stars.user_score/10./2];
+        _mRatingCell.mScodeLabel.text = [NSString stringWithFormat:@"%.1f", self.mDataInfo.stars.score];
+        
+    }
+    
+    return _mRatingCell;
+}
+
+
+- (CYTeaReviewComCell *)mCommentCell
+{
+    if (_mCommentCell == nil) {
+        _mCommentCell = [[[NSBundle mainBundle] loadNibNamed:@"CYTeaReviewComCell" owner:nil options:nil] objectAtIndex:0];
+        
+        _mCommentCell.mDesLabel.text = self.mDataInfo.review;
+
+        _mCommentCell.bottom_cons.constant = 5;
+        _mCommentCell.shopnameBg.hidden = YES;
+        [_mCommentCell updateConstraintsIfNeeded];
+        
+    }
+    
+    return _mCommentCell;
+}
+
+
+- (CYTeaSampleRatingCell *)mSmpRatingCell
+{
+    if (_mSmpRatingCell == nil) {
+        _mSmpRatingCell = [[[NSBundle mainBundle] loadNibNamed:@"CYTeaSampleRatingCell" owner:nil options:nil] objectAtIndex:0];
+        
+        _mSmpRatingCell.mStarLabel.text = [NSString stringWithFormat:@"茶语评分：%@",self.mDataInfo.review_score];
+        _mSmpRatingCell.mDesLabel.text = [NSString stringWithFormat:@"总评：%@",self.mDataInfo.score] ;
+        
+        [_mSmpRatingCell setNeedsUpdateConstraints];
+        [_mSmpRatingCell updateConstraintsIfNeeded];
+    }
+    return _mSmpRatingCell;
+}
+
+- (CYTeaReviewDetailFooterView *)mFooterView
+{
+    if (_mFooterView == nil) {
+        _mFooterView = [[CYTeaReviewDetailFooterView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, 73)];
+        
+        [_mFooterView.mCommentTeaBtn setTitle:@"我要评鉴" forState:UIControlStateNormal];
+        
+        [_mFooterView.mCommentNumBtn addTarget:self action:@selector(clickCommentNum:) forControlEvents:UIControlEventTouchUpInside];
+        [_mFooterView.mCommentTeaBtn addTarget:self action:@selector(clickWriteComment:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    
+    return _mFooterView;
+}
+
+- (IBAction)exchangeTeaSam_click:(id)sender {
+    
+    if (!MANAGER.isLoged) {
+        [APP_DELEGATE showLogView];
+        return;
+    }
+    
+    if (_mSampleid) {
+        CYExchangeTeaViewController *vc = viewControllerInStoryBoard(@"CYExchangeTeaViewController", @"Eva");
+        vc.goodsId = _mSampleid;
+        [self.navigationController pushViewController:vc animated:YES];
+    }
+    
+
+}
+
+- (IBAction)shoucang_click:(id)sender {
+    
+    if (!MANAGER.isLoged) {
+        [APP_DELEGATE showLogView];
+        return;
+    }
+    [CYWebClient Post:@"do_favor" parametes:@{@"itemid":_mSampleid,@"type":@"6"} success:^(id responObject) {
+        BOOL is_favor = [[responObject objectForKey:@"is_favor"] boolValue];
+        _shoucangimg.highlighted = is_favor;
+        _shoucangLbl.textColor = is_favor?MAIN_COLOR:CONTENTCOLOR;
+    } failure:^(id error) {
+        
+    }];
+}
+@end

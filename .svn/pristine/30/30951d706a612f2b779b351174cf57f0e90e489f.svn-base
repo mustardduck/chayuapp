@@ -1,0 +1,78 @@
+//
+//  CYHuaTiDetCommentCell.m
+//  茶语
+//
+//  Created by Leen on 16/7/27.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYHuaTiDetCommentCell.h"
+#import "CYQuanZiCommentView.h"
+
+@interface CYHuaTiDetCommentCell()<CYQuanZiCommentViewDelegate>
+
+@property (nonatomic, strong) CYQuanZiCommentView * commentView;
+
+@end
+
+@implementation CYHuaTiDetCommentCell
+
+- (void)awakeFromNib {
+    [super awakeFromNib];
+    // Initialization code
+    
+    [self addSubview:self.commentView];
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+
+- (void)showAllEvaluation
+{
+    if ([self.delegate respondsToSelector:@selector(showAllEvaluation)]) {
+        [self.delegate showAllEvaluation];
+    }
+}
+- (IBAction)huitie_click:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(huitie_click)]) {
+        [self.delegate huitie_click];
+    }
+}
+
+- (void)commentBtnClicked:(CYQuanZiCommentModel *)model
+{
+    if ([self.delegate respondsToSelector:@selector(commentBtnClicked:)]) {
+        [self.delegate commentBtnClicked:model];
+    }
+}
+
+- (CYQuanZiCommentView *) commentView
+{
+    if(!_commentView)
+    {
+        _commentView = [[[NSBundle mainBundle] loadNibNamed:@"CYQuanZiCommentView" owner:nil options:nil] firstObject];
+        _commentView.delegate = self;
+        _commentView.frame = CGRectMake(0, 50, SCREEN_WIDTH, 1);
+        _commentView.pageSize = 10;
+        _commentView.topicId = _topicId;
+    }
+    
+    return _commentView;
+}
+
+#pragma mark -
+#pragma mark CYBuyerEvaluationViewDelegate method
+- (void)evaluationViewendHeight:(CGFloat)endheight
+{
+    self.height = endheight + 50;
+    
+    if(self.reloadBlock)
+    {
+        self.reloadBlock(self.height);
+    }
+}
+
+@end

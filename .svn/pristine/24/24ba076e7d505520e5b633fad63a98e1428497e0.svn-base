@@ -1,0 +1,253 @@
+//
+//  CYHomeCell.m
+//  TeaMall
+//
+//  Created by Chayu on 15/10/20.
+//  Copyright © 2015年 Chayu. All rights reserved.
+//
+
+#import "CYHomeCell.h"
+#import "CYRoundLbl.h"
+#import "BaseButton.h"
+@interface CYHomeCell ()
+
+/**
+ *  大师介绍
+ */
+@property (weak, nonatomic) IBOutlet BaseButton *insbtn;
+
+/**
+ *  好茶详情
+ */
+@property (weak, nonatomic) IBOutlet BaseButton *goodteaBtn;
+
+/**
+ *  大师介绍文字
+ */
+@property (weak, nonatomic) IBOutlet UILabel *masinstrLable;
+
+
+@property (weak, nonatomic) IBOutlet UIView *publicView;
+@property (weak, nonatomic) IBOutlet UIView *goodsView;
+
+/**
+ *  好茶数量
+ */
+@property (weak, nonatomic) IBOutlet CYRoundLbl *teasNumLbl;
+@property (weak, nonatomic) IBOutlet UIImageView *showImage;
+
+- (IBAction)masterins_click:(id)sender;
+- (IBAction)goodTeaDetails_click:(id)sender;
+
+/**
+ *  大师头像
+ */
+@property (weak, nonatomic) IBOutlet UIImageView *sellerImg;
+
+/**
+ *  商品名称
+ */
+@property (weak, nonatomic) IBOutlet UILabel *goods_name;
+/**
+ *  商品介绍
+ */
+@property (weak, nonatomic) IBOutlet UILabel *goods_content;
+
+/**
+ *  购买数量
+ */
+@property (weak, nonatomic) IBOutlet UILabel *buy_num;
+
+/**
+ *  评论数
+ */
+@property (weak, nonatomic) IBOutlet UILabel *comm_num;
+
+@property (weak, nonatomic) IBOutlet UIView *handtitleView;
+
+@end
+
+@implementation CYHomeCell
+
+- (void)awakeFromNib {
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(selectMaster:)];
+    [_sellerImg addGestureRecognizer:tap];
+    tap = nil;
+}
+
+- (void)selectMaster:(UIGestureRecognizer *)sender
+{
+    if ([self.delegate respondsToSelector:@selector(cell:masterModel:)]) {
+        [self.delegate cell:self masterModel:_model];
+    }
+}
+
+- (void)setModel:(CYMasterListModel *)model
+{
+    for (id sonView in _handtitleView.subviews) {
+        [sonView removeFromSuperview];
+    }
+    _model = model;
+    NSURL *imgUrl = [NSURL URLWithString:_model.thumb];
+    [_showImage sd_setImageWithURL:imgUrl placeholderImage:[UIImage imageNamed:@"zwt_shiji_list"]];
+    NSInteger type = [_model.type integerValue];
+
+      _comm_num.hidden = YES;
+    _goodsView.hidden = YES;
+    _sellerImg.hidden = _goodsView.hidden;
+    _publicView.hidden = YES;
+    switch (type) {
+        case 1:
+        {
+           
+            
+            break;
+        }
+        case 2:
+        {
+            _comm_num.hidden = NO;
+            _comm_num.text = [NSString stringWithFormat:@"%@条评论",_model.comment_count];
+            break;
+        }
+        case 3:
+        {
+            if ([_model.mainid isEqualToString:@"13"]) {
+                [_goodteaBtn setTitle:@"好茶详情" forState:UIControlStateNormal];
+            }else{
+                [_goodteaBtn setTitle:@"商品详情" forState:UIControlStateNormal];
+            }
+            _masinstrLable.text = _model.content;
+            _publicView.hidden = NO;
+            break;
+        }
+        case 4:
+        {
+            
+            break;
+        }
+        case 5:
+        {
+            _sellerImg.layer.cornerRadius = _sellerImg.height/2.;
+            _sellerImg.layer.borderColor = [UIColor whiteColor].CGColor;
+            _sellerImg.layer.borderWidth = 1.0f;
+            _goodsView.hidden = NO;
+            _sellerImg.hidden = _goodsView.hidden;
+            _goods_name.text = _model.title;
+            _buy_num.text = [NSString stringWithFormat:@"%@人买过",_model.sales_count];
+            _goods_content.text = [NSString stringWithFormat:@"%@·%@条评论·%@",_model.catename,_model.comment_count,_model.sellerTypeName];
+            if (_model.sellerAvatar.length) {
+                NSURL *url = [NSURL URLWithString:_model.sellerAvatar];
+                [_sellerImg sd_setImageWithURL:url placeholderImage:nil];
+            }
+            break;
+        }
+        case 100:
+        {
+            break;
+        }
+            
+        default:
+            break;
+    }
+    
+
+    
+    _teasNumLbl.text = _model.goods_num;
+    if (!_model.goods_num.length) {
+        _teasNumLbl.hidden = YES;
+    }else{
+        _teasNumLbl.hidden = NO;
+    }
+    
+    NSInteger goodsnum = [_model.goodsList count]>2?2:[_model.goodsList count];
+    if (!_isMaster) {
+        for (int i =0; i<goodsnum; i++) {
+            CYGoodsListModel *listModel = _model.goodsList[i];
+            BaseButton *handBtn = [BaseButton initWithStyle:UIButtonTypeCustom Frame:CGRectMake(i*70,0, 60, 30) Title:listModel.title TitleColor:TITLECOLOR Font:FONT(12.0f)];
+            handBtn.tag = 3000 +i;
+            [handBtn addTarget:self action:@selector(selectGoods:) forControlEvents:UIControlEventTouchUpInside];
+            [_handtitleView addSubview:handBtn];
+            
+            if (i>0) {
+                UIView *view = [[UIView alloc] initWithFrame:CGRectMake(65*i,5, 1,20)];
+                view.backgroundColor = TITLECOLOR;
+                [_handtitleView addSubview:view];
+            }
+      
+        }
+    }
+    
+}
+
+-(void)selectGoods:(BaseButton *)sender{
+    CYGoodsListModel *listModel = _model.goodsList[sender.tag - 3000];
+    if ([self.delegate respondsToSelector:@selector(selectGoods:)]) {
+        [self.delegate selectGoods:listModel.data];
+    }
+}
+
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
++(instancetype)cellWidthTableView:(UITableView *)tableView
+{
+    static NSString *homeCellidentify = @"CYHomeCell";
+    CYHomeCell *cell = [tableView dequeueReusableCellWithIdentifier:homeCellidentify];
+    if (!cell) {
+        cell = [[[NSBundle mainBundle] loadNibNamed:@"CYHomeCell" owner:nil options:nil] firstObject];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    }
+    return cell;
+}
+
+
+- (void)setIsMaster:(BOOL)isMaster
+{
+    _isMaster = isMaster;
+     _masinstrLable.hidden = !_isMaster;
+    _handtitleView.hidden = _isMaster;
+    if (_isMaster) {
+     [_insbtn setTitle:@"大师介绍" forState:UIControlStateNormal];
+    }else{
+     [_insbtn setTitle:@"名家介绍" forState:UIControlStateNormal];
+    }
+    
+   
+   
+}
+- (void)setOnlyCharacter:(BOOL)onlyCharacter
+{
+    _onlyCharacter = onlyCharacter;
+    if (_onlyCharacter) {
+        _masinstrLable.hidden = !_onlyCharacter;
+        _handtitleView.hidden = _onlyCharacter;
+    }
+}
+
+/**
+ *  活动
+ */
+-(void)selectActivity_click:(UITapGestureRecognizer *)sender
+{
+    if ([self.delegate respondsToSelector:@selector(cell:ActivityModel:)]) {
+        [self.delegate cell:self ActivityModel:_model];
+    }
+}
+
+
+- (IBAction)masterins_click:(id)sender{
+    if ([self.delegate respondsToSelector:@selector(cell:masterModel:)]) {
+        [self.delegate cell:self masterModel:_model];
+    }
+}
+- (IBAction)goodTeaDetails_click:(id)sender{
+    if ([self.delegate respondsToSelector:@selector(cell:MasterGoodTeaModel:)]) {
+        [self.delegate cell:self MasterGoodTeaModel:_model];
+    }
+}
+
+
+@end

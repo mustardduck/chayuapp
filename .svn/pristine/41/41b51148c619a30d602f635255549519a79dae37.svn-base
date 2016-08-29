@@ -1,0 +1,228 @@
+//
+//  CYBuyerAllListVC.m
+//  茶语
+//
+//  Created by Leen on 16/6/28.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYBuyerAllListVC.h"
+#import "CYBuyAllCell.h"
+#import "CYBuyerAllCategoryView.h"
+#import "CYBuyerAllLetterView.h"
+#import "UILabel+Utilities.h"
+#import "CALayer+CALayer_CALayer_XibConfiguration.h"
+#import "UIColor+Additions.h"
+#import "UILabel+Utilities.h"
+#import "CYBuyerAllListCellModel.h"
+#import "CYBuyerDetailVC.h"
+
+@interface CYBuyerAllListVC ()<UITableViewDelegate, UITableViewDataSource,CYBuyerAllCategoryViewDelegate, CYBuyerAllLetterViewDelegate>
+{
+    NSMutableArray * _dataArr;
+    
+    NSInteger page;
+    
+    NSString * _catid;
+    NSString * _letter;
+
+    
+}
+
+@property (weak, nonatomic) IBOutlet UIButton *categoryBtn;
+
+@property (weak, nonatomic) IBOutlet UIButton *nameBtn;
+
+@property (weak, nonatomic) IBOutlet UITableView *mainTable;
+@property (nonatomic, strong) CYBuyerAllCategoryView * categoryView;
+@property (nonatomic, strong) CYBuyerAllLetterView * letterView;
+
+@end
+
+@implementation CYBuyerAllListVC
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    
+    _dataArr = [NSMutableArray array];
+    _catid = @"";
+    _letter = @"";
+    
+    [WINDOW addSubview:self.categoryView];
+    [WINDOW addSubview:self.letterView];
+
+    [self loadData];
+}
+
+- (void) loadData
+{
+    __weak __typeof(self) weakSelf = self;
+    
+    _mainTable.header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        [weakSelf loadTableViewData:NO];
+    }];
+    [_mainTable.header beginRefreshing];
+    _mainTable.footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+        [weakSelf loadTableViewData:YES];
+    }];
+}
+
+-(void)loadTableViewData:(BOOL)loadMore
+{
+    if (loadMore) {
+        page ++;
+    }else{
+        page =1;
+        [_dataArr removeAllObjects];
+        [_mainTable reloadData];
+    }
+    __weak __typeof(self) weakSelf = self;
+    
+    [CYWebClient Post:@"mingxing_list" parametes:@{@"p":@(page),@"pageSize":@(PAGESIZE),@"catid":_catid,@"letter":_letter} success:^(id responObj) {
+        if (loadMore) {
+            [weakSelf.mainTable.footer endRefreshing];
+        }else{
+            [weakSelf.mainTable.header endRefreshing];
+        }
+        if (![responObj isKindOfClass:[NSNull class]] && [responObj count] < PAGESIZE) {
+            [weakSelf.mainTable.footer endRefreshingWithNoMoreData];;
+        }
+        
+        [_dataArr addObjectsFromArray:[CYBuyerAllListCellModel objectArrayWithKeyValuesArray:responObj]];
+        
+        if ([_dataArr count] < 10) {
+            weakSelf.mainTable.footer = nil;
+        }
+        
+        [weakSelf.mainTable reloadData];
+        
+        //        _view_empty.hidden = (_dataArr.count != 0);
+        
+    } failure:^(id err) {
+        if (loadMore) {
+            [weakSelf.mainTable.footer endRefreshing];
+        }else{
+            [weakSelf.mainTable.header endRefreshing];
+        }
+    }];
+}
+
+- (IBAction)goback:(id)sender {
+    [self.categoryView removeFromSuperview];
+    [self.letterView removeFromSuperview];
+    
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (IBAction)touchUpInsideOn:(id)sender {
+    
+    UIButton * btn = (UIButton *)sender;
+    
+    if(btn == _categoryBtn)
+    {
+        _categoryView.hidden = !_categoryView.hidden;
+        
+        _letterView.hidden = YES;
+        
+        _categoryBtn.selected = !_categoryBtn.selected;
+        _nameBtn.selected = NO;
+    }
+    else if (btn == _nameBtn)
+    {
+        _categoryView.hidden = YES;
+        
+        _letterView.hidden = !_letterView.hidden;
+        
+        _nameBtn.selected = !_nameBtn.selected;
+        _categoryBtn.selected = NO;
+    }
+    
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CYBuyAllCell * cell = (CYBuyAllCell *)[self tableView:tableView cellForRowAtIndexPath:indexPath];
+    
+    return cell.height;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CYBuyerDetailVC * vc = viewControllerInStoryBoard(@"CYBuyerDetailVC", @"Buyer");
+    vc.seller_uid = ((CYBuyerAllListCellModel *) _dataArr[indexPath.row]).uid;
+    
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CYBuyAllCell * cell = [CYBuyAllCell cellForTableView:tableView];
+    cell.allListCellmodel = _dataArr[indexPath.row];
+
+    return cell;
+}
+
+- (NSInteger) numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return 1;
+}
+
+- (NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return _dataArr.count;
+}
+
+- (CYBuyerAllCategoryView *)categoryView
+{
+    if (!_categoryView) {
+        _categoryView = [[[NSBundle mainBundle] loadNibNamed:@"CYBuyerAllCategoryView" owner:nil options:nil] firstObject];
+        _categoryView.frame = WINDOW.bounds;
+        _categoryView.y = 124.0f;
+        _categoryView.delegate = self;
+        _categoryView.height = SCREEN_HEIGHT -124;
+        _categoryView.hidden = YES;
+    }
+    return _categoryView;
+}
+
+- (CYBuyerAllLetterView *)letterView
+{
+    if (!_letterView) {
+        _letterView = [[[NSBundle mainBundle] loadNibNamed:@"CYBuyerAllLetterView" owner:nil options:nil] firstObject];
+        _letterView.frame = WINDOW.bounds;
+        _letterView.y = 124.0f;
+        _letterView.delegate = self;
+        _letterView.height = SCREEN_HEIGHT -124;
+        _letterView.hidden = YES;
+    }
+    return _letterView;
+}
+
+- (void) selectLetter:(NSString *)letter
+{
+    NSLog(@"letter: %@", letter);
+    
+    _nameBtn.selected = NO;
+    
+    [_nameBtn setTitle:letter forState:UIControlStateNormal];
+
+}
+
+- (void)selectSubCategory:(NSDictionary *)info
+{
+    NSLog(@"selectSubCategory");
+    
+    _categoryBtn.selected = NO;
+    
+    NSString * title = [info objectForKey:@"selectedName"];
+    
+    [_categoryBtn setTitle:title forState:UIControlStateNormal];
+}
+
+@end

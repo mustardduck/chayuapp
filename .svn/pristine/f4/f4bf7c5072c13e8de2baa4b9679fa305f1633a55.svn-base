@@ -1,0 +1,190 @@
+//
+//  CYHomeViewController.m
+//  茶语
+//
+//  Created by Chayu on 16/6/27.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYHomeViewController.h"
+#import "CYHomeBannerCell.h"
+#import "CYHomeChaPingCell.h"
+#import "CYHomeShiJiCell.h"
+#import "CYHomeQuanZiCell.h"
+#import "CYHomeWenZhangCell.h"
+#import "CYDaoHangViewController.h"
+#import "CYSouSuoHomeViewController.h"
+#import "CYMyViewController.h"
+
+@interface CYHomeViewController ()<UITableViewDelegate,UITableViewDataSource>
+
+
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+@property (nonatomic, strong) CYHomeInfo *mHomeInfo;
+
+- (IBAction)gotodaohang_click:(id)sender;
+
+
+- (IBAction)sousuo_click:(id)sender;
+
+
+- (IBAction)usercenter_click:(id)sender;
+
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottom_cons;
+
+@end
+
+@implementation CYHomeViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    _bottom_cons.constant = 65*(SCREEN_WIDTH/375.);
+    [self creatkongNavBar];
+  [self loadHomeData];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+
+
+-(void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick beginLogPageView:@"茶语首页"];
+}
+
+-(void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:@"茶语首页"];
+}
+
+
+
+#pragma mark - self defined methods
+- (void)loadHomeData
+{
+    
+    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+//    [params setObject:@"2" forKey:@"version"];
+    [CYWebClient Post:@"Home" parametes:params success:^(id responObject) {
+        self.mHomeInfo = [CYHomeInfo objectWithKeyValues:responObject];
+        [self.tableView reloadData];
+    } failure:^(id error) {
+    }];
+
+}
+
+
+#pragma mark -
+#pragma mark UITableViewDataSource method
+-(NSInteger )tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return 5;
+}
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView{
+    return 1;
+}
+
+-(CGFloat )tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    switch (indexPath.row) {
+        case 0:
+            return 171.*SCREENBILI;
+            break;
+        case 1:
+            return 126.;
+            break;
+        case 2:
+            return 325.;
+            break;
+        case 3:
+            return 274.;
+            break;
+        case 4:
+            return 123.;
+            break;
+        default:
+            return 0.;
+            break;
+    }
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    switch (indexPath.row) {
+        case 0:
+        {
+            CYHomeBannerCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYHomeBannerCell"];
+            [cell parseData:self.mHomeInfo.slide];
+            return cell;
+            break;
+        }
+        case 1:
+        {
+            CYHomeChaPingCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYHomeChaPingCell"];
+            [cell parseData:self.mHomeInfo.chapingList];
+            return cell;
+            break;
+        }
+        case 2:
+        {
+            CYHomeShiJiCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYHomeShiJiCell"];
+            [cell parseData:self.mHomeInfo.shiji];
+            return cell;
+            break;
+        }
+        case 3:
+        {
+            CYHomeQuanZiCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYHomeQuanZiCell"];
+    
+            [cell parseData:self.mHomeInfo.group];
+            return cell;
+            break;
+        }
+        case 4:
+        {
+            CYHomeWenZhangCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYHomeWenZhangCell"];
+            [cell parseData:self.mHomeInfo.article];
+            return cell;
+            break;
+        }
+            
+        default:
+            return nil;
+            break;
+    }
+
+}
+
+#pragma mark -
+#pragma mark UITableViewDelegate method
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+}
+
+
+- (IBAction)gotodaohang_click:(id)sender {
+    CYDaoHangViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"CYDaoHangViewController"];
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (IBAction)sousuo_click:(id)sender {
+    CYSouSuoHomeViewController *vc = viewControllerInStoryBoard(@"CYSouSuoHomeViewController", @"SouSuo");
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (IBAction)usercenter_click:(id)sender {
+    if (!MANAGER.isLoged) {
+        [APP_DELEGATE showLogView];
+        return;
+    }
+    CYMyViewController *vc = viewControllerInStoryBoard(@"CYMyViewController", @"My");
+    [self.navigationController pushViewController:vc animated:YES];
+}
+@end

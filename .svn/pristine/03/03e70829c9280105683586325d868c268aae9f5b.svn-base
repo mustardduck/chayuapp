@@ -1,0 +1,106 @@
+//
+//  CYPublicPostCardController.m
+//  茶语
+//
+//  Created by Chayu on 16/7/15.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYPublicPostCardController.h"
+#import "PlaceholderTextView.h"
+@interface CYPublicPostCardController ()
+
+
+- (IBAction)goback:(id)sender;
+
+@property (weak, nonatomic) IBOutlet PlaceholderTextView *contentTxt;
+- (IBAction)tijiao_click:(id)sender;
+
+
+
+
+@end
+
+@implementation CYPublicPostCardController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    _contentTxt.placeholder = @"请输入回复内容，字数不少于5个字";
+}
+
+-(void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick beginLogPageView:@"发表评论"];
+}
+
+-(void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:@"发表评论"];
+}
+
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+- (IBAction)tijiao_click:(id)sender {
+    
+    if (!MANAGER.isLoged) {
+        [APP_DELEGATE showLogView];
+        return;
+    }
+    
+    [_contentTxt resignFirstResponder];
+    NSString *content = self.contentTxt.text;
+    if (content.length == 0) {
+        [SVProgressHUD showErrorWithStatus:@"请输入评论内容"];
+        return;
+    }
+    
+    NSMutableDictionary *param = [NSMutableDictionary new];
+    [param setObject:_mItemid forKey:@"itemid"];
+    [param setObject:self.contentTxt.text forKey:@"content"];
+    
+    if (self.pid != nil) {
+        [param setObject:self.pid forKey:@"pid"];
+    }
+    
+    if (self.touid != nil) {
+        [param setObject:self.touid forKey:@"touid"];
+    }
+    [SVProgressHUD showWithStatus:@"正在提交" maskType:SVProgressHUDMaskTypeBlack];
+    [CYWebClient basePost:@"ArticleCommentsSave" parametes:param success:^(id responObject) {
+        NSInteger state = [[responObject objectForKey:@"state"] integerValue];
+        NSString *msg =[responObject objectForKey:@"msg"];
+        if (state == 400) {
+            if (self.postcardbackBlock) {
+                self.postcardbackBlock();
+                [SVProgressHUD dismiss];
+                [self.navigationController popViewControllerAnimated:YES];
+            }
+        }else{
+            [SVProgressHUD showErrorWithStatus:msg];
+        }
+    
+    } failure:^(id error) {
+        [SVProgressHUD dismiss];
+    }];
+}
+@end

@@ -1,0 +1,74 @@
+//
+//  CYActiveHeader.m
+//  茶语
+//
+//  Created by Chayu on 16/3/24.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYActiveHeader.h"
+#import "UICommon.h"
+
+
+@interface CYActiveHeader ()
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *img_height;
+
+@property (weak, nonatomic) IBOutlet UILabel *descLbl;
+
+@end
+
+
+
+
+@implementation CYActiveHeader
+
+
+- (void)setTitleName:(NSString *)titleName
+{
+    _titleName = titleName;
+    
+    _titleLbl.text = _titleName;
+}
+
+- (void)setDesc:(NSString *)desc
+{
+    desc = [desc stringByReplacingOccurrencesOfString:@"&nbsp;" withString:@" "];
+    
+    _desc = desc;
+    
+    CGFloat imgheight =250*(SCREEN_WIDTH/375);
+    
+    CGFloat descHe = [UICommon lableHeightWithString:_desc Size:CGSizeMake(_descLbl.width, MAXFLOAT) fontSize:14.0];
+    
+    self.height = 55 + imgheight + descHe;
+    
+    _descLbl.text = _desc;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"COLLECTIONHEADERHEIGHT" object:nil];
+    
+}
+
+- (void)awakeFromNib
+{
+    
+}
+
+//#pragma mark -
+//#pragma mark BBWebViewSizeAdjust delegate method
+//- (void)bbweb:(BBWebView *)web didAdjustSizeTo:(CGSize)endSize from:(CGSize)startSize
+//{
+//    if (startSize.height<endSize.height) {
+//        _webView.height = endSize.height;
+//        CGFloat imgheight =250*(SCREEN_WIDTH/375);
+//        CGFloat webHeight = endSize.height;
+//        if (SCREEN_WIDTH <375) {
+//            webHeight +=30;
+//        }
+//        self.height = 50+webHeight+imgheight;
+//          [[NSNotificationCenter defaultCenter] postNotificationName:@"COLLECTIONHEADERHEIGHT" object:nil];
+//    }
+//    
+//}
+
+@end

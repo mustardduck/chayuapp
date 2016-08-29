@@ -1,0 +1,312 @@
+//
+//  CYWriteCommentViewController.m
+//  茶语
+//
+//  Created by 李峥 on 16/2/22.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYWriteCommentViewController.h"
+#import "PYRatingView.h"
+#import "CYCommentRatingViewController.h"
+#import "CYBuyerProductCollectionViewCell.h"
+#import "UICommon.h"
+#import <ZYQAssetPickerController.h>
+#import "PlaceholderTextView.h"
+#import "NTAlbum.h"
+//static const int ADD_IMG_COUNT = 9;
+@interface CYWriteCommentViewController ()<PYRatingViewDelegate,CYCommentRatingViewDelegate,UITextViewDelegate>
+{
+    CYRatingInfo *selectRat;
+     NSMutableArray * _productImgArr;
+    NSString * _currentFileName;
+}
+
+@property (weak, nonatomic) IBOutlet PYRatingView *mRatingView;
+@property (weak, nonatomic) IBOutlet PlaceholderTextView *mTextView;
+
+- (IBAction)tijiao_click:(id)sender;
+
+@property (nonatomic, strong) CYRatingInfo *mChildRatingData;
+
+@property (nonatomic, strong) UIImage *uploadImage;
+
+@property (nonatomic, strong) NSMutableDictionary *proportionList;
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *chooseImgBg_cons;
+- (IBAction)goback:(id)sender;
+
+
+@property (weak, nonatomic) IBOutlet UIView *imgchooseBg;
+
+@property (nonatomic,strong)NTAlbum *albumView;
+
+@property (weak, nonatomic) IBOutlet UIScrollView *contentView;
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *topviewconsheight;
+
+@property (weak, nonatomic) IBOutlet PYRatingView *ganchaRatView;
+
+@property (weak, nonatomic) IBOutlet PYRatingView *tangseRatView;
+
+@property (weak, nonatomic) IBOutlet PYRatingView *xiangqiRatView;
+
+@property (weak, nonatomic) IBOutlet PYRatingView *ziweiRatView;
+@property (weak, nonatomic) IBOutlet PYRatingView *yediRatView;
+
+@property (weak, nonatomic) IBOutlet UILabel *ganchafenLbl;
+
+@property (weak, nonatomic) IBOutlet UILabel *tangsefenLbl;
+@property (weak, nonatomic) IBOutlet UILabel *xiangqifenLbl;
+
+@property (weak, nonatomic) IBOutlet UILabel *ziweifenLbl;
+@property (weak, nonatomic) IBOutlet UIImageView *statusImg;
+
+@property (weak, nonatomic) IBOutlet UILabel *yedifenLbl;
+
+@property (weak, nonatomic) IBOutlet UILabel *zongfenLbl;
+
+- (IBAction)zhankaiPingfen_click:(id)sender;
+
+@end
+
+@implementation CYWriteCommentViewController
+
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
+    self.title = @"发表评鉴";
+    
+    _productImgArr = [NSMutableArray array];
+    _mTextView.placeholder = @"请输入茶评";
+    [_mRatingView setImagesDeselected:@"eva03" partlySelected:@"eva02" fullSelected:@"eva01" andDelegate:nil];
+     [_ganchaRatView setImagesDeselected:@"eva03" partlySelected:@"eva02" fullSelected:@"eva01" andDelegate:self];
+     [_tangseRatView setImagesDeselected:@"eva03" partlySelected:@"eva02" fullSelected:@"eva01" andDelegate:self];
+     [_xiangqiRatView setImagesDeselected:@"eva03" partlySelected:@"eva02" fullSelected:@"eva01" andDelegate:self];
+     [_ziweiRatView setImagesDeselected:@"eva03" partlySelected:@"eva02" fullSelected:@"eva01" andDelegate:self];
+    [_yediRatView setImagesDeselected:@"eva03" partlySelected:@"eva02" fullSelected:@"eva01" andDelegate:self];
+    [_imgchooseBg addSubview:self.albumView];
+    __weak __typeof(self) weakSelf = self;
+    weakSelf.albumView.imgcuntChangeBlock = ^(NSInteger imgcount){
+        if (imgcount <9) {
+            _chooseImgBg_cons.constant = ceilf((imgcount+1)/4.)*82 +58;
+        }else{
+            _chooseImgBg_cons.constant = ceilf(imgcount/4.)*82 +58;
+        }
+        
+        [_contentView layoutIfNeeded];
+        
+    };
+}
+
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [MobClick beginLogPageView:self.title];
+}
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:self.title];
+}
+
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+
+}
+
+- (void)textViewDidChange:(UITextView *)textView
+{
+
+}
+
+
+
+- (NTAlbum *)albumView
+{
+    if (!_albumView) {
+        _albumView = [[[NSBundle mainBundle] loadNibNamed:@"NTAlbum" owner:nil options:nil] firstObject];
+        _albumView.frame = _imgchooseBg.bounds;
+        _albumView.imageCountLimit = 9;
+        _albumView.contro = self;
+    }
+    return _albumView;
+}
+
+
+#pragma mark - UIImagePicker delegate
+
+- (void)ratingChanged:(float)newRating andPYRatingView:(PYRatingView *)view
+{
+    if (view == _ganchaRatView) {
+        _ganchafenLbl.text = [NSString stringWithFormat:@"%.1f",newRating*2];
+    }else if (view == _tangseRatView){
+       _tangsefenLbl.text = [NSString stringWithFormat:@"%.1f",newRating*2];
+    }else if (view == _xiangqiRatView){
+        _xiangqifenLbl.text = [NSString stringWithFormat:@"%.1f",newRating*2];
+    }else if (view ==_ziweiRatView){
+        _ziweifenLbl.text = [NSString stringWithFormat:@"%.1f",newRating*2];
+    }else if(view == _yediRatView){
+        _yedifenLbl.text = [NSString stringWithFormat:@"%.1f",newRating*2];
+    }
+    
+    
+    CGFloat zongfen =(_ganchaRatView.rating +_tangseRatView.rating +_xiangqiRatView.rating +_ziweiRatView.rating +_yediRatView.rating)/5.;
+    _zongfenLbl.text = [NSString stringWithFormat:@"%.1f",zongfen*2];
+    [_mRatingView displayRating:zongfen];
+}
+
+- (IBAction)clickRating:(id)sender {
+    CYCommentRatingViewController *rating = [[CYCommentRatingViewController alloc] initWithNibName:@"CYCommentRatingViewController" bundle:nil];
+    rating.delegate = self;
+    if (self.mChildRatingData) {
+        rating.retInfo = self.mChildRatingData;
+    }
+    [self.navigationController pushViewController:rating animated:YES];
+}
+
+- (IBAction)clickSend:(id)sender {
+   }
+
+- (void)commentRatingData:(CYRatingInfo *)info
+{
+    self.mChildRatingData = info;
+//    selectRat = info;
+    //计算总评
+    CGFloat sum = [self ratingProportion];
+    
+//    self.mRatinglabel.text = [NSString stringWithFormat:@"%.1f",sum];
+    [self.mRatingView displayRating:sum];
+}
+
+- (CGFloat)ratingProportion
+{
+    NSArray *list = [self.proportionList objectForKey:_bid];
+    CGFloat sum = 0;
+    if (list) {
+        sum += self.mChildRatingData.drytea * [list[0] floatValue]/100;
+        sum += self.mChildRatingData.soupcolor * [list[1] floatValue]/100;
+        sum += self.mChildRatingData.smell * [list[2] floatValue]/100;
+        sum += self.mChildRatingData.flavour * [list[3] floatValue]/100;
+        sum += self.mChildRatingData.leaves * [list[4] floatValue]/100;
+    }
+    else{
+        sum += self.mChildRatingData.drytea * 0.2f;
+        sum += self.mChildRatingData.soupcolor * 0.2f;
+        sum += self.mChildRatingData.smell * 0.2f;
+        sum += self.mChildRatingData.flavour * 0.2f;
+        sum += self.mChildRatingData.leaves * 0.2f;
+    }
+
+    return sum;
+}
+
+- (NSMutableDictionary *)proportionList
+{
+    if (_proportionList == nil) {
+        _proportionList = [NSMutableDictionary new];
+        
+        [_proportionList setObject:[@"25,10,25,30,10" componentsSeparatedByString:@","] forKey:@"1"];
+        
+        [_proportionList setObject:[@"20,10,30,30,10" componentsSeparatedByString:@","] forKey:@"2"];
+        [_proportionList setObject:[@"20,15,25,30,10" componentsSeparatedByString:@","] forKey:@"3"];
+        
+        [_proportionList setObject:[@"25,10,25,30,10" componentsSeparatedByString:@","] forKey:@"4"];
+        
+        [_proportionList setObject:[@"25,10,25,30,10" componentsSeparatedByString:@","] forKey:@"5"];
+
+        [_proportionList setObject:[@"25,10,25,30,10" componentsSeparatedByString:@","] forKey:@"6"];
+        [_proportionList setObject:[@"25,10,25,30,10" componentsSeparatedByString:@","] forKey:@"7"];
+        [_proportionList setObject:[@"20,10,30,30,10" componentsSeparatedByString:@","] forKey:@"8"];
+        [_proportionList setObject:[@"10,20,30,30,10" componentsSeparatedByString:@","] forKey:@"9"];
+        [_proportionList setObject:[@"10,20,35,35,0" componentsSeparatedByString:@","] forKey:@"10"];
+
+    }
+    
+    return _proportionList;
+}
+
+/*
+1 => '[25,10,25,30,10]', //绿茶
+2 => '[20,10,30,30,10]', //乌龙
+3 => '[20,15,25,30,10]', //红茶
+4 => '[25,10,25,30,10]', //普洱
+5 => '[25,10,25,30,10]', //黑茶
+6 => '[25,10,25,30,10]', //白茶
+7 => '[25,10,25,30,10]', //黄茶
+8 => '[20,10,30,30,10]', //花茶
+9 => '[10,20,30,30,10]', //袋泡
+10 => '[10,20,35,35,0]', //速溶茶
+ */
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (IBAction)tijiao_click:(id)sender {
+    NSString *text = [self.mTextView text];
+    if (text.length == 0) {
+        [SVProgressHUD showErrorWithStatus:@"请输入评鉴内容"];
+        return;
+    }
+    if (self.mRatingView.rating <= 0) {
+        [SVProgressHUD showErrorWithStatus:@"请选择评分"];
+        return;
+    }
+    
+    NSMutableDictionary *params = [NSMutableDictionary new];
+    if (self.mChildRatingData != nil) {
+        [params setDictionary:[self.mChildRatingData keyValues]];
+    }
+    
+    [params setObject:_mItemid forKey:@"itemid"];
+    [params setObject:text forKey:@"content"];
+    [params setObject:@(self.mRatingView.rating * 2) forKey:@"score"];
+    
+    if (_mType == TeaCommentType_sample) {
+        [params setObject:@"sample" forKey:@"module"];
+    }else
+    {
+        [params setObject:@"tea" forKey:@"module"];
+    }
+    
+    NSMutableDictionary *files = nil;
+    if (self.albumView.imageArr.count) {
+        files = [NSMutableDictionary new];
+        [files setObject:self.albumView.imageArr forKey:@"attachs"];
+    }
+    
+    [SVProgressHUD showInfoWithStatus:@"正在提交"];
+    [SVProgressHUD setBackgroundColor:[UIColor blackColor]];
+    [SVProgressHUD setForegroundColor:[UIColor whiteColor]];
+    [CYWebClient Post:@"review" parametes:params files:files success:^(id responObject) {
+        [SVProgressHUD showSuccessWithStatus:@"评鉴成功"];
+        if (self.backBlock) {
+            self.backBlock();
+        }
+        
+        [self.navigationController popViewControllerAnimated:YES];
+    } failure:^(id error) {
+        
+    }];
+
+}
+
+
+
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+- (IBAction)zhankaiPingfen_click:(id)sender {
+    _statusImg.highlighted = !_statusImg.highlighted;
+    _topviewconsheight.constant = _statusImg.highlighted?60:285;
+    [_contentView layoutIfNeeded];
+    
+}
+@end

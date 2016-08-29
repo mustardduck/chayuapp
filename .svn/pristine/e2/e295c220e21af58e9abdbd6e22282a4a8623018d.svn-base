@@ -1,0 +1,443 @@
+//
+//  CYConfirmOrderViewController.m
+//  TeaMall
+//
+//  Created by Chayu on 15/11/24.
+//  Copyright © 2015年 Chayu. All rights reserved.
+//
+
+#import "CYConfirmOrderViewController.h"
+#import "CYCOrderTableViewCell.h"
+#import "CYAddressListViewController.h"
+//#import "CYInvoiceViewController.h"
+#import "CYLeaveMessageViewController.h"
+#import "CYPayTableViewController.h"
+#import "CYCorderFooterView.h"
+#import "CYSelectCoupViewController.h"
+#import "CYProductDetViewController.h"
+@interface CYConfirmOrderViewController ()<UITableViewDataSource,UITableViewDelegate,CYCOrderTableViewCellDelegate>
+{
+    NSMutableArray *_dataArr;
+    CYShippingAddressModel *shipingModel;
+    NSInteger goodsNum;
+    NSDictionary *couponList;
+    NSDictionary *totalShipPrice;
+    NSMutableDictionary *orderInfo;
+    NSMutableArray *couponArr;//优惠券信息
+    
+    BOOL _invoiceBtnSelected;
+}
+- (IBAction)goback:(id)sender;
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+@property (weak, nonatomic) IBOutlet UILabel *nameLbl;
+@property (weak, nonatomic) IBOutlet UILabel *phoneLbl;
+@property (weak, nonatomic) IBOutlet UILabel *addressLbl;
+@property (nonatomic,strong)CYCorderFooterView *footerView;
+- (IBAction)selectAddress_click:(id)sender;
+/**
+ *  结算
+ */
+- (IBAction)settleaccounts_click:(id)sender;
+@property (weak, nonatomic) IBOutlet CYBorderButton *settleBtn;
+@property (weak, nonatomic) IBOutlet UILabel *priceLbl;
+/**
+ *  运费
+ */
+@property (weak, nonatomic) IBOutlet UILabel *shipmentLbl;
+
+@end
+
+@implementation CYConfirmOrderViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    goodsNum = 0;
+    orderInfo = [NSMutableDictionary dictionary];
+    couponArr = [NSMutableArray array];
+    couponList  =[NSDictionary dictionary];
+    totalShipPrice = [NSDictionary dictionary];
+//    _priceLbl.text = [NSString stringWithFormat:@"￥%.2f",[self allGoodsPrice]];
+
+    [self loadAddressMessage];
+
+    [orderInfo setObject:[NSNumber numberWithFloat:[self allGoodsPrice]] forKey:@"allprcie"];
+    _tableView.tableFooterView = self.footerView;
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [MobClick beginLogPageView:self.title];
+}
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:self.title];
+}
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+
+-(void)getPaidFreightVolumeInfo:(NSString *)addressId
+{
+    NSMutableArray *specIdArr =[NSMutableArray array];//规格ID
+    NSMutableArray *goodsNumberArr = [NSMutableArray array];//商品数量
+  
+    for (int i =0; i<[_dataArr count]; i++) {
+        CYOrderDetailModel *model = _dataArr[i];
+        goodsNum += [model.commodityCount integerValue];
+        for (CYShopTrolleyModel *shopModel in model.goodsList) {
+            [specIdArr addObject:shopModel.specId];
+            [goodsNumberArr addObject:shopModel.goodsNumber];
+        
+        }
+    }
+    [SVProgressHUD setBackgroundColor:[UIColor blackColor]];
+    [SVProgressHUD setForegroundColor:[UIColor whiteColor]];
+    [SVProgressHUD showWithStatus:@"正在加载数据"];
+    NSString *buttontitle = [NSString stringWithFormat:@"结算（%d）",(int)goodsNum];
+    [_settleBtn setTitle:buttontitle forState:UIControlStateNormal];
+    [orderInfo setObject:[NSNumber numberWithInteger:goodsNum] forKey:@"goodsnum"];
+    __weak typeof(self) weakSelf = self;
+    [CYWebClient Post:@"getPaidFreightVolumeInfo" parametes:@{@"specId":[specIdArr JSONString],@"number":[goodsNumberArr JSONString],@"addressId":addressId} success:^(id responObject) {
+        [SVProgressHUD showSuccessWithStatus:@"加载完成"];
+        couponList = [responObject objectForKey:@"couponList"];
+        totalShipPrice = [responObject objectForKey:@"totalShipPrice"];
+        CGFloat shipprice = 0.0;
+        for (NSString *key in totalShipPrice) {
+            shipprice +=[[totalShipPrice objectForKey:key] floatValue];
+        }
+        [orderInfo setObject:[NSNumber numberWithFloat:shipprice] forKey:@"shipprice"];
+        CGFloat coupprice = 0.0;
+        for (NSString *key in couponList) {
+            NSArray *coupArr = [couponList objectForKey:key];
+            if ([coupArr count]>0) {
+                NSDictionary *info = coupArr[0];
+                coupprice +=[[info objectForKey:@"money"] floatValue];
+                [couponArr addObject:[info objectForKey:@"id"]];
+            }else{
+                [couponArr addObject:@""];
+            }
+        }
+        [orderInfo setObject:[NSNumber numberWithFloat:coupprice] forKey:@"coupprice"];
+        weakSelf.priceLbl.text = [NSString stringWithFormat:@"%.2f",[self allGoodsPrice] - coupprice +shipprice];
+        weakSelf.shipmentLbl.text = [NSString stringWithFormat:@"含运费：￥%.2f",shipprice];
+//         _realpriceLbl.text = [NSString stringWithFormat:@"￥%.2f",allprcie-coupprice+shipprice];
+        weakSelf.footerView.orderInfo = orderInfo;
+        [weakSelf.tableView reloadData];
+        [weakSelf changeFooterInfo];
+        
+    } failure:^(id error) {
+         [SVProgressHUD showSuccessWithStatus:@"加载失败"];
+    }];
+}
+
+- (CYCorderFooterView *)footerView
+{
+    if (!_footerView) {
+        _footerView = [[[NSBundle mainBundle] loadNibNamed:@"CYCorderFooterView" owner:nil options:nil] firstObject];
+        _footerView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 130);
+    }
+    return _footerView;
+}
+
+
+-(CGFloat)allGoodsPrice
+{
+    CGFloat price = 0.00;
+    goodsNum = 0;
+    for (CYOrderDetailModel *model in _dataArr) {
+        price +=[model.orderPrice floatValue];
+//        goodsNum += [model.commodityCount integerValue];
+    }
+    return price;
+}
+
+- (void)loadAddressMessage
+{
+    __weak typeof(self) weakSelf = self;
+    [CYWebClient Post:@"Address" parametes:nil success:^(id responObj) {
+        if ([responObj count]) {
+            shipingModel = [CYShippingAddressModel objectWithKeyValues:responObj[0]];
+            weakSelf.nameLbl.text = shipingModel.name;
+            weakSelf.phoneLbl.text = shipingModel.mobile;
+            NSString *readAddress = [NSString stringWithFormat:@"%@%@%@%@",shipingModel.provinceName,shipingModel.cityName,shipingModel.areaName,shipingModel.areaAddress];
+            weakSelf.addressLbl.text = readAddress;
+            [self getPaidFreightVolumeInfo:shipingModel.addressId];
+        }
+    
+    } failure:^(id err) {
+        NSLog(@"%@",err);
+    }];
+}
+
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+#pragma mark -
+#pragma mark 按钮点击事件 method
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+/**
+ *  选择地址
+ */
+- (IBAction)selectAddress_click:(id)sender {
+    CYAddressListViewController *vc = viewControllerInStoryBoard(@"CYAddressListViewController", @"My");
+    vc.addressType = CYAddressTypeChoose;
+    __weak __typeof(self) weakSelf = self;
+    vc.back = ^(CYShippingAddressModel *model){
+        shipingModel = model;
+        weakSelf.nameLbl.text = model.name;
+        weakSelf.phoneLbl.text = model.mobile;
+        NSString *readAddress = [NSString stringWithFormat:@"%@%@%@%@",model.provinceName,model.cityName,model.areaName,model.areaAddress];
+        weakSelf.addressLbl.text = readAddress;
+        [self getPaidFreightVolumeInfo:shipingModel.addressId];
+    };
+    [self.navigationController pushViewController:vc animated:YES];
+    
+}
+/**
+ *  结算
+ */
+- (IBAction)settleaccounts_click:(id)sender {
+    [self settleaccountHttprequest];
+}
+
+
+/**
+ *  去结算请求网络
+ */
+-(void)settleaccountHttprequest
+{
+//    SaveOrder
+    
+    _settleBtn.userInteractionEnabled = NO;
+    NSMutableDictionary *param = [NSMutableDictionary dictionary];
+    NSMutableArray *specIdArr =[NSMutableArray array];//规格ID
+    NSMutableArray *goodsNumberArr = [NSMutableArray array];//商品数量
+    NSMutableArray *msgArr = [NSMutableArray array];//卖家留言
+    NSMutableArray *invoiceNeedArr = [NSMutableArray array];//是否需要发票
+    NSMutableArray *ticketArr = [NSMutableArray array];//发票信息
+    for (int i =0; i<[_dataArr count]; i++) {
+        CYOrderDetailModel *model = _dataArr[i];
+        NSString *message = @"";
+        if (model.buyersMessage.length) {
+            message = model.buyersMessage;
+        }
+        [msgArr addObject:message];
+        if (model.invPayee.length) {
+              [ticketArr addObject:model.invPayee];
+        }else{
+            [ticketArr addObject:@""];
+        }
+        
+      
+        if (model.invPayee.length == 0) {
+            [invoiceNeedArr addObject:@"0"];
+        }else{
+            [invoiceNeedArr addObject:@"1"];
+        }
+        
+        for (CYShopTrolleyModel *shopModel in model.goodsList) {
+            [goodsNumberArr addObject:shopModel.goodsNumber];
+            [specIdArr addObject:shopModel.specId];
+        }
+    }
+    
+    if (!shipingModel.addressId.length) {
+        [Itost showMsg:@"请选择收货地址" inView:self.view];
+        _settleBtn.userInteractionEnabled = YES;
+        return;
+    }
+    [param setObject:shipingModel.addressId forKey:@"addressId"];
+    [param setObject:[specIdArr JSONString] forKey:@"specId"];
+    [param setObject:[goodsNumberArr JSONString] forKey:@"goodsNumber"];
+    [param setObject:[msgArr JSONString]forKey:@"msg"];
+    [param setObject:[invoiceNeedArr JSONString]forKey:@"invoiceNeed"];
+    [param setObject:[ticketArr  JSONString]forKey:@"ticket"];
+    [param setObject:@"2" forKey:@"source"];
+    [param setObject:[couponArr JSONString] forKey:@"coupon_log_id"];
+    NSString *rootInStr = _confirmtype == CYConfirmOrderTypeCard?@"0":@"1";
+    [param setObject:rootInStr forKey:@"rootIn"];
+//    NSString *postParam = [param JSONString];
+    
+    [SVProgressHUD showInfoWithStatus:@"正在提交订单"];
+    [CYWebClient Post:@"SaveOrder" parametes:param success:^(id responObj) {
+        NSLog(@"responObj = %@",responObj);
+        
+        _settleBtn.userInteractionEnabled = YES;
+        if (responObj) {
+            [SVProgressHUD showSuccessWithStatus:@"提交成功"];
+            CYPayTableViewController *vc = viewControllerInStoryBoard(@"CYPayTableViewController", @"TeaMall");
+            vc.orderId = [responObj objectForJSONKey:@"orderSn"];
+            NSString *price = [[responObj objectForKey:@"orderAmount"] description];
+            vc.price = [NSString stringWithFormat:@"%.2f",[price floatValue]];
+            [self.navigationController pushViewController:vc animated:YES];
+        }
+        
+    } failure:^(id err) {
+        [SVProgressHUD showErrorWithStatus:@"提交失败"];
+         _settleBtn.userInteractionEnabled = YES;
+        NSLog(@"%@",err);
+    }];
+    
+    
+}
+
+#pragma mark -
+#pragma mark UITableViewDataSource method
+-(NSInteger )tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return [_dataArr count];
+}
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView{
+    return 1;
+}
+
+-(CGFloat )tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CYOrderDetailModel *model = _dataArr[indexPath.row];
+    CGFloat offect_height = 0;
+    if (model.goodsList.count>1) {
+        offect_height = 88*(model.goodsList.count-1);
+    }
+    NSArray *couplist =[couponList objectForKey:[model.seller objectForKey:@"sellerUid"]];
+    if ([couplist count]>0) {
+        offect_height +=35;
+    }
+    
+    if(_invoiceBtnSelected)
+    {
+        offect_height += 40;
+    }
+    
+    return BASECELLHEIGHT +offect_height;
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CYCOrderTableViewCell *cell = [CYCOrderTableViewCell cellWidthTableView:tableView];
+    CYOrderDetailModel *model =_dataArr[indexPath.row];
+    cell.corderModel = model;
+
+    NSArray *couplist =[couponList objectForKey:[model.seller objectForKey:@"sellerUid"]];
+//    if (!couplist) {
+//        couplist = [couponList objectForKey:@"1"];
+//    }
+    
+    if (couplist && [couplist count]>0) {
+        cell.couponinfo = couplist[0];
+    }else{
+        cell.couponinfo = @{};
+    }
+    
+    
+    NSString *price =[totalShipPrice objectForKey:[model.seller objectForKey:@"sellerUid"]];
+    if (!price) {
+        price = [totalShipPrice objectForKey:@"1"];
+    }
+    cell.shipPrice = price;
+    cell.delegate = self; 
+    
+
+    
+    return cell;
+}
+
+#pragma mark -
+#pragma mark UITableViewDelegate method
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+}
+#pragma mark -
+#pragma mark CYCOrderTableViewCellDelegate method
+- (void)selectinvoiceCell:(CYCOrderTableViewCell *)cell andModel:(CYOrderDetailModel *)model
+{
+    
+    
+//    CYInvoiceViewController *vc =viewControllerInStoryBoard(@"CYInvoiceViewController", @"TeaMall");
+//    vc.block = ^(NSString *title){
+//          model.invPayee = title;
+//        if (title.length) {
+//            cell.invoiceStr = title;
+//        }else{
+//            cell.invoiceStr = @"不要发票";
+//            model.invPayee = title;
+//        }
+//    };
+//    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (void)fillinthemessage:(CYCOrderTableViewCell *)cell WithModel:(CYOrderDetailModel *)model
+{
+    CYLeaveMessageViewController *vc =viewControllerInStoryBoard(@"CYLeaveMessageViewController", @"TeaMall");
+    
+    if (model.buyersMessage) {
+        vc.levemessage = model.buyersMessage;
+    }
+    
+    vc.block = ^(NSString *message){
+        cell.messageStr = message;
+        model.buyersMessage = message;
+    };
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (void)invoiceBtn_click:(CYCOrderTableViewCell *)cell WithModel:(CYOrderDetailModel *)model
+{
+    _invoiceBtnSelected = cell.invoiceBtn.selected;
+    
+    [_tableView reloadData];
+}
+
+
+- (void)selectOrderCell:(CYCOrderTableViewCell *)cell andModel:(CYOrderDetailModel *)modell
+{
+    NSIndexPath *indexPath = [_tableView indexPathForCell:cell];
+    __block CGFloat coupprice = [[orderInfo objectForKey:@"coupprice"] floatValue];
+    if (cell.couponinfo.count) {
+         coupprice -= [[cell.couponinfo objectForKey:@"money"] floatValue];
+    }
+    
+    CYSelectCoupViewController *vc= viewControllerInStoryBoard(@"CYSelectCoupViewController", @"TeaMall");
+    vc.block = ^(NSDictionary *coupInfo){
+        coupprice +=[[coupInfo objectForKey:@"money"] floatValue];
+        [orderInfo setObject:[NSNumber numberWithFloat:coupprice] forKey:@"coupprice"];
+        cell.couponinfo = coupInfo;
+        [couponArr replaceObjectAtIndex:indexPath.row withObject:[coupInfo objectForKey:@"id"]];
+        [self changeFooterInfo];
+    };
+    vc.dataArr = [couponList objectForKey:[modell.seller objectForKey:@"sellerUid"]];
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+-(void)goodsdetails:(CYShopTrolleyModel *)model
+{
+    CYProductDetViewController *vc= viewControllerInStoryBoard(@"CYProductDetViewController", @"TeaMall");
+    vc.goodId = model.goodsId;
+    [self.navigationController pushViewController:vc animated:YES];}
+
+-(void)changeFooterInfo{
+    self.footerView.orderInfo = orderInfo;
+    CGFloat allprcie = [[orderInfo objectForKey:@"allprcie"] floatValue];
+    CGFloat coupprice = [[orderInfo objectForKey:@"coupprice"] floatValue];
+    CGFloat shipprice = [[orderInfo objectForKey:@"shipprice"] floatValue];
+    _priceLbl.text =[NSString stringWithFormat:@"￥%.2f",allprcie-coupprice+shipprice];
+    
+}
+
+@end

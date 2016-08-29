@@ -1,0 +1,25 @@
+//
+//  CYActiveHeader.h
+//  茶语
+//
+//  Created by Chayu on 16/3/24.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+#import "BBWebView.h"
+@interface CYActiveHeader : UIView
+
+@property (weak, nonatomic) IBOutlet UIImageView *showImg;
+
+@property (nonatomic,strong)NSString *desc;
+
+@property (nonatomic,assign)CGFloat headerHeight;
+
+@property (nonatomic,strong)NSString *titleName;
+
+@property (weak, nonatomic) IBOutlet UILabel *titleLbl;
+
+@property (nonatomic, copy) void(^seeFullBlock)();
+
+@end

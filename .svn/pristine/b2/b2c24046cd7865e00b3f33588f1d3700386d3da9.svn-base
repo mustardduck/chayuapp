@@ -1,0 +1,631 @@
+//
+//  CYDaoHangViewController.m
+//  茶语
+//
+//  Created by Chayu on 16/7/4.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYDaoHangViewController.h"
+#import "CYDaoHangHeaderView.h"
+#import "BXTabBarController.h"
+#import "CYMasterListViewController.h"
+#import "CYBuyerMainViewController.h"
+#import "CYAllGoodsViewController.h"
+#import "CYClassViewController.h"
+#import "CYQuanZiLIstViewController.h"
+#import "CYWenZhangListController.h"
+#import "CYEvaListViewController.h"
+#import "CYBrandLitViewController.h"
+#import "CYBrandWebViewController.h"
+@interface CYDaoHangViewController ()<UITableViewDelegate,UITableViewDataSource>
+{
+    NSMutableArray *dataArr;
+    NSInteger selindex;
+    BOOL chaleiOpen;
+    BOOL pinpaiOpen;
+    BOOL bangdanOpen;
+    NSDictionary *teaInfo;
+    NSDictionary *shijiInfo;
+    NSDictionary *quanziInfo;
+    NSDictionary *wenzhangInfo;
+}
+
+
+- (IBAction)goback:(id)sender;
+
+
+
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+
+@end
+
+@implementation CYDaoHangViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    dataArr = [NSMutableArray array];
+    chaleiOpen = NO;
+    pinpaiOpen = NO;
+    bangdanOpen = NO;
+    NSArray *chapingArr = @[@"茶类",@"热门品牌",@"榜单",@""];
+    NSArray *shijiArr = @[@"大师手制",@"名家监制",@"茗星私享",@"全部商品",@"全部分类",@""];
+    NSArray *quanziArr = @[@"圈子",@"话题",@""];
+    NSArray *wenzhangArr = @[@"最新",@"最热",@"专题",@""];
+    [dataArr addObject:@{@"ico":@"daohang_home",@"title":@"首页",@"isOpen":@(NO)}];
+    [dataArr addObject:@{@"ico":@"daohang_chaping",@"title":@"茶评",@"isOpen":@(NO),@"fenlei":chapingArr}];
+    [dataArr addObject:@{@"ico":@"daohang_shiji",@"title":@"市集",@"isOpen":@(NO),@"fenlei":shijiArr}];
+    [dataArr addObject:@{@"ico":@"daohang_quanzi",@"title":@"圈子",@"isOpen":@(NO),@"fenlei":quanziArr}];
+    [dataArr addObject:@{@"ico":@"daohang_wenzhang",@"title":@"文章",@"isOpen":@(NO),@"fenlei":wenzhangArr}];
+    [_tableView reloadData];
+    [self creatkongNavBar];
+    [self loadDaoHangInfo];
+    
+    selindex = -1;
+}
+
+#pragma mark - self defined methods
+- (void)loadDaoHangInfo
+{
+    
+    [CYWebClient Post:@"2.0_submenu" parametes:nil success:^(id responObject) {
+        teaInfo = [responObject objectForKey:@"tea"];
+        shijiInfo = [responObject objectForKey:@"shiji"];
+        quanziInfo = [responObject objectForKey:@"group"];
+        wenzhangInfo = [responObject objectForKey:@"article"];
+        [self.tableView reloadData];
+    } failure:^(id error) {
+    }];
+    
+}
+
+
+-(void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick beginLogPageView:@"导航"];
+}
+
+-(void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:@"导航"];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+#pragma mark -
+#pragma mark UITableViewDataSource method
+-(NSInteger )tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    
+    NSDictionary *info = dataArr[section];
+    BOOL isOpen = [[info objectForKey:@"isOpen"] boolValue];
+    if (isOpen) {
+        if (section != 0) {
+            NSArray *fenleiArr = [info objectForKey:@"fenlei"];
+            return [fenleiArr count];
+        }
+        return 0;
+       
+    }else{
+        return 0;
+    }
+
+    
+   
+}
+-(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
+    return [dataArr count];
+}
+
+-(CGFloat )tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSDictionary *info = dataArr[indexPath.section];
+    BOOL isOpen = [[info objectForKey:@"isOpen"] boolValue];
+    if (isOpen) {
+          NSArray *fenleiArr = [info objectForKey:@"fenlei"];
+        if (indexPath.row<[fenleiArr count]-1) {
+            if (indexPath.section == 1) {
+                if (indexPath.row == 0) {
+                    if (chaleiOpen) {
+                        NSArray *bigcate = [teaInfo objectForKey:@"bigcate"];
+                        CGFloat height = 35.0;
+                        CGFloat teaheight = ceilf(bigcate.count/4.)*90;
+                        height +=teaheight;
+                        return height;
+                    }
+                        return 35.0;
+                }
+                if (indexPath.row == 1) {
+                    if (pinpaiOpen) {
+                        NSArray *pingpaiArr = [teaInfo objectForKey:@"brand"];
+                        CGFloat pinpaiHeight = 35.0;
+                        pinpaiHeight +=(ceilf(pingpaiArr.count/4.)*90);
+                        return pinpaiHeight;
+                    }
+                    return 35.0;
+                 
+                }
+                if (indexPath.row == 2) {
+                    if (bangdanOpen) {
+                        NSArray *bangdanArr = [teaInfo objectForKey:@"bangdan"];
+                        CGFloat bangdanHeight = 35.0f;
+                        bangdanHeight +=(ceilf(bangdanArr.count/4.)*100);
+                        return bangdanHeight;
+                    }
+                    return 35.0;
+                }
+            }
+            return 35;
+        }else{
+            return 260.0;
+        }
+    }else{
+        return 0;
+    }
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString *daohangcellidentify = @"daohangcell";
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:daohangcellidentify];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:daohangcellidentify];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    }else{
+        for (UIView * view in cell.contentView.subviews ) {
+            [view removeFromSuperview];
+        }
+    }
+    
+    NSDictionary *info = dataArr[indexPath.section];
+    BOOL isOpen = [[info objectForKey:@"isOpen"] boolValue];
+    if (isOpen) {
+        NSArray *fenleiArr = [info objectForKey:@"fenlei"];
+        UILabel *titleLbl = [[UILabel alloc] initWithFrame:CGRectMake(46, 0, SCREEN_WIDTH-46,35)];
+        titleLbl.textColor = CONTENTCOLOR;
+        titleLbl.text = fenleiArr[indexPath.row];
+        titleLbl.font = FONT(16.0);
+        UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectMake(20,10,SCREEN_WIDTH-40,230)];
+        imgView.image = [UIImage imageNamed:@"750×563"];
+        if (indexPath.row< [fenleiArr count]-1) {
+            [cell.contentView addSubview:titleLbl];
+            if (indexPath.section == 1) {
+                UIImageView *rightImg = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0,16, 8)];
+                rightImg.image = [UIImage imageNamed:@"daohang_down_row"];
+                [rightImg sizeToFit];
+                rightImg.x = SCREEN_WIDTH -20 -rightImg.width;
+                rightImg.y = (35 - rightImg.height)/2;
+                [cell.contentView addSubview:rightImg];
+                UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+                button.frame = cell.contentView.bounds;
+                button.height = 35;
+                button.tag = 800 +indexPath.row;
+                [button addTarget:self action:@selector(xuanzeerjiFenlei_click:) forControlEvents:UIControlEventTouchUpInside];
+                [cell.contentView addSubview:button];
+#define ITEMVIEWWIDTH  ((SCREEN_WIDTH -40)/4.0)
+               
+                if (indexPath.row ==0) {
+                    if (chaleiOpen) {
+                          rightImg.image = [UIImage imageNamed:@"daohang_up_row"];
+                        NSArray *bigcate = [teaInfo objectForKey:@"bigcate"];
+                        CGFloat bgviewheight =ceilf(bigcate.count/4.)*90;
+                        UIView *chaleiview = [[UIView alloc] initWithFrame:CGRectMake(20,35,SCREEN_WIDTH -40,bgviewheight)];
+                        [cell.contentView addSubview:chaleiview];
+                        UIView *lineView = [[UIView alloc] initWithFrame:CGRectMake(0,bgviewheight +35, SCREEN_WIDTH, 1)];
+                        lineView.backgroundColor = [UIColor getColorWithHexString:@"eeeeee"];
+                        [cell.contentView addSubview:lineView];
+                        for (int i = 0; i<[bigcate count]; i++) {
+                            NSDictionary *itemInfo = bigcate[i];
+                            NSInteger row = i%4;
+                            NSInteger sec = i/4;
+                            UIView *itemView = [[UIView alloc] initWithFrame:CGRectMake(row*ITEMVIEWWIDTH, sec *90, ITEMVIEWWIDTH, 90)];
+                            [chaleiview addSubview:itemView];
+                            
+                            UIImageView *icoImg = [[UIImageView alloc] initWithFrame:CGRectMake(0,5, 50, 50)];
+                            icoImg.x = (itemView.width -icoImg.width)/2;
+                            NSString *icoPath =[itemInfo objectForKey:@"ico"];
+                            if (icoPath) {
+                                [icoImg sd_setImageWithURL:[NSURL URLWithString:icoPath] placeholderImage:SQUARE];
+                            }
+                            [itemView addSubview:icoImg];
+                            
+                            NSString *titleStr = [itemInfo objectForKey:@"name"];
+                            UILabel *titleLbl = [[UILabel alloc] initWithFrame:CGRectMake(0,60,itemView.width, 20)];
+                            titleLbl.text = titleStr;
+                            titleLbl.font = FONT(12.0);
+                            titleLbl.textColor = btnTitle_COLOR;
+                            titleLbl.textAlignment = NSTextAlignmentCenter;
+                            [itemView addSubview:titleLbl];
+                            UIButton *chaleiBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+                            chaleiBtn.frame = itemView.bounds;
+                            chaleiBtn.tag = 10000+i;
+                            [chaleiBtn addTarget:self action:@selector(chaleiItem_click:) forControlEvents:UIControlEventTouchUpInside];
+                            [itemView addSubview:chaleiBtn];
+                           
+                        }
+                       
+                    }
+                }
+                
+                if (indexPath.row ==1) {
+                    if (pinpaiOpen) {
+                        rightImg.image = [UIImage imageNamed:@"daohang_up_row"];
+                        NSArray *bigcate = [teaInfo objectForKey:@"brand"];
+                        CGFloat bgviewheight =ceilf(bigcate.count/4.)*90;
+                        UIView *chaleiview = [[UIView alloc] initWithFrame:CGRectMake(20,35,SCREEN_WIDTH -40,bgviewheight)];
+                        [cell.contentView addSubview:chaleiview];
+                        UIView *lineView = [[UIView alloc] initWithFrame:CGRectMake(0,bgviewheight +35, SCREEN_WIDTH, 1)];
+                        lineView.backgroundColor = [UIColor getColorWithHexString:@"eeeeee"];
+                        [cell.contentView addSubview:lineView];
+                        for (int i = 0; i<[bigcate count]; i++) {
+                            NSDictionary *itemInfo = bigcate[i];
+                            NSInteger row = i%4;
+                            NSInteger sec = i/4;
+                            UIView *itemView = [[UIView alloc] initWithFrame:CGRectMake(row*ITEMVIEWWIDTH, sec *90, ITEMVIEWWIDTH, 90)];
+                            [chaleiview addSubview:itemView];
+                            UIImageView *icoImg = [[UIImageView alloc] initWithFrame:CGRectMake(0,5, 50, 50)];
+                            icoImg.x = (itemView.width -icoImg.width)/2;
+                            icoImg.layer.cornerRadius = 25.0f;
+                            icoImg.layer.borderColor = [UIColor getColorWithHexString:@"eeeeee"].CGColor;
+                            icoImg.layer.borderWidth = 1.f;
+                            icoImg.clipsToBounds = YES;
+                            NSString *icoPath =[itemInfo objectForKey:@"logo"];
+                            if (icoPath) {
+                                [icoImg sd_setImageWithURL:[NSURL URLWithString:icoPath] placeholderImage:SQUARE];
+                            }
+                            [itemView addSubview:icoImg];
+                            
+                            NSString *titleStr = [itemInfo objectForKey:@"name"];
+                            UILabel *titleLbl = [[UILabel alloc] initWithFrame:CGRectMake(0,60,itemView.width, 20)];
+                            titleLbl.text = titleStr;
+                            titleLbl.font = FONT(12.0);
+                            titleLbl.textColor = btnTitle_COLOR;
+                            titleLbl.textAlignment = NSTextAlignmentCenter;
+                            [itemView addSubview:titleLbl];
+                            UIButton *chaleiBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+                            chaleiBtn.frame = itemView.bounds;
+                            chaleiBtn.tag = 20000+i;
+                            [chaleiBtn addTarget:self action:@selector(pinpai_click:) forControlEvents:UIControlEventTouchUpInside];
+                            [itemView addSubview:chaleiBtn];
+                        }
+                    }
+                }
+            if (indexPath.row ==2) {
+                if (bangdanOpen) {
+                    rightImg.image = [UIImage imageNamed:@"daohang_up_row"];
+                    NSArray *bigcate = [teaInfo objectForKey:@"bangdan"];
+                    CGFloat bgviewheight =ceilf(bigcate.count/4.)*100;
+                    UIView *chaleiview = [[UIView alloc] initWithFrame:CGRectMake(20,35,SCREEN_WIDTH -40,bgviewheight)];
+                    [cell.contentView addSubview:chaleiview];
+                    UIView *lineView = [[UIView alloc] initWithFrame:CGRectMake(0,bgviewheight +35, SCREEN_WIDTH, 1)];
+                    lineView.backgroundColor = [UIColor getColorWithHexString:@"eeeeee"];
+                    [cell.contentView addSubview:lineView];
+                    for (int i = 0; i<[bigcate count]; i++) {
+                        NSDictionary *itemInfo = bigcate[i];
+                        NSInteger row = i%4;
+                        NSInteger sec = i/4;
+                        UIView *itemView = [[UIView alloc] initWithFrame:CGRectMake(row*ITEMVIEWWIDTH, sec *90, ITEMVIEWWIDTH, 90)];
+                         [chaleiview addSubview:itemView];
+                        UIImageView *icoImg = [[UIImageView alloc] initWithFrame:CGRectMake(0,5, 50, 50)];
+                        icoImg.x = (itemView.width -icoImg.width)/2;
+                   
+                        NSString *icoPath =[itemInfo objectForKey:@"logo"];
+                        if (icoPath) {
+                            [icoImg sd_setImageWithURL:[NSURL URLWithString:icoPath] placeholderImage:SQUARE];
+                        }
+                        [itemView addSubview:icoImg];
+                        NSString *titleStr = [itemInfo objectForKey:@"name1"];
+                        UILabel *titleLbl = [[UILabel alloc] initWithFrame:CGRectMake(8,60,itemView.width-16,15)];
+                        titleLbl.text = titleStr;
+                        titleLbl.font = FONT(12.0);
+                        titleLbl.textColor = btnTitle_COLOR;
+                        titleLbl.textAlignment = NSTextAlignmentCenter;
+                        [itemView addSubview:titleLbl];
+                        NSString *titleStr1= [itemInfo objectForKey:@"name2"];
+                        UILabel *titleLbl1 = [[UILabel alloc] initWithFrame:CGRectMake(5,78,itemView.width-10,15)];
+                        titleLbl1.text = titleStr1;
+                        titleLbl1.font = FONT(12.0);
+                        titleLbl1.textColor = btnTitle_COLOR;
+                        titleLbl1.textAlignment = NSTextAlignmentCenter;
+                        [itemView addSubview:titleLbl1];
+                        UIButton *chaleiBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+                        chaleiBtn.frame = itemView.bounds;
+                        chaleiBtn.tag = 30000+i;
+                        [chaleiBtn addTarget:self action:@selector(bangdan_click:) forControlEvents:UIControlEventTouchUpInside];
+                        [itemView addSubview:chaleiBtn];
+                    }
+                    
+                }
+            }
+        }
+        }else{
+            NSDictionary *info = nil;
+            switch (indexPath.section) {
+                case 1:
+                {
+                    info = [teaInfo objectForKey:@"banner"];
+                    break;
+                }
+                case 2:
+                {
+                    info = [shijiInfo objectForKey:@"banner"];
+                    break;
+                }
+                case 3:
+                {
+                    info = [quanziInfo objectForKey:@"banner"];
+                    break;
+                }
+                case 4:
+                {
+                    info = [wenzhangInfo objectForKey:@"banner"];
+                    break;
+                }
+                default:
+                    break;
+            }
+            NSString *thumb = [info objectForKey:@"thumb"];
+            if (thumb.length>0) {
+                [imgView sd_setImageWithURL:[NSURL URLWithString:thumb] placeholderImage:[UIImage imageNamed:@"750×563"]];
+            }
+            [cell.contentView addSubview:imgView];
+            
+        }
+    
+    }
+    return cell;
+}
+
+//茶类点击事件
+-(void)chaleiItem_click:(UIButton *)sender
+{
+    NSLog(@"选择了第几个%d",(int)sender.tag -10000);
+    NSArray *bigcate = [teaInfo objectForKey:@"bigcate"];
+    NSDictionary *info = bigcate[sender.tag - 10000];
+    CYEvaListViewController *vc = viewControllerInStoryBoard(@"CYEvaListViewController", @"Eva");
+    vc.teaCateStr = [info objectForKey:@"name"];
+    vc.bid = [[info objectForKey:@"bid"] description];
+    vc.isPingPai = NO;
+    [self.navigationController pushViewController:vc animated:YES];
+}
+//品牌 点击事件
+-(void)pinpai_click:(UIButton *)sender
+{
+    NSLog(@"选择了第几个%d",(int)sender.tag - 20000);
+    NSArray *bigcate = [teaInfo objectForKey:@"bangdan"];
+     NSDictionary *info = bigcate[sender.tag - 20000];
+    CYEvaListViewController *vc = viewControllerInStoryBoard(@"CYEvaListViewController", @"Eva");
+    vc.teaCateStr = [info objectForKey:@"name"];
+    vc.brandid = [info objectForKey:@"brandid"];;
+    vc.isPingPai = YES;
+    [self.navigationController pushViewController:vc animated:YES];
+}
+//榜单 点击事件
+-(void)bangdan_click:(UIButton *)sender
+{
+    NSLog(@"选择了第几个%d",(int)sender.tag - 30000);
+    NSArray *bigcate = [teaInfo objectForKey:@"brand"];
+    NSDictionary *info = bigcate[sender.tag - 30000];
+//    NSInteger type = [[info objectForKey:@"type"] integerValue];
+    if (sender.tag -30000<2) {
+        CYBrandLitViewController *vc = viewControllerInStoryBoard(@"CYBrandLitViewController", @"Eva");
+        vc.typeName = [NSString stringWithFormat:@"%@评分", [info objectForJSONKey:@"names"]];
+        vc.orderId = [[info objectForKey:@"data"] description];
+        [self.navigationController pushViewController:vc animated:YES];
+    }else{
+        CYBrandWebViewController *vc = viewControllerInStoryBoard(@"CYBrandWebViewController", @"Eva");
+        vc.webUrl = [[info objectForKey:@"url"] description];
+//        NSDictionary * dic = [info objectForJSONKey:@"share"];
+//        OSMessage * msg = [[OSMessage alloc] init];
+//        msg.title = [dic objectForJSONKey:@"title"];
+//        msg.desc = [dic objectForJSONKey:@"description"];
+//        msg.link = [dic objectForJSONKey:@"url"];
+//        msg.imgUrl = [dic objectForJSONKey:@"thumb"];
+//        
+//        vc.shareMsg = msg;
+        [self.navigationController pushViewController:vc animated:YES];
+    }
+}
+-(void)xuanzeerjiFenlei_click:(UIButton *)sender
+{
+    NSInteger selectIndex = sender.tag -800;
+    switch (selectIndex) {
+        case 0:
+        {
+            chaleiOpen = !chaleiOpen;
+            break;
+        }
+        case 1:
+        {
+            pinpaiOpen = !pinpaiOpen;
+            break;
+        }
+        case 2:
+        {
+            bangdanOpen = !bangdanOpen;
+            break;
+        }
+        default:
+            break;
+    }
+    [_tableView reloadSections:[NSIndexSet indexSetWithIndex:1] withRowAnimation:UITableViewRowAnimationAutomatic];
+    
+    
+}
+
+-(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    CYDaoHangHeaderView *header = [[[NSBundle mainBundle] loadNibNamed:@"CYDaoHangHeaderView" owner:nil options:nil] firstObject];
+//    for (UIView *view in header.subviews) {
+//        [view removeFromSuperview];
+//    }
+    
+    NSDictionary *info = dataArr[section];
+     header.row_img.hidden = YES;
+    if (section >0) {
+        header.row_img.hidden = NO;
+    }
+    header.ico_img.image = [UIImage imageNamed:[info objectForKey:@"ico"]];
+    header.titleLbl.text = [info objectForKey:@"title"];
+    BOOL isOpen = [[info objectForKey:@"isOpen"] boolValue];
+    header.row_img.image = isOpen?[UIImage imageNamed:@"daohang_up_row"]:[UIImage imageNamed:@"daohang_down_row"];
+//    if (section>0) {
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    button.frame = header.bounds;
+    button.tag = section +15000;
+    [button addTarget:self action:@selector(selectHeader:) forControlEvents:UIControlEventTouchUpInside];
+    [header addSubview:button];
+//    }
+   
+    return header;
+    
+}
+
+
+-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 71.0;
+}
+
+
+
+#pragma mark -
+#pragma mark UITableViewDelegate method
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.section == 0) {
+        
+    }else if(indexPath.section ==1){
+        
+    }else if(indexPath.section ==2){
+        switch (indexPath.row) {
+            case 0:
+            {
+                //大师名家
+                CYMasterListViewController *vc = viewControllerInStoryBoard(@"CYMasterListViewController", @"TeaMall");
+//                if (tag == 1) {
+//                    vc.type = CYSellerTypeHandmade;
+//                }else{
+                    vc.type = CYSellerTypeMaster;
+//                }
+                 [self.navigationController pushViewController:vc animated:YES];
+                break;
+            }
+            case 1:
+            {
+                //大师名家
+                CYMasterListViewController *vc = viewControllerInStoryBoard(@"CYMasterListViewController", @"TeaMall");
+//                if (tag == 1) {
+                    vc.type = CYSellerTypeHandmade;
+//                }else{
+//                    vc.type = CYSellerTypeMaster;
+                 [self.navigationController pushViewController:vc animated:YES];
+//                }
+                break;
+            }
+            case 2:
+            {
+                CYBuyerMainViewController *vc = viewControllerInStoryBoard(@"CYBuyerMainViewController", @"Buyer");
+                
+                [self.navigationController pushViewController:vc animated:YES];
+                break;
+            }
+            case 3:
+            {
+                CYAllGoodsViewController *vc =viewControllerInStoryBoard(@"CYAllGoodsViewController", @"TeaMall");
+                //vc.hidesBottomBarWhenPushed = YES;
+                [self.navigationController pushViewController:vc animated:YES];
+                break;
+            }
+            case 4:
+            {
+                CYClassViewController *vc = viewControllerInStoryBoard(@"CYClassViewController", @"TeaMall");
+                [self.navigationController pushViewController:vc animated:YES];
+                break;
+            }
+                
+            default:
+                break;
+        }
+    }else if (indexPath.section ==3){
+        if (indexPath.row <2) {
+            CYQuanZiLIstViewController *vc = viewControllerInStoryBoard(@"CYQuanZiLIstViewController", @"BBS");
+            if (indexPath.row ==1) {
+                vc.isHuati = YES;
+            }
+            [self.navigationController pushViewController:vc animated:YES];
+        }else{
+            
+        }
+  
+    
+    }else if (indexPath.section == 4){
+        if (indexPath.row<3) {
+            CYWenZhangListController *vc = viewControllerInStoryBoard(@"CYWenZhangListController", @"WenZhang");
+            if (indexPath.row == 0) {
+                vc.wenzhangtype = WenZhangListTypeNew;
+            }else if (indexPath.row == 1){
+                vc.wenzhangtype = WenZhangListTypeHot;
+            }else{
+                vc.wenzhangtype = WenZhangListTypeZhuanTi;
+            }
+            [self.navigationController pushViewController:vc animated:YES];
+        }
+  
+    }
+}
+
+
+-(void)selectHeader:(UIButton *)sender
+{
+    NSInteger selectIndex = sender.tag - 15000;
+    if (selectIndex == 0) {
+        [self.navigationController popToRootViewControllerAnimated:YES];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.33 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            BXTabBarController *tabVC = (BXTabBarController *)APP_DELEGATE.window.rootViewController;
+            tabVC.selectedIndex = 0;
+            BXTabBar *tabbar = tabVC.mytabbar;
+            UIButton *button = [UIButton new];
+            button.tag = 12000;
+            [tabbar btnClick:button];
+//            [[NSNotificationCenter defaultCenter] postNotificationName:tabBarIndex object:@{@"selectIndex":@"0"}];
+        });
+        return;
+    }
+    
+    NSMutableDictionary *selectinfo = [NSMutableDictionary dictionaryWithDictionary:dataArr[selectIndex]];
+    BOOL isopen = [[selectinfo objectForKey:@"isOpen"] boolValue];
+    if (selectIndex != selindex && selindex>0) {
+        NSMutableDictionary *info = [NSMutableDictionary dictionaryWithDictionary:dataArr[selindex]];
+        [info setObject:[NSNumber numberWithBool:NO] forKey:@"isOpen"];
+        [dataArr replaceObjectAtIndex:selindex withObject:info];
+        [_tableView reloadSections:[NSIndexSet indexSetWithIndex:selindex] withRowAnimation:UITableViewRowAnimationAutomatic];
+    }
+
+    isopen = !isopen;
+    [selectinfo setObject:[NSNumber numberWithBool:isopen] forKey:@"isOpen"];
+    [dataArr replaceObjectAtIndex:selectIndex withObject:selectinfo];
+    [_tableView reloadSections:[NSIndexSet indexSetWithIndex:selectIndex] withRowAnimation:UITableViewRowAnimationAutomatic];
+    selindex = selectIndex;
+}
+
+
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+@end

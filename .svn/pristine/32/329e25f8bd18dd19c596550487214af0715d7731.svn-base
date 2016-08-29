@@ -1,0 +1,110 @@
+//
+//  CYTopicDetailController.m
+//  茶语
+//
+//  Created by iXcoder on 16/2/20.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYTopicDetailController.h"
+#import "CYCmmtTopicController.h"
+#import "CYActionSheet.h"
+#import "AppDelegate.h"
+#import "CYTopicCommentsController.h"
+#import "CYHuaTiDetTopCell.h"
+#import "CYHuaTiDetLikeCell.h"
+#import "CYHuaTiDetContentCell.h"
+@interface CYTopicDetailController ()<UITableViewDelegate,UITableViewDataSource>
+{
+    
+}
+
+
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+
+
+- (IBAction)goback:(id)sender;
+
+
+
+@end
+
+@implementation CYTopicDetailController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    self.title = @"话题详情";
+
+}
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:@"话题详情"];
+}
+
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [MobClick beginLogPageView:@"话题详情"];
+}
+
+
+#pragma mark -
+#pragma mark UITableViewDataSource method
+-(NSInteger )tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return 1;
+}
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView{
+    return 3;
+}
+
+-(CGFloat )tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.section == 0) {
+        return 160.0f;
+    }else if (indexPath.section == 1){
+        return 5;
+    }else{
+        return 226.0;
+    }
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.section == 0) {
+        CYHuaTiDetTopCell *cell =[tableView dequeueReusableCellWithIdentifier:@"CYHuaTiDetTopCell"];
+        return cell;
+    }else if (indexPath.section == 1){
+        CYHuaTiDetContentCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYHuaTiDetContentCell"];
+        return cell;
+    }else{
+        CYHuaTiDetLikeCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYHuaTiDetLikeCell"];
+        return cell;
+    }
+}
+
+#pragma mark -
+#pragma mark UITableViewDelegate method
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+}
+
+
+
+
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+@end

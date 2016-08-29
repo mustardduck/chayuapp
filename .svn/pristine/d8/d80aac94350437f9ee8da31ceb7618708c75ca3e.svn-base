@@ -1,0 +1,75 @@
+//
+//  CYShiJiCell.m
+//  茶语
+//
+//  Created by Chayu on 16/6/28.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYHomeShiJiCell.h"
+
+@interface CYHomeShiJiCell ()
+
+@property (weak, nonatomic) IBOutlet UIScrollView *contentScro;
+
+
+@end
+
+@implementation CYHomeShiJiCell
+
+- (void)awakeFromNib {
+    [super awakeFromNib];
+    // Initialization code
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+}
+- (void)parseData:(id)data
+{
+    
+    
+    if ([self.mClickData count]>0) {
+        return;
+    }
+    for (UIView *view in _contentScro.subviews) {
+        [view removeFromSuperview];
+    }
+    self.mClickData = data;
+    [self loadScroData];
+}
+
+-(void)loadScroData
+{
+    
+    for (int i = 0; i<[self.mClickData count]; i++) {
+        CYHomeMarkertInfo *info = self.mClickData[i];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            CYHomeShiJiView *shijiView = [[[NSBundle mainBundle] loadNibNamed:@"CYHomeShiJiView" owner:nil options:nil] firstObject];
+            shijiView.frame = CGRectMake(i *_contentScro.width-10, 0,SCREEN_WIDTH-40,_contentScro.height);
+            shijiView.selectBtn.tag = 900 +i;
+//            [shijiView.selectBtn addTarget:self action:@selector(selectItem:) forControlEvents:UIControlEventTouchUpInside];
+            shijiView.markerInfo = info;
+            shijiView.tag = 100 +i;
+            [_contentScro addSubview:shijiView];
+            UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(selectTea:)];
+            [shijiView addGestureRecognizer:tap];
+        });
+    }
+     _contentScro.contentSize = CGSizeMake((SCREEN_WIDTH - 20) * [self.mClickData count],0);
+}
+
+
+
+
+-(void)selectTea:(UITapGestureRecognizer *)sender
+{
+    UIView *view = sender.view;
+    if (self.gotosomeViewBlock) {
+        self.gotosomeViewBlock(self.mClickData[view.tag -100]);
+    }
+}
+
+
+@end

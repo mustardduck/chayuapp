@@ -1,0 +1,27 @@
+//
+//  CYMyMessageCell.h
+//  茶语
+//
+//  Created by Chayu on 16/7/11.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+#import "CYRoundLbl.h"
+@interface CYMyMessageCell : UITableViewCell
+
+
+@property (weak, nonatomic) IBOutlet UIImageView *userImg;
+
+@property (weak, nonatomic) IBOutlet UILabel *userNameLbl;
+@property (weak, nonatomic) IBOutlet UILabel *chabiLbl;
+- (IBAction)menu_click:(id)sender;
+
+
+@property(nonatomic,copy)void (^menuclickBlock)(NSInteger);
+@property (weak, nonatomic) IBOutlet CYRoundLbl *xiaoxiStatusLbl;
+
+@property (weak, nonatomic) IBOutlet CYRoundLbl *pinglunstatusLbl;
+
+
+@end

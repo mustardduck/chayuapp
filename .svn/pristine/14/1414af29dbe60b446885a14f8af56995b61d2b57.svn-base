@@ -1,0 +1,28 @@
+//
+//  CYDuihuanCHaYangCell.h
+//  茶语
+//
+//  Created by Chayu on 16/3/2.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+
+@protocol CYDuiHuanChaYangCellDelegate;
+
+@interface CYDuiHuanChaYangCell : UITableViewCell
+
+@property (nonatomic,strong)NSDictionary *teaSamInfo;
+
+@property (weak, nonatomic) IBOutlet UILabel *goodsNum;
+
+@property (assign,nonatomic)id<CYDuiHuanChaYangCellDelegate>delegate;
+
+@end
+
+
+@protocol CYDuiHuanChaYangCellDelegate <NSObject>
+
+- (void)changeTeaSamNum:(CYDuiHuanChaYangCell *)cell andCoinNum:(NSInteger)num withAllCoin:(NSInteger)coin;
+
+@end

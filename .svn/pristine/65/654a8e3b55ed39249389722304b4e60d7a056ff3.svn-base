@@ -1,0 +1,205 @@
+//
+//  CYTopicDetailController.m
+//  茶语
+//
+//  Created by iXcoder on 16/2/20.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYTopicDetailController.h"
+#import "CYCmmtTopicController.h"
+#import "CYActionSheet.h"
+#import "AppDelegate.h"
+#import "CYTopicCommentsController.h"
+#import "CYHuaTiDetTopCell.h"
+#import "CYHuaTiDetLikeCell.h"
+#import "CYHuaTiDetContentCell.h"
+#import "CYPostCardViewController.h"
+#import "CYCmmtTopicController.h"
+@interface CYTopicDetailController ()<UITableViewDelegate,UITableViewDataSource>
+{
+    NSDictionary *detailsInfo;
+    CGFloat secHeight;
+    
+}
+
+- (IBAction)shoucang_click:(id)sender;
+@property (weak, nonatomic) IBOutlet UIButton *soucangBtn;
+@property (weak, nonatomic) IBOutlet UIButton *zanBtn;
+
+- (IBAction)zan_click:(id)sender;
+
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+
+
+- (IBAction)goback:(id)sender;
+
+
+
+- (IBAction)fatie_click:(id)sender;
+
+- (IBAction)huitie_click:(id)sender;
+
+@end
+
+@implementation CYTopicDetailController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    self.title = @"话题详情";
+    secHeight = 0.;
+    [self loadhuatixiangqingData];
+}
+
+
+-(void)loadhuatixiangqingData
+{
+    if (_tid.length) {
+        [CYWebClient Post:@"bbs_topic_detail" parametes:@{@"tid":_tid} success:^(id responObject) {
+            if ([responObject isKindOfClass:[NSDictionary class]]) {
+                detailsInfo = [NSDictionary dictionaryWithDictionary:responObject];
+                
+                BOOL isFavorate = [[detailsInfo objectForKey:@"isFavorate"] integerValue] ==1?YES:NO;
+                _soucangBtn.selected = isFavorate;
+                BOOL isSuported = [[detailsInfo objectForKey:@"isSuported"] integerValue] ==1?YES:NO;
+                _zanBtn.selected = isSuported;
+                [_tableView reloadData];
+            }
+          
+        } failure:^(id error) {
+            
+        }];
+    }
+
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:@"话题详情"];
+}
+
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [MobClick beginLogPageView:@"话题详情"];
+}
+
+
+#pragma mark -
+#pragma mark UITableViewDataSource method
+-(NSInteger )tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return 1;
+}
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView{
+    return 3;
+}
+
+-(CGFloat )tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.section == 0) {
+        return 160.0f;
+    }else if (indexPath.section == 1){
+        return secHeight;
+    }else{
+        NSArray *youlike = [detailsInfo objectForJSONKey:@"youlike"];
+        if (youlike.count>0) {
+            return (youlike.count *35 +51);
+        }
+        return 51.;
+    }
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.section == 0) {
+        CYHuaTiDetTopCell *cell =[tableView dequeueReusableCellWithIdentifier:@"CYHuaTiDetTopCell"];
+//        NSString *
+//        cell.showImg
+        return cell;
+    }else if (indexPath.section == 1){
+        CYHuaTiDetContentCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYHuaTiDetContentCell"];
+        cell.contentStr = [detailsInfo objectForKey:@"content"];
+        cell.reloadBlock = ^(CGFloat heaight){
+            secHeight = heaight;
+            [tableView reloadSections:[NSIndexSet indexSetWithIndex:1] withRowAnimation:UITableViewRowAnimationNone];
+        };
+        return cell;
+    }else{
+        CYHuaTiDetLikeCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYHuaTiDetLikeCell"];
+        cell.likeArr = [detailsInfo objectForJSONKey:@"youlike"];
+        cell.selecthuatiBlock = ^(NSString *tid){
+            _tid = tid;
+        };
+        return cell;
+    }
+}
+
+#pragma mark -
+#pragma mark UITableViewDelegate method
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+}
+
+
+
+
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (IBAction)fatie_click:(id)sender {
+    CYPostCardViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"CYPostCardViewController"];
+    vc.gid = _gid;
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (IBAction)huitie_click:(id)sender {
+    CYCmmtTopicController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"CYCmmtTopicController"];
+    vc.tid = _tid;
+    vc.callback = ^(NSInteger count){
+        
+    };
+    [self.navigationController pushViewController:vc animated:YES];
+}
+- (IBAction)shoucang_click:(id)sender {
+    if (!MANAGER.isLoged) {
+        [APP_DELEGATE showLogView];
+        return;
+    }
+    [CYWebClient Post:@"favorite" parametes:@{@"itemid":_tid,@"type":@"4"} success:^(id responObject) {
+        
+        if ([[responObject objectForKey:@"do"] integerValue] ==0) {
+            _soucangBtn.selected = NO;
+        }else{
+            
+            _soucangBtn.selected = YES;
+        }
+    } failure:^(id error) {
+        
+    }];
+}
+- (IBAction)zan_click:(id)sender {
+    
+    NSString *class = _zanBtn.selected?@"0":@"1";
+    [CYWebClient Post:@"do_suport" parametes:@{@"itemid":_tid,@"type":@"4",@"class":class} success:^(id responObject) {
+        if ([[responObject objectForKey:@"do"] integerValue] ==0) {
+            _zanBtn.selected = NO;
+        }else{
+            _zanBtn.selected = YES;
+        }
+    } failure:^(id error) {
+        
+    }];
+}
+@end

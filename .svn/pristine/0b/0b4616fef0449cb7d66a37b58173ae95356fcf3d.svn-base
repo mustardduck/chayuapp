@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="CYWriteArticelCommentViewController">
+            <connections>
+                <outlet property="mSendBtn" destination="cDP-EY-bLr" id="I6P-TC-o2L"/>
+                <outlet property="mTextView" destination="FJR-LS-urc" id="185-1J-HgJ"/>
+                <outlet property="mTipLabel" destination="dDf-1a-4oT" id="ayE-Kw-qdU"/>
+                <outlet property="numLable" destination="k1b-gb-zDR" id="NOX-UQ-SzD"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Fvc-ou-h8s" customClass="TPKeyboardAvoidingScrollView">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                    <subviews>
+                        <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="FJR-LS-urc">
+                            <rect key="frame" x="12" y="12" width="296" height="150"/>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="150" id="fKG-81-7a9"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                            <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            <connections>
+                                <outlet property="delegate" destination="-1" id="LgW-8v-hYp"/>
+                            </connections>
+                        </textView>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cDP-EY-bLr">
+                            <rect key="frame" x="12" y="197" width="296" height="38"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="38" id="5Us-9z-vKU"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                            <state key="normal" title="发表评论">
+                                <color key="titleColor" red="0.53725490200000003" green="0.24313725489999999" blue="0.12549019610000001" alpha="1" colorSpace="calibratedRGB"/>
+                            </state>
+                            <connections>
+                                <action selector="clickSend:" destination="-1" eventType="touchUpInside" id="KMx-yJ-IaX"/>
+                            </connections>
+                        </button>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="请输入评论内容，不超过500字" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dDf-1a-4oT">
+                            <rect key="frame" x="17" y="21" width="181" height="16"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                            <color key="textColor" red="0.61568627450980395" green="0.61568627450980395" blue="0.61960784313725492" alpha="1" colorSpace="calibratedRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0/500字" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="k1b-gb-zDR">
+                            <rect key="frame" x="258" y="169" width="50" height="16"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                            <color key="textColor" red="0.40000000000000002" green="0.40000000000000002" blue="0.40000000000000002" alpha="1" colorSpace="calibratedRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstItem="cDP-EY-bLr" firstAttribute="top" secondItem="FJR-LS-urc" secondAttribute="bottom" constant="35" id="7WJ-Vr-405"/>
+                        <constraint firstItem="k1b-gb-zDR" firstAttribute="top" secondItem="FJR-LS-urc" secondAttribute="bottom" constant="7" id="AC7-N6-auL"/>
+                        <constraint firstAttribute="bottom" secondItem="cDP-EY-bLr" secondAttribute="bottom" constant="20" id="D7u-Nt-Mqy"/>
+                        <constraint firstItem="FJR-LS-urc" firstAttribute="leading" secondItem="Fvc-ou-h8s" secondAttribute="leading" constant="12" id="Snb-in-jS0"/>
+                        <constraint firstAttribute="trailing" secondItem="FJR-LS-urc" secondAttribute="trailing" constant="12" id="fJk-em-KDz"/>
+                        <constraint firstItem="dDf-1a-4oT" firstAttribute="leading" secondItem="Fvc-ou-h8s" secondAttribute="leading" constant="17" id="jJD-24-KqS"/>
+                        <constraint firstItem="cDP-EY-bLr" firstAttribute="trailing" secondItem="FJR-LS-urc" secondAttribute="trailing" id="l3K-cL-KKM"/>
+                        <constraint firstAttribute="trailing" secondItem="k1b-gb-zDR" secondAttribute="trailing" constant="12" id="mOy-es-oZp"/>
+                        <constraint firstItem="cDP-EY-bLr" firstAttribute="centerX" secondItem="Fvc-ou-h8s" secondAttribute="centerX" id="ntW-QI-lPf"/>
+                        <constraint firstItem="dDf-1a-4oT" firstAttribute="top" secondItem="Fvc-ou-h8s" secondAttribute="top" constant="21" id="xjf-3J-Qby"/>
+                        <constraint firstItem="FJR-LS-urc" firstAttribute="top" secondItem="Fvc-ou-h8s" secondAttribute="top" constant="12" id="z5N-eA-eR1"/>
+                        <constraint firstItem="cDP-EY-bLr" firstAttribute="leading" secondItem="FJR-LS-urc" secondAttribute="leading" id="zUz-He-G9g"/>
+                    </constraints>
+                </scrollView>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="Fvc-ou-h8s" secondAttribute="bottom" id="jKa-1o-M1t"/>
+                <constraint firstAttribute="trailing" secondItem="Fvc-ou-h8s" secondAttribute="trailing" id="piU-s2-lbq"/>
+                <constraint firstItem="Fvc-ou-h8s" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="rXy-xe-Xga"/>
+                <constraint firstItem="Fvc-ou-h8s" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="xNT-xE-PNI"/>
+            </constraints>
+            <point key="canvasLocation" x="408" y="298"/>
+        </view>
+    </objects>
+</document>

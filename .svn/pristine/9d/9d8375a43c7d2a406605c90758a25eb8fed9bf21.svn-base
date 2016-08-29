@@ -1,0 +1,26 @@
+//
+//  UICommon.h
+//  茶语
+//
+//  Created by Leen on 16/6/22.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+//#import "CSBImagePickerController.h"
+
+@interface UICommon : NSObject
+
++ (void) showAlbum:(id)delegate view:(UIViewController*)controller;
+
++ (void) showTakePhoto:(id)delegate view:(UIViewController*) controller allowsEditing:(BOOL)allow;
+
++ (BOOL)isBlankString:(NSString *)string;
+
++ (void) showAlbumMore:(id)delegate view:(UIViewController *)controller number:(NSInteger)count;
+
++ (void) startTime:(id)sender;
+
++ (UIImage *)stretchImage:(UIImage *)image;
+
+@end

@@ -1,0 +1,62 @@
+//
+//  CYQuanZiAllCommentVC.m
+//  茶语
+//
+//  Created by Leen on 16/7/27.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYQuanZiAllCommentVC.h"
+#import "CYQuanZiAllCommentView.h"
+
+@interface CYQuanZiAllCommentVC ()<CYQuanZiAllCommentViewDelegate>
+
+@property (nonatomic, strong) CYQuanZiAllCommentView * allCommentView;
+
+@end
+
+@implementation CYQuanZiAllCommentVC
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    
+    [WINDOW addSubview:self.allCommentView];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (IBAction)goback:(id)sender
+{
+    [self.allCommentView removeFromSuperview];
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (CYQuanZiAllCommentView *) allCommentView
+{
+    if(!_allCommentView)
+    {
+        _allCommentView = [[[NSBundle mainBundle] loadNibNamed:@"CYQuanZiAllCommentView" owner:nil options:nil] firstObject];
+        CGFloat y = 90 * (SCREEN_WIDTH / 375 );
+        _allCommentView.frame = CGRectMake(0, y, SCREEN_WIDTH, SCREEN_HEIGHT - y);
+        _allCommentView.topicId = _topicId;
+        _allCommentView.delegate = self;
+        
+    }
+    return _allCommentView;
+}
+
+- (void)zanBtnClicked:(id)sender
+{
+    
+}
+
+- (void)commentBtnClicked:(id)sender
+{
+    
+}
+
+@end

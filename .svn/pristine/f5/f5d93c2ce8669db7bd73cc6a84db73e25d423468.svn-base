@@ -1,0 +1,146 @@
+//
+//  CYMyGroupViewController.m
+//  茶语
+//
+//  Created by Leen on 16/2/25.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYMyGroupViewController.h"
+#import "CYToolBar.h"
+#import "CYThemeItemCell.h"
+#import "CYTopicItemCell.h"
+#import "CYMyCommentCell.h"
+
+#import "CYTopicDetailController.h"
+#import "CYTopicListController.h"
+
+@interface CYMyGroupViewController ()<UITableViewDelegate,UITableViewDataSource>
+{
+    
+    NSInteger page;
+    NSMutableArray *dataArr;
+    
+}
+
+
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *lin_leading_cons;
+
+@property (weak, nonatomic) IBOutlet UIView *topBg;
+- (IBAction)goback:(id)sender;
+
+@end
+
+@implementation CYMyGroupViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.title = @"圈子";
+ 
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [MobClick beginLogPageView:self.title];
+}
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:self.title];
+}
+
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+
+#pragma mark -
+#pragma mark UITableViewDataSource method
+-(NSInteger )tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return 10;
+}
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView{
+    return 1;
+}
+
+-(CGFloat )tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 50.f;
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString *identify = @"";
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identify];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identify];
+    }
+    return cell;
+}
+
+#pragma mark -
+#pragma mark UITableViewDelegate method
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+}
+
+
+- (IBAction)topmenu_click:(id)sender {
+    UIButton *selectButton = (UIButton *)sender;
+    for (int i = 6325; i<6328; i++) {
+        UIButton *button = (UIButton *)[_topBg viewWithTag:i];
+        if (button.tag == selectButton.tag) {
+            button.selected = YES;
+        }else{
+            button.selected = NO;
+        }
+    }
+    
+    switch (selectButton.tag) {
+        case 6325:
+        {
+            _quanzitype = WoDeQuanZiTypeDongTai;
+            break;
+        }
+        case 6326:
+        {
+            _quanzitype = WoDeQuanZiTypeHuaTi;
+            break;
+        }
+        case 6327:
+        {
+            _quanzitype = WoDeQuanZiTypeQuanZi;
+            break;
+        }
+            
+        default:
+            break;
+    }
+
+    
+    [UIView animateWithDuration:0.25 animations:^{
+        _lin_leading_cons.constant = selectButton.x;
+        [_topBg layoutIfNeeded];
+    }];
+    
+}
+
+
+- (IBAction)goback:(id)sender {
+}
+@end

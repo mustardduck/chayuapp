@@ -1,0 +1,25 @@
+//
+//  CYMyCommentModel.m
+//  茶语
+//
+//  Created by Leen on 16/2/23.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYMyCommentModel.h"
+
+@implementation CYMyTeaCommentModel
+
+
+@end
+
+@implementation CYMyArcCommentModel
+
+
+@end
+
+
+@implementation CYMyThemeCommentModel
+
+
+@end

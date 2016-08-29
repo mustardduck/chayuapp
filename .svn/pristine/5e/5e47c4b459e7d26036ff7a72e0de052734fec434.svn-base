@@ -1,0 +1,116 @@
+//
+//  NIDropDown.m
+//  NIDropDown
+//
+//  Created by Bijesh N on 12/28/12.
+//  Copyright (c) 2012 Nitor Infotech. All rights reserved.
+//
+
+#import "LDXDropDown.h"
+#import "QuartzCore/QuartzCore.h"
+
+
+#define ROWHEIGHT 40
+@interface LDXDropDown ()
+
+@property(nonatomic, strong) UITableView *table;
+@property(nonatomic, strong) UIButton *btnSender;
+@property(nonatomic, retain) NSArray *list;
+@property(nonatomic, retain) UIView *inView;
+@end
+
+@implementation LDXDropDown
+
+
+- (id)initDropDown:(UIButton *)b maxHeight:(CGFloat)height titles:(NSArray *)arr inView:(UIView*)view{
+    _btnSender = b;
+    _inView = view;
+    self = [super init];
+    if (self) {
+        // Initialization code
+        CGRect btn = (_inView) ? [[b superview] convertRect:b.frame toView:view] : b.frame;
+        
+        self.frame = CGRectMake(btn.origin.x, btn.origin.y+btn.size.height, btn.size.width, 0);
+        self.list = [NSArray arrayWithArray:arr];
+        self.layer.masksToBounds = NO;
+        self.layer.cornerRadius = 8;
+        self.layer.shadowOffset = CGSizeMake(-5, 5);
+        self.layer.shadowRadius = 5;
+        self.layer.shadowOpacity = 0.5;
+        
+        _table = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, btn.size.width, 0)];
+        _table.delegate = self;
+        _table.dataSource = self;
+        _table.layer.cornerRadius = 5;
+        _table.backgroundColor = [UIColor whiteColor];
+//        _table.separatorStyle = UITableViewCellSeparatorStyleNone;
+        //        table.separatorColor = [UIColor grayColor];
+        
+        [UIView beginAnimations:nil context:nil];
+        [UIView setAnimationDuration:0.5];
+        self.frame = CGRectMake(btn.origin.x, btn.origin.y+btn.size.height, btn.size.width, MIN(height, ROWHEIGHT*arr.count));
+        _table.frame = CGRectMake(0, 0, btn.size.width, CGRectGetHeight(self.frame));
+        [UIView commitAnimations];
+        
+        [view addSubview:self];
+        [self addSubview:_table];
+    }
+    return self;
+}
+
+-(void)hideDropDown:(UIButton *)b {
+    CGRect btn = (_inView)?[[b superview] convertRect:b.frame toView:_inView]:b.frame;
+    
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDuration:0.5];
+    self.frame = CGRectMake(btn.origin.x, btn.origin.y+btn.size.height, btn.size.width, 0);
+    _table.frame = CGRectMake(0, 0, btn.size.width, 0);
+    [UIView commitAnimations];
+}
+
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return 40;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return [self.list count];
+}   
+
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    static NSString *CellIdentifier = @"Cell";
+    
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    if (cell == nil) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+        cell.textLabel.font = [UIFont systemFontOfSize:15];
+        cell.textLabel.textAlignment = NSTextAlignmentCenter;
+        cell.backgroundColor = [UIColor clearColor];
+    }
+    cell.textLabel.text =[_list objectAtIndex:indexPath.row];
+    cell.textLabel.textColor = TITLECOLOR;
+//    cell.textLabel.highlightedTextColor = COLOR_DROPDOWN_HLTEXT;
+    
+//    UIView * v = [[UIView alloc] init];
+//    v.backgroundColor = COLOR_DROPDOWN_SELECTIOM;
+//    cell.selectedBackgroundView = v;
+    
+    return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [self hideDropDown:_btnSender];
+    UITableViewCell *c = [tableView cellForRowAtIndexPath:indexPath];
+    [_btnSender setTitle:c.textLabel.text forState:UIControlStateNormal];
+    if ([self.delegate respondsToSelector:@selector(ldxDropDownDelegateMethod:index:title:)]) {
+        [self.delegate ldxDropDownDelegateMethod:self index:indexPath.row title:c.textLabel.text];
+    }
+}
+
+
+@end

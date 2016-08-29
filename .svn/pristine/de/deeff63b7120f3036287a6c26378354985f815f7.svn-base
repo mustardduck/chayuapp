@@ -1,0 +1,262 @@
+//
+//  CYWoDeXiaoXiController.m
+//  茶语
+//
+//  Created by Chayu on 16/7/22.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYWoDeXiaoXiController.h"
+#import "CYWoDeXiaoXiCell.h"
+@interface CYWoDeXiaoXiController ()<UITableViewDelegate,UITableViewDataSource>
+{
+    NSMutableArray *dataArr;
+    NSMutableArray *selectArr;
+    NSInteger page;
+    BOOL isbianji;
+}
+
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+
+- (IBAction)goback:(id)sender;
+
+- (IBAction)bianji_click:(id)sender;
+@property (weak, nonatomic) IBOutlet UIButton *editBtn;
+
+- (IBAction)cancel_click:(id)sender;
+
+@property (weak, nonatomic) IBOutlet UIButton *lizhiBtn;
+
+@property (weak, nonatomic) IBOutlet UIButton *selectAllBtn;
+- (IBAction)selectall_click:(id)sender;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *table_bottom_cons;
+@property (weak, nonatomic) IBOutlet UIView *bottomView;
+
+@end
+
+@implementation CYWoDeXiaoXiController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    dataArr = [NSMutableArray array];
+    selectArr = [NSMutableArray array];
+    page = 1;
+    isbianji = NO;
+    hiddenSepretor(_tableView);
+    __weak __typeof(self) weakSelf = self;
+    _tableView.header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        [weakSelf loadwodepinglunData:NO];
+        
+    }];
+    [_tableView.header beginRefreshing];
+    _tableView.footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+        [weakSelf loadwodepinglunData:YES];
+    }];
+}
+
+
+
+
+
+-(void)loadwodepinglunData:(BOOL)hasMore
+{
+    if (hasMore) {
+        page ++;
+    }else{
+        page =1 ;
+    }
+    __weak __typeof(self) weakSelf = self;
+    [CYWebClient Post:@"2.0_user.notify.get_list" parametes:@{@"p":@(page),@"pageSize":@"10"} success:^(id responObj) {
+        if (hasMore) {
+            [weakSelf.tableView.footer endRefreshing];
+        }else{
+            [weakSelf.tableView.header endRefreshing];
+            [dataArr removeAllObjects];
+            [weakSelf.tableView reloadData];
+        }
+        NSArray *arr = [responObj objectForKey:@"items"];
+        if ([arr count]<10) {
+            [weakSelf.tableView.footer endRefreshingWithNoMoreData];
+            
+        }else{
+            [weakSelf.tableView.footer resetNoMoreData];
+        }
+        
+        [dataArr addObjectsFromArray:arr];
+        [weakSelf.tableView reloadData];
+        
+        if (dataArr.count<10) {
+            weakSelf.tableView.footer = nil;
+        }else{
+            [weakSelf.tableView.footer resetNoMoreData];
+        }
+        
+        
+    } failure:^(id err) {
+        if (hasMore) {
+            [weakSelf.tableView.footer endRefreshing];
+        }else{
+            [weakSelf.tableView.header endRefreshing];
+        }
+    }];
+    
+    
+}
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+#pragma mark -
+#pragma mark UITableViewDataSource method
+-(NSInteger )tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return [dataArr count];
+}
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView{
+    return 1;
+}
+
+-(CGFloat )tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 90.f;
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSDictionary *info = dataArr[indexPath.row];
+    
+    CYWoDeXiaoXiCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYWoDeXiaoXiCell"];
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    cell.titleLbl.text = [info objectForJSONKey:@"title"];
+    if (isbianji) {
+        cell.selectBtn.hidden = NO;
+        cell.leading_cons.constant = 40;
+    }else{
+        cell.leading_cons.constant = 20;
+        cell.selectBtn.hidden = YES;
+    }
+    cell.selectBtn.selected = NO;
+    NSString *mesid = [info objectForJSONKey:@"id"];
+    for (NSString *messageId in selectArr) {
+        if ([messageId isEqualToString:mesid]) {
+            cell.selectBtn.selected = YES;
+        }
+    }
+    
+    cell.selectBtn.tag = 500 +indexPath.row;
+    [cell.selectBtn addTarget:self action:@selector(selectcell:) forControlEvents:UIControlEventTouchUpInside];
+    
+    
+    cell.contentLbl.text = [info objectForJSONKey:@"body"];
+    NSString *time = [self dataWithSince:[[info objectForKey:@"created"] doubleValue]];
+    cell.timeLb.text = time;
+    return cell;
+}
+
+- (NSString *)dataWithSince:(NSTimeInterval )dataString
+{
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"YYYY-MM-dd HH:mm"];
+    NSDate *confromTimesp = [NSDate dateWithTimeIntervalSince1970:dataString];
+    NSString *confromTimespStr = [formatter stringFromDate:confromTimesp];
+    
+    return confromTimespStr;
+}
+
+-(void)selectcell:(UIButton *)sender
+{
+    NSInteger selectInex = sender.tag - 500;
+//    NSIndexPath *indexPath = [NSIndexPath indexPathWithIndex:selectInex];
+    NSDictionary *info = dataArr[selectInex];
+    NSString *messageId = [info objectForJSONKey:@"id"];
+    sender.selected = !sender.selected;
+    if (sender.selected) {
+        [selectArr addObject:messageId];
+    }else{
+        [selectArr removeObject:messageId];
+    }
+    [self changenum:[selectArr count]];
+    [_tableView reloadData];
+    
+}
+
+#pragma mark -
+#pragma mark UITableViewDelegate method
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+}
+
+
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (IBAction)bianji_click:(id)sender {
+    isbianji = !isbianji;
+    NSString *title = isbianji?@"完成":@"编辑";
+    [_editBtn setTitle:title forState:UIControlStateNormal];
+    [_tableView reloadData];
+    _table_bottom_cons.constant = isbianji?50:0;
+    [self.view layoutIfNeeded];
+    _bottomView.hidden = !isbianji;
+    
+}
+
+//删除
+- (IBAction)cancel_click:(id)sender {
+
+    if (selectArr.count >0) {
+        NSMutableString * collectStr = [NSMutableString string];
+        for (NSString * collectId in selectArr) {
+            [collectStr appendString:[NSString stringWithFormat:@"%@,",collectId]];
+        }
+        NSString * collStr = [collectStr substringToIndex:collectStr.length - 1];
+        
+        [CYWebClient Post:@"2.0_user.notify.delete" parametes:@{@"ids":collStr} success:^(id responObj) {
+            [selectArr removeAllObjects];
+            [self loadwodepinglunData:NO];
+        } failure:^(id err) {
+            
+        }];
+        
+    }else{
+           [Itost showMsg:@"请选择要删除的系统消息" inView:WINDOW];
+    }
+  
+    
+}
+
+//选择全部
+- (IBAction)selectall_click:(id)sender {
+    _selectAllBtn.selected = !_selectAllBtn.selected;
+    [selectArr removeAllObjects];
+    if (_selectAllBtn.selected) {
+        for (NSDictionary *messInfo in dataArr) {
+            NSString *mesid = [messInfo objectForJSONKey:@"id"];
+            [selectArr addObject:mesid];
+        }
+    }
+    [self changenum:[selectArr count]];
+    [_tableView reloadData];
+}
+
+-(void)changenum:(NSInteger)num
+{
+    NSString *titleStr = [NSString stringWithFormat:@"删除(%d)",(int)num];
+    [_lizhiBtn setTitle:titleStr forState:UIControlStateNormal];
+    
+}
+@end

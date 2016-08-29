@@ -1,0 +1,135 @@
+//
+//  CYBuyerMainLatestOrPopularView.m
+//  茶语
+//
+//  Created by Leen on 16/8/10.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYBuyerMainLatestOrPopularView.h"
+#import "CYBuyerPDCellModel.h"
+#import "UIColor+Additions.h"
+#import "UICommon.h"
+#import "CYBuyerMainCell.h"
+#import "CYBuyerMainCellModel.h"
+
+
+@interface CYBuyerMainLatestOrPopularView ()
+
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+
+@end
+
+
+@implementation CYBuyerMainLatestOrPopularView
+
+- (void)awakeFromNib
+{
+    hiddenSepretor(_tableView);
+}
+
+- (void) setDataArr:(NSArray *)dataArr
+{
+    _dataArr = dataArr;
+    
+    [_tableView reloadData];
+}
+
+
+#pragma mark -
+#pragma mark UITableViewDataSource
+-(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return _dataArr.count;
+}
+
+- (CGFloat) tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+{
+    return 5;
+}
+
+- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
+{
+    UIView * view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 5)];
+    view.backgroundColor = [UIColor grayBackgroundColor];
+    
+    return view;
+}
+
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return 1;
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CGFloat he = ((UITableViewCell *)[self tableView:tableView cellForRowAtIndexPath:indexPath]).height;
+    
+    return he;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
+    return 0.0001f;
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CYBuyerPDCellModel * model = _dataArr[indexPath.section];
+    
+    CYBuyerMainCell * cell = [CYBuyerMainCell cellForTableView:tableView];
+    
+    CYBuyerMainCellModel * mainModel = [[CYBuyerMainCellModel alloc] init];
+    mainModel.thumb = model.thumb;
+    mainModel.selleravatar = model.avatar;
+    mainModel.sellername = model.realname;
+    mainModel.title = model.name;
+    mainModel.enjoy_count = model.enjoy;
+    mainModel.comment_count = model.comment_count;
+    mainModel.price_sell = model.price_sell;
+    
+    cell.model = mainModel;
+    
+    [cell.buyerBtn addTarget:self action:@selector(buyerClicked:) forControlEvents:UIControlEventTouchUpInside];
+    
+    return cell;
+}
+
+- (void)buyerClicked:(id)sender
+{
+    //    CYBuyerMainCell * cell = (CYBuyerMainCell *)[[sender superview] superview];
+    //    NSIndexPath * indexP = [_tableView indexPathForCell:cell];
+    //
+    //    CYBuyerDetailVC * vc = viewControllerInStoryBoard(@"CYBuyerDetailVC", @"Buyer");
+    //
+    //    if(_headerView.recomBtn.selected)
+    //    {
+    //        CYBuyerMainCellModel * model = _dataArr[indexP.section];
+    //        vc.seller_uid = model.selleruid;//茗星ID
+    //
+    //    }
+    //    else
+    //    {
+    //        CYBuyerPDCellModel * model = _dataArr[indexP.section];
+    //        vc.seller_uid = model.uid;//茗星ID
+    //    }
+    //
+    //    [self.navigationController pushViewController:vc animated:YES];
+    
+    
+}
+
+#pragma mark -
+#pragma mark UITableViewDelegate
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+//    CYBuyerPDCellModel * model = _dataArr[indexPath.section];
+//    
+//    CYProductDetViewController * vc = viewControllerInStoryBoard(@"CYProductDetViewController", @"TeaMall");
+//    vc.goodId = model.goods_id;
+//    
+//    [self.navigationController pushViewController:vc animated:YES];
+}
+
+
+
+@end

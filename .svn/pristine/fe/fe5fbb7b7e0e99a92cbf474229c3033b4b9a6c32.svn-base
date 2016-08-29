@@ -1,0 +1,29 @@
+//
+//  CYFenLeiTopView.h
+//  茶语
+//
+//  Created by Chayu on 16/7/18.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+
+@interface CYFenLeiTopView : UICollectionReusableView
+
+
+- (IBAction)huanyiqi_click:(id)sender;
+
+@property (weak, nonatomic) IBOutlet UIView *biaoqianContentView;
+
+
+@property(nonatomic,strong)void(^selectblock)(NSDictionary *);//block传值
+
+@property (nonatomic,copy)void (^huanyipiBlock)();
+
+@property (nonatomic,strong)NSArray *biaoqianArr;
+
++(CGFloat )fenleiTopViewHeightWithData:(NSArray *)hot_tag_list;
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *biaoqian_height_cons;
+
+@end

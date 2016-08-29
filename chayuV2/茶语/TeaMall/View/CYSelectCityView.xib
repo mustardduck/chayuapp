@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="CYSelectCityView">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="oN3-gp-FWJ">
+                    <rect key="frame" x="100" y="0.0" width="275" height="48"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="配送至" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ujC-TL-VLE">
+                            <rect key="frame" x="114" y="14" width="48" height="20"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                            <color key="textColor" red="0.26666666666666666" green="0.26666666666666666" blue="0.26666666666666666" alpha="1" colorSpace="calibratedRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="o8E-gB-YWS">
+                            <rect key="frame" x="0.0" y="0.0" width="40" height="48"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="40" id="UBp-Pg-gf4"/>
+                            </constraints>
+                            <state key="normal" image="top_back"/>
+                            <connections>
+                                <action selector="back:" destination="iN0-l3-epB" eventType="touchUpInside" id="Hra-Uj-f35"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" red="0.96078431372549022" green="0.96078431372549022" blue="0.96078431372549022" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstItem="o8E-gB-YWS" firstAttribute="leading" secondItem="oN3-gp-FWJ" secondAttribute="leading" id="BcQ-tH-PMF"/>
+                        <constraint firstAttribute="bottom" secondItem="o8E-gB-YWS" secondAttribute="bottom" id="MXm-Ua-33D"/>
+                        <constraint firstItem="o8E-gB-YWS" firstAttribute="top" secondItem="oN3-gp-FWJ" secondAttribute="top" id="hdn-iV-Oaq"/>
+                        <constraint firstItem="ujC-TL-VLE" firstAttribute="centerY" secondItem="oN3-gp-FWJ" secondAttribute="centerY" id="mLZ-O8-wmx"/>
+                        <constraint firstItem="ujC-TL-VLE" firstAttribute="centerX" secondItem="oN3-gp-FWJ" secondAttribute="centerX" id="mNd-OF-831"/>
+                        <constraint firstAttribute="height" constant="48" id="sa7-ls-NMF"/>
+                    </constraints>
+                </view>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="APX-qn-gap">
+                    <rect key="frame" x="100" y="48" width="275" height="619"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                </tableView>
+            </subviews>
+            <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.40000000000000002" colorSpace="calibratedRGB"/>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="APX-qn-gap" secondAttribute="bottom" id="1Cv-lw-XlH"/>
+                <constraint firstItem="oN3-gp-FWJ" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="HxZ-rP-2cR"/>
+                <constraint firstAttribute="trailing" secondItem="oN3-gp-FWJ" secondAttribute="trailing" id="J2L-TM-0Ow"/>
+                <constraint firstItem="APX-qn-gap" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="100" id="ZW3-up-tOB"/>
+                <constraint firstItem="oN3-gp-FWJ" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="100" id="gaA-Sd-TZF"/>
+                <constraint firstItem="APX-qn-gap" firstAttribute="top" secondItem="oN3-gp-FWJ" secondAttribute="bottom" id="iTf-dL-MXn"/>
+                <constraint firstAttribute="trailing" secondItem="APX-qn-gap" secondAttribute="trailing" id="u8v-Wd-Aqo"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina47"/>
+            <connections>
+                <outlet property="tableView" destination="APX-qn-gap" id="3Fr-UK-Adb"/>
+            </connections>
+            <point key="canvasLocation" x="332.5" y="370.5"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="top_back" width="10" height="18"/>
+    </resources>
+</document>

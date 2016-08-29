@@ -1,0 +1,158 @@
+//
+//  CYBuyAllself.m
+//  茶语
+//
+//  Created by Leen on 16/6/28.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYBuyAllCell.h"
+#import "CALayer+CALayer_CALayer_XibConfiguration.h"
+#import "UILabel+Utilities.h"
+#import "UIColor+Additions.h"
+
+
+@implementation CYBuyAllCell
+
+- (void)awakeFromNib {
+    [super awakeFromNib];
+    // Initialization code
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+
++(instancetype)cellForTableView:(UITableView *)tableView
+{
+    static NSString *cellID = @"CYBuyAllCell";
+    
+    CYBuyAllCell * cell = [tableView dequeueReusableCellWithIdentifier:cellID];
+    
+    if(!cell)
+    {
+        cell = [[[NSBundle mainBundle] loadNibNamed:cellID owner:nil options:nil] firstObject];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    }
+    
+    return cell;
+}
+
+- (void)followBtnClicked:(id)sender
+{
+    ((UIButton *) sender).selected =  !((UIButton *) sender).selected;
+    
+    _followIcon.hidden = _followBtn.selected;
+    
+    _followBtn.layer.borderUIColor = _followBtn.selected ? [UIColor grayTitleOrLineColor] : [UIColor brownTitleColor];
+    
+    if(self.delegate && [self.delegate respondsToSelector:@selector(followBtnClicked:)])
+    {
+        [self.delegate followBtnClicked:sender];
+    }
+}
+
+- (void)setAllListCellmodel:(CYBuyerAllListCellModel *)model
+{
+    _allListCellmodel = model;
+    
+    self.nameLbl.text = model.realname;
+    
+    _imgview.height = 250 * SCREEN_WIDTH / 375;
+    
+    _desLbl.text = [NSString stringWithFormat:@"简介：%@",model.introduce];
+    
+    [_desLbl setFontColor:[UIColor blackTitleColor] range:NSMakeRange(0, 3)];
+    
+    _followBtn.selected = [model.isAttend integerValue] ? YES : NO;
+    
+    [self.followBtn addTarget:self action:@selector(followBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
+    
+    NSDictionary * tagDic = model.majorids;
+    
+    NSMutableArray * tagArr = [NSMutableArray array];
+    
+    for(int i = 0; i < [tagDic allKeys].count; i++)
+    {
+        [tagArr addObject:[tagDic objectForKey:[tagDic allKeys][i]]];
+    }
+    
+    [self addTagView:tagArr];
+
+}
+
+- (void) addTagView:(NSArray *)tagArr
+{
+    NSInteger row = 1;
+    
+    CGFloat tagLbl_X = 0;
+    
+    CGFloat tagLbl_Y = (19 + 5) * (row - 1);
+    
+    
+    for(int i = 0; i < tagArr.count; i ++)
+    {
+        UILabel * lbl = [[UILabel alloc] initWithFrame:CGRectMake(tagLbl_X, tagLbl_Y, 50, 19)];
+        lbl.backgroundColor = [UIColor grayDarkBackgroundColor];
+        lbl.textColor = [UIColor grayDarkerTitleColor];
+        lbl.font = FONT(12);
+        
+        lbl.text = tagArr[i];
+        lbl.width = lbl.boundingRectWithWidth + 14;
+        
+        lbl.textAlignment = NSTextAlignmentCenter;
+        
+        tagLbl_X += lbl.width + 5;
+        
+        if(tagLbl_X + lbl.width + 5 >= self.tagView.width)
+        {
+            
+            row ++;
+            
+            tagLbl_Y = (19 + 5) * (row - 1);
+            
+            tagLbl_X = 0;
+            
+            lbl.x = tagLbl_X;
+            
+            lbl.y = tagLbl_Y;
+            
+            tagLbl_X += lbl.width + 5;
+            
+        }
+        
+        [self.tagView addSubview:lbl];
+        
+    }
+    
+    self.tagViewHeightCons.constant = row * (19 + 5) + 10;
+    
+    self.height = 382 + _imgview.height  - 250 + self.tagViewHeightCons.constant - 34;
+
+}
+
+- (void)setModel:(CYBuyerMainCellModel *)model
+{
+    _model = model;
+    
+    self.nameLbl.text = model.sellername;
+    
+    _imgview.height = 250 * SCREEN_WIDTH / 375;
+    
+    _desLbl.text = [NSString stringWithFormat:@"简介：%@",model.content];
+    
+    [_desLbl setFontColor:[UIColor blackTitleColor] range:NSMakeRange(0, 3)];
+
+    _followBtn.selected = model.isAttend;
+    
+    [self.followBtn addTarget:self action:@selector(followBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
+    
+    NSArray * tagArr = model.catarr;
+    
+    [self addTagView:tagArr];
+
+}
+
+@end

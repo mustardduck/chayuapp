@@ -1,0 +1,358 @@
+//
+//  CYMasterListViewController.m
+//  TeaMall
+//
+//  Created by Chayu on 15/10/22.
+//  Copyright © 2015年 Chayu. All rights reserved.
+//
+
+#import "CYMasterListViewController.h"
+#import "CYMasterCell.h"
+//#import "CYHomeCell.h"
+#import "CYMasterDetailViewController.h"
+@interface CYMasterListViewController ()<UITableViewDataSource,UITableViewDelegate>
+{
+    BOOL topmenushow;
+    NSInteger gid; //大师 9， 名家10
+    NSInteger page;
+    NSArray *searchTitle;
+    NSMutableArray *allData;
+    NSString *selectWord;
+  
+}
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+@property (weak, nonatomic) IBOutlet UILabel *masternumLbl;
+@property (weak, nonatomic) IBOutlet UILabel *famousNumLbl;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *linview_horizon_cons;
+@property (weak, nonatomic) IBOutlet UIView *topView;
+
+@property (nonatomic,strong)NSMutableArray *dataArr;
+- (IBAction)goback:(id)sender;
+- (IBAction)top_menu:(id)sender;
+
+@property (weak, nonatomic) IBOutlet UITableView *searchTableView;
+
+- (IBAction)masterOrFamous_click:(UIButton *)sender;
+
+@property (weak, nonatomic) IBOutlet UIScrollView *searchScro;
+
+@end
+
+@implementation CYMasterListViewController
+
+
+
+-(void)viewDidLoad
+{
+    [super viewDidLoad];
+    hiddenSepretor(_searchTableView);
+      page = 1;
+    selectWord = @"#";
+    allData = [[NSMutableArray alloc] init];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.01 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        UIButton *button = nil;
+        if (_type == CYSellerTypeHandmade) {
+            gid = 10;
+            button = (UIButton *)[_topView viewWithTag:1301];
+        }else{
+            button = (UIButton *)[_topView viewWithTag:1300];
+            gid = 9;
+        }
+        [self masterOrFamous_click:button];
+    });
+  
+    __weak __typeof(self) weakSelf = self;
+    _tableView.header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        [weakSelf loadTableViewData:NO];
+        
+    }];
+    _tableView.footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+        [weakSelf loadTableViewData:YES];
+    }];
+    
+    [self loadRightItem];
+    
+ 
+    
+}
+-(void)loadRightItem
+{
+    searchTitle = @[@"#",@"A",@"B",@"C",@"D",@"E",@"F",@"G",@"H",@"I",@"J",@"K",@"L",@"M",@"N",@"O",@"P",@"Q",@"R",@"S",@"T",@"U",@"V",@"W",@"X",@"Y",@"Z"];
+    CGFloat contentSize_height = 0.0f;
+    for (int i = 0; i<[searchTitle count]; i++) {
+        UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+        button.frame = CGRectMake(0,21*i, 21, 21);
+        [button setTitle:searchTitle[i] forState:UIControlStateNormal];
+        button.titleLabel.font = FONT(12);
+        if (i == 0) {
+            [button setBackgroundColor:MAIN_COLOR];
+        }
+        
+        button.tag = 5000+i;
+        [button addTarget:self action:@selector(selectRightItem:) forControlEvents:UIControlEventTouchUpInside];
+        [button setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [_searchScro addSubview:button];
+        contentSize_height +=button.height;
+    }
+    _searchScro.contentSize = CGSizeMake(21, contentSize_height);
+
+}
+
+- (NSMutableArray *)dataArr
+{
+    if (!_dataArr) {
+        _dataArr = [[NSMutableArray alloc] init];
+    }
+    return _dataArr;
+}
+
+
+-(void)selectRightItem:(UIButton *)sender
+{
+    _searchTableView.hidden = NO;
+    _tableView.hidden = YES;
+    for (int i =0; i<[searchTitle count]; i++) {
+        UIButton *button = (UIButton *)[_searchScro viewWithTag:i+5000];
+        if (sender.tag == button.tag) {
+            selectWord = searchTitle[i];
+            if ([allData count]==0) {
+                [self loadSearchData];
+            }else{
+                [self tableScro];
+            }
+
+            [button setBackgroundColor:MAIN_COLOR];
+        }else{
+            [button setBackgroundColor:CLEARCOLOR];
+        }
+    }
+}
+
+-(void)tableScro
+{
+    BOOL hasResult = NO;
+    for (int j=0; j<[allData count]; j++) {
+        if ([selectWord isEqualToString:@"#"]) {
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+            [_searchTableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionNone animated:YES];
+            hasResult = YES;
+            
+            break;
+        }
+        CYMasterCellModel *model = allData[j];
+        if ([model.first_letter isEqualToString:selectWord]) {
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:j inSection:0];
+            [_searchTableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionNone animated:YES];
+            hasResult = YES;
+            break;
+        }
+    }
+    
+    if (!hasResult) {
+        [Itost showMsg:@"暂无您要查找的人物" inView:self.view];
+    }
+}
+
+
+-(void)uploadRightView
+{
+    for (int i =0; i<[searchTitle count]; i++) {
+        UIButton *button = (UIButton *)[_searchScro viewWithTag:i+5000];
+        if (i == 0) {
+            [button setBackgroundColor:MAIN_COLOR];
+        }else{
+            [button setBackgroundColor:CLEARCOLOR];
+        }
+    }
+}
+
+-(void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    topmenushow = NO;
+     [MobClick beginLogPageView:self.title];
+}
+
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:self.title];
+}
+
+/**
+ *  加载页面数据
+ */
+-(void)loadTableViewData:(BOOL)loadMore
+{
+    NSInteger pageSize = 8;
+    if (loadMore) {
+        page ++;
+    }else{
+        page =1;
+        [self.dataArr removeAllObjects];
+        [_tableView reloadData];
+    }
+    
+    __weak __typeof(self) weakSelf = self;
+    [CYWebClient Post:@"SellerList" parametes:@{@"gid":@(gid),@"p":@(page),@"pageSize":@(pageSize)} success:^(id responObj) {
+        if (loadMore) {
+            [weakSelf.tableView.footer endRefreshing];
+        }else{
+            [weakSelf.tableView.header endRefreshing];
+        }
+        NSArray *arr = responObj;
+        if ([arr count]<8) {
+            
+            weakSelf.tableView.contentInset = UIEdgeInsetsZero;
+//            weakSelf.tableView.footer.automaticallyHidden = YES;
+            [weakSelf.tableView.footer endRefreshingWithNoMoreData];
+
+        }else{
+//             [weakSelf.tableView.footer setHidden:NO];
+            [weakSelf.tableView.footer resetNoMoreData];
+//            weakSelf.tableView.footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+//                [weakSelf loadTableViewData:YES];
+//            }];
+        }
+        
+        [weakSelf.dataArr addObjectsFromArray:[CYMasterCellModel objectArrayWithKeyValuesArray:arr]];
+         [weakSelf.tableView reloadData];
+        
+        if (weakSelf.dataArr.count == 0) {
+            [weakSelf.view addSubview:[self emptyView]];
+        }else{
+            UIView *view = [weakSelf.view viewWithTag:1000002];
+            if (view) {
+                [view removeFromSuperview];
+            }
+            
+        }
+    } failure:^(id err) {
+        if (loadMore) {
+            [weakSelf.tableView.footer endRefreshing];
+        }else{
+            [weakSelf.tableView.header endRefreshing];
+        }
+    }];
+
+   
+}
+
+-(void)loadSearchData
+{
+    __weak __typeof(self) weakSelf = self;
+    [CYWebClient Post:@"SellerList" parametes:@{@"gid":@(gid),@"order":@"1"} success:^(id responObj) {
+        [allData removeAllObjects];
+        [allData addObjectsFromArray:[CYMasterCellModel objectArrayWithKeyValuesArray:responObj]];
+        [weakSelf.searchTableView reloadData];
+        [weakSelf tableScro];
+    } failure:^(id err) {
+        
+    }];
+}
+
+
+#pragma mark -
+#pragma mark 按钮点击事件 method
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (IBAction)top_menu:(id)sender {
+//    [self showTopMenuView:!topmenushow];
+    topmenushow = !topmenushow;
+}
+
+
+
+- (IBAction)masterOrFamous_click:(UIButton *)sender {
+    _linview_horizon_cons.constant = sender.x;
+    _searchTableView.hidden = YES;
+    _tableView.hidden  = NO;
+    [self uploadRightView];
+    if (sender.tag == 1300) {//大师
+        gid = 9;
+    }else{
+        gid = 10;
+    }
+    [allData removeAllObjects];
+     [self loadTableViewData:NO];
+    UIView *view = [self.view viewWithTag:1250];//顶部view tag值1250
+    for (int i =1300;i<1302; i++) {
+        UIButton *btn = (UIButton *)[view viewWithTag:i];
+        if (sender.tag == btn.tag) {
+            btn.selected = YES;
+           
+        }else{
+            btn.selected = NO;
+        }
+    }
+}
+
+
+#pragma mark -
+#pragma mark UITableViewDataSource method
+-(NSInteger )tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    if (tableView == _searchTableView) {
+        return [allData count];
+    }else{
+       return [self.dataArr count];
+    }
+    
+}
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView{
+    return 1;
+}
+
+-(CGFloat )tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CGFloat height =MASTERCELL_HEIGHT*(SCREEN_WIDTH/320.);
+    return height;
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CYMasterCell *cell = [CYMasterCell cellWidthTableView:tableView];
+    CYMasterCellModel *model = nil;
+    if (tableView == _searchTableView) {
+        model = allData[indexPath.row];
+    }else{
+        model = self.dataArr[indexPath.row];
+    }
+    cell.masterModel = model;
+    if (gid == 9) {
+        cell.isMaster = YES;
+    }else{
+        cell.isMaster = NO;
+    }
+    return cell;
+}
+
+#pragma mark -
+#pragma mark UITableViewDelegate method
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+
+   CYMasterCellModel *model =  nil;
+    if(!_searchTableView.hidden) {
+        model = allData[indexPath.row];
+    }else{
+        model = _dataArr[indexPath.row];
+    }
+    CYMasterDetailViewController *vc =viewControllerInStoryBoard(@"CYMasterDetailViewController", @"TeaMall");
+    if (gid == 9) {
+        vc.isMaster = YES;
+    }else{
+        vc.isMaster = NO;
+    }
+  
+    vc.uid = model.sellerUid;
+    [self.navigationController pushViewController:vc animated:YES];
+    
+}
+
+
+
+@end

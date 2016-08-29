@@ -1,0 +1,30 @@
+//
+//  CYWoDePingLunCell.h
+//  茶语
+//
+//  Created by Chayu on 16/7/19.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+#import "BaseImageView.h"
+@interface CYWoDePingLunCell : UITableViewCell
+
+@property (weak, nonatomic) IBOutlet BaseImageView *showImg;
+
+@property (weak, nonatomic) IBOutlet UILabel *nameLbl;
+
+@property (weak, nonatomic) IBOutlet UILabel *contentLbl;
+
+@property (weak, nonatomic) IBOutlet UILabel *replyLbl;
+
+@property (weak, nonatomic) IBOutlet UILabel *timeLbl;
+@property (weak, nonatomic) IBOutlet UILabel *zanLbl;
+@property (weak, nonatomic) IBOutlet UIButton *huifuBtn;
+@property (weak, nonatomic) IBOutlet UIButton *dianzanBtn;
+
+@property (weak, nonatomic) IBOutlet UIButton *shanchuBtn;
+
++(CGFloat)tableCellHeight:(NSDictionary *)info andType:(NSInteger)type;
+
+@end

@@ -1,0 +1,25 @@
+//
+//  CYBrandWebViewController.h
+//  茶语
+//
+//  Created by 李峥 on 16/4/6.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYBaseViewController.h"
+
+typedef NS_ENUM(NSInteger, BrandYear) {
+    BrandYear_2014 = 0,
+    BrandYear_2015 = 1
+};
+
+@interface CYBrandWebViewController : CYBaseViewController
+@property (weak, nonatomic) IBOutlet UIWebView *mWebView;
+
+@property (nonatomic,strong)NSString *webUrl;
+
+@property (nonatomic,strong)NSDictionary *shareInfo;
+
+@property (nonatomic, assign) BrandYear type;
+
+@end

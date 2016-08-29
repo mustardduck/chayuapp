@@ -1,0 +1,577 @@
+//
+//  CYBuyerPDDetailView.m
+//  茶语
+//
+//  Created by Leen on 16/7/21.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYBuyerPDDetailView.h"
+#import "CYBuyerPDTopView.h"
+#import "CYBuyerEvaluationView.h"
+#import "CYSpecificationView.h"
+#import "AppDelegate.h"
+#import "CYActionSheet.h"
+#import "CYShopTrolleyModel.h"
+#import "CYOrderDetailModel.h"
+#import "CYConfirmOrderViewController.h"
+#import "CYMasterDetailViewController.h"
+#import "CYBuyerProFooterVIew.h"
+#import "BaseLable.h"
+#import "CYSCartViewController.h"
+#import "BBWebView.h"
+#import "CYMasterDetailViewController.h"
+#import "CYBuyerDetailVC.h"
+#import "CYBaseLineLable.h"
+#import "UICommon.h"
+
+@interface CYBuyerPDDetailView ()<CYBuyerPDTopViewDelegate,CYSpecificationViewDelegate,UIAlertViewDelegate,BBWebViewSizeAdjust,UIWebViewDelegate,CYBuyerProFooterVIewDelegate, UIGestureRecognizerDelegate,CYBuyerEvaluationViewDelegate>
+{
+    BOOL isBuy;//是否是购买
+    CGFloat endWebHeight;
+    BBWebView *webView;
+    BOOL allvalueShow; //所有评价是否显示
+    int _lastPosition;    //A variable define in headfile
+}
+
+@property (nonatomic,strong)NSString *goodId;
+
+@property (weak, nonatomic) IBOutlet UIButton *nomoreBtn;
+
+
+@property (nonatomic,strong)CYBuyerPDTopView *productTopView;
+@property (weak, nonatomic) IBOutlet UIScrollView *contentView;
+/**
+ *  底部大师相关+其他人买
+ */
+@property (nonatomic,strong)CYBuyerProFooterVIew *footerView;
+
+/**
+ *  评价view
+ */
+@property (nonatomic,strong)CYBuyerEvaluationView *evaluationView;
+
+@property (nonatomic,strong)CYSpecificationView *specificationView;
+
+
+
+@property (weak, nonatomic) IBOutlet BaseLable *cartNum;
+
+@property (nonatomic,strong)UIView *detailViw;
+
+- (IBAction)bottom_click:(id)sender;
+
+- (IBAction)gouwuche_click:(id)sender;
+
+- (IBAction)shoucang_click:(id)sender;
+
+@property (weak, nonatomic) IBOutlet UIImageView *shoucangImg;
+
+@property (weak, nonatomic) IBOutlet UIView *productBottomView;
+
+
+/**
+ *  悬浮框商品名称
+ */
+@property (weak, nonatomic) IBOutlet UILabel *pdTilteLbl;
+@property (weak, nonatomic) IBOutlet UIImageView *pdLikeIcon;
+@property (weak, nonatomic) IBOutlet UILabel *pdKuCunLbl;
+@property (weak, nonatomic) IBOutlet UILabel *pdYiShouLbl;
+@property (weak, nonatomic) IBOutlet UILabel *pdPriceLbl;
+@property (weak, nonatomic) IBOutlet CYBaseLineLable *pdOddPriceLbl;
+
+@end
+
+@implementation CYBuyerPDDetailView
+
+-(void)handleSwipeFrom:(UISwipeGestureRecognizer *)recognizer{
+    
+    CGFloat currentPostion = _contentView.contentOffset.y;
+    
+    if(recognizer.direction==UISwipeGestureRecognizerDirectionDown) {
+        
+        NSLog(@"swipe down");
+        //执行程序
+        
+        if(currentPostion < SCREEN_HEIGHT - 90 - 45)
+        {
+            [UIView animateWithDuration:0.4 animations:^{
+                _productBottomView.transform = CGAffineTransformTranslate(CGAffineTransformIdentity, 0, 0);
+            }];
+        }
+    }
+    if(recognizer.direction==UISwipeGestureRecognizerDirectionUp) {
+        
+        NSLog(@"swipe up");
+        
+        //执行程序
+        [UIView animateWithDuration:0.4 animations:^{
+            _productBottomView.transform = CGAffineTransformTranslate(CGAffineTransformIdentity, 0, SCREEN_HEIGHT - 45);
+        }];
+    }
+}
+
+- (IBAction)shareGoods_click:(id)sender
+{
+    [self shareGoods];
+}
+
+- (void)PDTopViewlikeClicked
+{
+    _pdLikeIcon.highlighted = !_pdLikeIcon.highlighted;
+}
+
+- (IBAction)like_click:(id)sender {
+    ChaYuer *manager = [ChaYuManager  getCurrentUser];
+    if (!manager.isLoged) {
+        [APP_DELEGATE showLogView];
+        return;
+    }
+    [CYWebClient Post:@"userdoEnjoy" parametes:@{@"goods_id":_productModel.goodsId} success:^(id responObject) {
+        _pdLikeIcon.highlighted = !_pdLikeIcon.highlighted;
+        
+        _productTopView.xihuanImg.highlighted = !_productTopView.xihuanImg.highlighted;
+        
+        
+    } failure:^(id error) {
+        
+    }];
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+{
+    return YES;
+}
+
+-(void)awakeFromNib
+{
+    
+}
+
+- (void) setProductModel:(CYProductDetailsModel *)productModel
+{
+    _productModel = productModel;
+    
+    self.goodId = productModel.goodsId;
+
+    
+    if ([MANAGER isLoged]) {
+        [self loadCartNum];
+    }else{
+        _cartNum.hidden = YES;
+    }
+    
+    AppDelegate *applegate = APP_DELEGATE;
+    applegate.searchType = CYSearchTypeGoods;
+    
+    UISwipeGestureRecognizer * ge = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(handleSwipeFrom:)];
+    [ge setDirection:UISwipeGestureRecognizerDirectionUp];
+    ge.delegate = self;
+    ge.cancelsTouchesInView = NO;
+    [_contentView addGestureRecognizer:ge];
+    
+    ge = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(handleSwipeFrom:)];
+    [ge setDirection:UISwipeGestureRecognizerDirectionDown];
+    ge.delegate = self;
+    ge.cancelsTouchesInView = NO;
+    [_contentView addGestureRecognizer:ge];
+    
+    isBuy = YES;
+    endWebHeight = 1.0;
+    allvalueShow = NO;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.001 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        webView = [[BBWebView alloc] initWithFrame:CGRectMake(0, 0,SCREEN_WIDTH,1)];
+        webView.sizeDelegate = self;
+        webView.scrollView.scrollEnabled = NO;
+        webView.scalesPageToFit = YES;
+        webView.userInteractionEnabled = NO;
+        [_contentView addSubview:webView];
+        
+        [_contentView addSubview:self.productTopView];
+        _productTopView.productModel = _productModel;
+
+        
+        [_contentView addSubview:self.evaluationView];
+        _evaluationView.goodId = _goodId;
+        
+        [_contentView addSubview:self.footerView];
+        
+        _contentView.contentSize = CGSizeMake(SCREEN_WIDTH,self.productTopView.height);
+        
+    });
+    
+    
+    
+    _productModel.goodsId = _goodId;
+    
+    
+    if (MANAGER.isLoged) {
+        if ([_productModel.isFavorited boolValue]) {
+            _shoucangImg.highlighted = YES;
+        }
+        if ([_productModel.is_enjoy boolValue]) {
+            _pdLikeIcon.highlighted = YES;
+        }
+        
+        
+    }
+    
+    
+    _pdTilteLbl.text = _productModel.name;
+    _pdPriceLbl.text = [NSString stringWithFormat:@"￥%@",_productModel.specDataDef[@"pricePromote"]];
+    NSString *proPrice = [NSString stringWithFormat:@"￥%@",_productModel.specDataDef[@"price"]];
+    NSMutableAttributedString *attrStr = [[NSMutableAttributedString alloc] initWithString:proPrice];
+    [attrStr addAttribute:NSStrikethroughStyleAttributeName value:@(YES) range:NSMakeRange(0,proPrice.length)];
+    [attrStr addAttribute:NSStrikethroughColorAttributeName value:CONTENTCOLOR range:NSMakeRange(0, proPrice.length)];
+    _pdOddPriceLbl.attributedText = attrStr;
+    
+    NSInteger isPromote = [_productModel.specDataDef[@"isPromote"] integerValue];
+    if (isPromote == 0) {
+        _pdOddPriceLbl.hidden = YES;
+        _pdPriceLbl.text = [NSString stringWithFormat:@"￥%@",_productModel.specDataDef[@"price"]];
+    }
+    
+    NSInteger stock = [[_productModel.specDataDef objectForJSONKey:@"stock"] integerValue];
+    if (stock == 0) {
+        _nomoreBtn.hidden = NO;
+    }else{
+        _nomoreBtn.hidden = YES;
+    }
+    _pdKuCunLbl.text = [NSString stringWithFormat:@"库存 %ld", stock];
+    _pdYiShouLbl.text = [NSString stringWithFormat:@"已售 %@",_productModel.salesBase];
+    
+    _contentView.hidden = NO;
+    [webView loadHTMLString:_productModel.introduce baseURL:[NSURL URLWithString:@"http://www.chayu.alp/"]];
+
+}
+
+
+-(void)loadCartNum
+{
+    [CYWebClient Post:@"cartcount" parametes:nil success:^(id responObj) {
+        if ([[responObj objectForJSONKey:@"count"]integerValue] == 0) {
+            _cartNum.hidden = YES;
+        }else{
+            _cartNum.hidden = NO;
+        }
+        _cartNum.text = [responObj objectForJSONKey:@"count"];
+    } failure:^(id err) {
+        NSLog(@"%@",err);
+    }];
+}
+
+- (CYBuyerPDTopView *)productTopView
+{
+    if (!_productTopView) {
+        _productTopView = [[[NSBundle mainBundle] loadNibNamed:@"CYBuyerPDTopView" owner:nil options:nil] firstObject];
+        _productTopView.delegate = self;
+        _productTopView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 156);
+    }
+    return _productTopView;
+}
+
+- (CYBuyerEvaluationView *)evaluationView
+{
+    if (!_evaluationView) {
+        _evaluationView = [[[NSBundle mainBundle]loadNibNamed:@"CYBuyerEvaluationView" owner:nil options:nil] firstObject];
+        _evaluationView.frame = CGRectMake(0,_productTopView.height + _productTopView.y,SCREEN_WIDTH,1);
+        _evaluationView.pageSize = @"2";
+        _evaluationView.delegate = self;
+    }
+    return _evaluationView;
+}
+
+- (CYSpecificationView *)specificationView
+{
+    if (!_specificationView) {
+        _specificationView = [[[NSBundle mainBundle]loadNibNamed:@"CYSpecificationView" owner:nil options:nil] firstObject];
+        _specificationView.frame = WINDOW.bounds;
+        _specificationView.delegate =  self;
+    }
+    return _specificationView;
+}
+
+
+- (CYBuyerProFooterVIew *)footerView{
+    if (!_footerView) {
+        _footerView = [[[NSBundle mainBundle] loadNibNamed:@"CYBuyerProFooterVIew" owner:nil options:nil] firstObject];
+        _footerView.frame = CGRectMake(0, _evaluationView.y + _evaluationView.height + 10, SCREEN_WIDTH, 190);
+        _footerView.seller = _productModel.seller;
+        _footerView.sellerUid = _productModel.sellerUid;
+        _footerView.delegate = self;
+        
+    }
+    return _footerView;
+}
+
+- (UIView *)detailViw
+{
+    if (!_detailViw) {
+        _detailViw = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 0)];
+    }
+    
+    return _detailViw;
+}
+
+- (CYBuyerAllEvaluationView *)allEvaView
+{
+    if (!_allEvaView) {
+        _allEvaView = [[[NSBundle mainBundle] loadNibNamed:@"CYBuyerAllEvaluationView" owner:nil options:nil] firstObject];
+        _allEvaView.frame = CGRectMake(SCREEN_WIDTH,0,SCREEN_WIDTH,self.height - 45);
+        
+    }
+    return _allEvaView;
+}
+
+/**
+ *  加入购物车，立即购买 弹出选择规格页面
+ */
+- (IBAction)bottom_click:(UIButton *)sender {
+    if (sender.tag == 1601) {
+        isBuy = YES;
+    }else{
+        isBuy = NO;
+    }
+    [WINDOW addSubview:self.specificationView];
+    
+    _specificationView.productModel = _productModel;
+
+}
+
+- (IBAction)gouwuche_click:(id)sender {
+    
+    if(self.delegate && [self.delegate respondsToSelector:@selector(CYBuyerPD_gouwuche_click)])
+    {
+        [self.delegate CYBuyerPD_gouwuche_click];
+    }
+    
+}
+
+- (IBAction)shoucang_click:(id)sender {
+    
+    if (!MANAGER.isLoged) {
+        [APP_DELEGATE showLogView];
+        return;
+    }
+    
+    [CYWebClient Post:@"userdoFavorit" parametes:@{@"goods_id":_goodId} success:^(id responObject) {
+        _shoucangImg.highlighted = !_shoucangImg.highlighted;
+    } failure:^(id error) {
+        
+    }];
+}
+
+- (void)selectSpecification{
+    
+    [WINDOW addSubview:self.specificationView];
+    
+}
+
+
+- (void)shareGoods
+{
+    CYShareModel * model = [[CYShareModel alloc] init];
+    model.shareUrl = _shareurl;
+    
+    NSDictionary * dic = _productModel.albumList[0];
+    NSString * imgUrl = [dic objectForJSONKey:@"path"];
+    
+    model.shareImg = imgUrl;
+    model.shareTitle = _productModel.title;
+    model.shareDesc = _productModel.desc;
+    
+    [UICommon shareGoods:model];
+}
+
+#pragma mark -
+#pragma mark CYSpecificationViewDelegate method
+-(void)selectgoodsInfo:(NSDictionary *)goodsInfo
+{
+    [self.specificationView removeFromSuperview];
+    
+    ChaYuer *manager = [ChaYuManager  getCurrentUser];
+    if (!manager.isLoged) {
+        UIAlertView *alt = [[UIAlertView alloc] initWithTitle:@"温馨提示" message:@"您尚未登录，请登录后继续操作" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+        [alt show];
+        return;
+    }
+    
+    if ([[goodsInfo objectForJSONKey:@"number"]integerValue]>[[_productModel.specDataDef objectForKey:@"stock"] integerValue]) {
+        [Itost showMsg:@"库存不足！" inView:self];
+        return;
+    }
+    
+    NSString *specId =[goodsInfo objectForJSONKey:@"specId"];
+    if (specId.length == 0) {
+        specId = [_productModel.specDataDef objectForJSONKey:@"specId"];
+    }
+    if (isBuy) {
+        CYShopTrolleyModel *model = [[CYShopTrolleyModel alloc] init];
+        CGFloat price = [[_productModel.specDataDef objectForKey:@"isPromote"] integerValue] == 0?[[_productModel.specDataDef objectForJSONKey:@"price"] floatValue]:[[_productModel.specDataDef objectForJSONKey:@"pricePromote"] floatValue];
+        
+        NSString *sellerName = [_productModel.seller objectForKey:@"sellerName"];
+        NSString *avatar = [_productModel.seller objectForKey:@"avatar"];
+        NSMutableArray *goodsArr = [NSMutableArray array];
+        NSMutableArray *detailArr  =[NSMutableArray array];
+        if (_productModel.albumList.count>0) {
+            
+            NSDictionary * dic = _productModel.albumList[0];
+            NSString * imgUrl = [dic objectForJSONKey:@"path"];
+            
+            model.thumb = imgUrl;
+        }else{
+            model.thumb = @"";
+        }
+        
+        NSString *selleruid = [_productModel.is_self boolValue]?@"1":_productModel.sellerUid;
+        model.name = _productModel.name;
+        model.goodsNumber = [[goodsInfo objectForJSONKey:@"number"] integerValue] ==0?@"1":[goodsInfo objectForJSONKey:@"number"];
+        model.goodsId = _productModel.goodsId;
+        model.specId = specId;
+        model.specdataId = specId;
+        model.commodityPrice = [NSString stringWithFormat:@"%.2f",price];
+        model.stock = [_productModel.specDataDef objectForJSONKey:@"stock"];
+        [goodsArr addObject:model];
+        price *=[[goodsInfo objectForJSONKey:@"number"] integerValue];
+        NSDictionary *data = @{@"goodsList":goodsArr,
+                               @"commodityCount":[goodsInfo objectForJSONKey:@"number"],
+                               @"seller":@{@"sellerName":sellerName,@"sellerAvatar":avatar,@"sellerUid":selleruid},
+                               @"orderPrice":[NSNumber numberWithFloat:price]};
+        
+        
+        CYOrderDetailModel *goodsModel = [CYOrderDetailModel objectWithKeyValues:data];
+        [detailArr addObject:goodsModel];
+        
+        if(self.delegate && [self.delegate respondsToSelector:@selector(CYBuyerPD_selectgoodsInfo:confirmType:)])
+        {
+            [self.delegate CYBuyerPD_selectgoodsInfo:detailArr confirmType:CYConfirmOrderTypeBuyNow];
+        }
+
+    }else{
+        NSMutableDictionary *info = [NSMutableDictionary dictionaryWithDictionary:goodsInfo];
+        [info setObject:specId forKey:@"specId"];
+        [CYWebClient Post:@"AddCart" parametes:info success:^(id responObj) {
+            [self loadCartNum];
+        } failure:^(id err) {
+            NSLog(@"%@",err);
+        }];
+    }
+    
+}
+
+#pragma mark -
+#pragma mark BBWebViewSizeAdjust delegate method
+- (void)bbweb:(BBWebView *)web didAdjustSizeTo:(CGSize)endSize from:(CGSize)startSize
+{
+    if (startSize.height<endSize.height) {
+        
+        self.productTopView.height = self.productTopView.endHeight;
+    
+        webView.y = 0;
+        webView.height = endSize.height;
+        endWebHeight = endSize.height;
+        
+        CGFloat contentsize_height = 0.0;
+        
+        self.productTopView.y = webView.y + endWebHeight;
+        
+        self.evaluationView.y = _productTopView.y + _productTopView.height;
+        
+        self.footerView.y = _evaluationView.y + _evaluationView.height + 10;
+        if ([_productModel.guanliansale count] == 0) {
+            self.footerView.onlyShowTop = YES;
+            self.footerView.height = 424-234;
+        }else{
+            self.footerView.height = 190;
+        }
+        
+        if ([_productModel.sellerUid isEqualToString:@"0"]) {
+            self.footerView.onlyShopBottom = YES;
+            self.footerView.height = 234.;
+            if ([_productModel.guanliansale count] == 0) {
+                self.footerView.height = 0.0f;
+            }
+            
+            
+        }
+        
+//        [_contentView addSubview:self.footerView];
+        
+        if (![_productModel.sellerUid isEqualToString:@"0"]) {
+            _footerView.seller = _productModel.seller;
+            _footerView.goodsList = _productModel.guanliansale;
+            _footerView.sellerUid = _productModel.sellerUid;
+        }
+        
+        contentsize_height = _footerView.y + _footerView.height;
+        
+        _contentView.contentSize = CGSizeMake(SCREEN_WIDTH,contentsize_height);
+    }
+    
+}
+#pragma mark -
+#pragma mark CYBuyerProFooterVIewDelegate method
+- (void)mingjiajieshao:(NSString *)uid
+{
+    if(self.delegate && [self.delegate respondsToSelector:@selector(CYBuyerPD_mingxingjieshao_click:)])
+    {
+        [self.delegate CYBuyerPD_mingxingjieshao_click:_productModel.sellerUid];
+    }
+    
+}
+
+#pragma mark -
+#pragma mark UIAlertViewDelegate method
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == 1) {
+        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+        [appDelegate showLogView];
+    }
+}
+
+#pragma mark -
+#pragma mark CYBuyerEvaluationViewDelegate method
+- (void)evaluationViewendHeight:(CGFloat)endheight
+{
+    _footerView.y = _evaluationView.y + _evaluationView.height + 10;
+    
+    self.contentView.contentSize = CGSizeMake(SCREEN_WIDTH,_productTopView.y + _productTopView.height + endheight + _footerView.height);
+}
+
+- (void)showAllEvaluation
+{
+    self.allEvaView.goodsId = _goodId;
+    [self allevaShow:YES];
+}
+
+-(void)allevaShow:(BOOL)show
+{
+    allvalueShow = show;
+    if (show) {
+//        self.title = @"全部评价";
+        [self addSubview:self.allEvaView];
+        [self bringSubviewToFront:self.allEvaView];
+        [UIView animateWithDuration:0.25 animations:^{
+            self.allEvaView.x = 0;
+        } completion:^(BOOL finished) {
+            
+        }];
+    }else{
+//        self.title = @"商品详情";
+        [UIView animateWithDuration:0.25 animations:^{
+            self.allEvaView.x = SCREEN_WIDTH;
+        } completion:^(BOOL finished) {
+            [self.allEvaView removeFromSuperview];
+        }];
+    }
+    
+    if(self.delegate && [self.delegate respondsToSelector:@selector(CYBuyerPD_allevaShow_click:)])
+    {
+        [self.delegate CYBuyerPD_allevaShow_click:YES];
+    }
+}
+
+@end
+
+

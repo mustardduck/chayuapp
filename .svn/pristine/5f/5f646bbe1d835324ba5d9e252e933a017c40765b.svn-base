@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10116" systemVersion="15G31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="ViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
+                        <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="495" y="304"/>
+        </scene>
+        <!--Preview View Controller-->
+        <scene sceneID="Y91-8y-hGK">
+            <objects>
+                <viewController storyboardIdentifier="PreviewViewController" id="Btg-J9-IJE" customClass="PreviewViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="l4a-lA-1qn"/>
+                        <viewControllerLayoutGuide type="bottom" id="mLX-ev-EPb"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="5ww-NW-rKe">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <pageControl hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" numberOfPages="3" translatesAutoresizingMaskIntoConstraints="NO" id="0Y3-xE-zFX">
+                                <rect key="frame" x="141" y="516" width="39" height="37"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="39" id="6zl-zx-n1Z"/>
+                                    <constraint firstAttribute="height" constant="37" id="j8x-an-rbX"/>
+                                </constraints>
+                                <variation key="default">
+                                    <mask key="constraints">
+                                        <exclude reference="6zl-zx-n1Z"/>
+                                        <exclude reference="j8x-an-rbX"/>
+                                    </mask>
+                                </variation>
+                            </pageControl>
+                        </subviews>
+                        <color key="backgroundColor" red="0.13725490200000001" green="0.1333333333" blue="0.14901960780000001" alpha="1" colorSpace="calibratedRGB"/>
+                        <constraints>
+                            <constraint firstItem="mLX-ev-EPb" firstAttribute="top" secondItem="0Y3-xE-zFX" secondAttribute="bottom" constant="15" id="MPb-Fm-lGl"/>
+                            <constraint firstItem="0Y3-xE-zFX" firstAttribute="leading" secondItem="5ww-NW-rKe" secondAttribute="leadingMargin" constant="125" id="Rfh-a2-bdQ"/>
+                            <constraint firstItem="mLX-ev-EPb" firstAttribute="top" secondItem="0Y3-xE-zFX" secondAttribute="bottom" constant="15" id="SKX-wz-HV3"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="0Y3-xE-zFX" secondAttribute="trailing" constant="124" id="dND-19-10c"/>
+                        </constraints>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="SKX-wz-HV3"/>
+                            </mask>
+                        </variation>
+                    </view>
+                    <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
+                    <connections>
+                        <outlet property="pageControl" destination="0Y3-xE-zFX" id="K6t-g6-4GY"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="JZK-xg-fYN" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2417" y="-49"/>
+        </scene>
+    </scenes>
+</document>

@@ -1,0 +1,52 @@
+//
+//  CYTeaCommentCell.m
+//  茶语
+//
+//  Created by 李峥 on 16/2/21.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYTeaCommentCell.h"
+#import "CYEvaCommentInfo.h"
+
+static CYTeaCommentCell *__cell = nil;
+@implementation CYTeaCommentCell
+
+- (void)parseData:(id)data
+{
+    CYEvaCommentInfo *info = [CYEvaCommentInfo objectWithKeyValues:data];
+    
+    [_mUserImageView sd_setImageWithURL:[NSURL URLWithString:info.avatar] placeholderImage:[UIImage imageNamed:@"200x200"]];
+    _mNameLabel.text = info.nickname;
+    _mDesLabel.text = info.content;
+    _mScoreLabel.text = info.score;
+    _mDateLabel.text = info.created;
+    _mZanLabel.text = info.favors;
+    _zanimg.highlighted = info.support;
+    _mZanLabel.textColor = info.support?MAIN_COLOR:LIGHTCOLOR;
+    if (info.attach.count>0) {
+         _mImageConstraintHeight.constant = 90 *SCREENBILI;
+    }else{
+        _mImageConstraintHeight.constant = 0.0;
+    }
+    
+    self.mClickData = info;
+}
+
++ (CGFloat)calcCellHeight:(id)data
+{
+    if (__cell == nil) {
+        __cell = [[[NSBundle mainBundle] loadNibNamed:@"CYTeaCommentCell" owner:nil options:nil] objectAtIndex:0];
+    }
+    
+    [__cell parseData:data];
+    
+    [__cell setNeedsUpdateConstraints];
+    [__cell updateConstraintsIfNeeded];
+    
+    CGFloat height = [__cell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height + 1;
+    
+    return height;
+}
+
+@end

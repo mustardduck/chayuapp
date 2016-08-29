@@ -1,0 +1,272 @@
+//
+//  CYEvaluationCell.m
+//  TeaMall
+//
+//  Created by Chayu on 15/10/27.
+//  Copyright © 2015年 Chayu. All rights reserved.
+//
+
+#import "CYEvaluationCell.h"
+#import "LDXScore.h"
+@interface CYEvaluationCell ()
+
+
+@property (weak, nonatomic) IBOutlet LDXScore *starView;
+
+@property (strong,nonatomic)UILabel *contentLable;
+@property (weak, nonatomic) IBOutlet UIImageView *showImg;
+
+@property (weak, nonatomic) IBOutlet UILabel *userNameLbl;
+@property (strong, nonatomic) UILabel *standLbl;
+
+
+
+/**
+ *  买家第一次评价
+ */
+@property (nonatomic,strong)UIView *userView;
+
+
+/**
+ *  追加评价
+ */
+@property (nonatomic,strong)UIView *zjView;
+
+
+//卖家回复相关
+@property (strong,nonatomic) UIView *adminreview;
+
+
+@end
+
+@implementation CYEvaluationCell
+
+- (void)awakeFromNib {
+    _starView.show_star = 3;
+
+  
+    [self.contentView addSubview:self.userView];
+    [self.contentView addSubview:self.standLbl];
+   
+    
+}
+
+-(UILabel *)contentLable
+{
+    if (!_contentLable) {
+        _contentLable = [[UILabel alloc] init];
+        _contentLable.frame = CGRectMake(0,0,SCREEN_WIDTH-20,20);
+        _contentLable.backgroundColor = CLEARCOLOR;
+        _contentLable.font = FONT(12.0);
+        _contentLable.numberOfLines = 0.0f;
+        _contentLable.textColor = TITLECOLOR;
+       
+    }
+    return _contentLable;
+}
+
+
+- (UIView *)adminreview
+{
+    if (!_adminreview) {
+        _adminreview = [[UIView alloc] initWithFrame:CGRectMake(10,self.userView.height + self.userView.y +10, SCREEN_WIDTH-20,1)];
+        _adminreview.clipsToBounds = YES;
+        _adminreview.backgroundColor = MAIN_BGCOLOR;
+        UILabel *replycommLbl = [[UILabel alloc] initWithFrame:CGRectMake(10,5,_adminreview.width -20,_adminreview.height -10)];
+        replycommLbl.tag = 3000;
+        replycommLbl.textColor = CONTENTCOLOR;
+        replycommLbl.font = FONT(12);
+        replycommLbl.numberOfLines = 0;
+        [_adminreview addSubview:replycommLbl];
+        _adminreview.layer.cornerRadius = 3.0f;
+    }
+    return _adminreview;
+}
+
+- (UIView *)userView
+{
+    if (!_userView) {
+        _userView= [[UIView alloc] initWithFrame:CGRectMake(10,60,SCREEN_WIDTH-20, 40)];
+        _userView.backgroundColor = CLEARCOLOR;
+        [_userView addSubview:self.contentLable];
+        UILabel *timeLbl = [[UILabel alloc] initWithFrame:CGRectMake(0,_userView.height -15,SCREEN_WIDTH, 15)];
+        timeLbl.font = FONT(12);
+        timeLbl.textColor = LIGHTCOLOR;
+        timeLbl.tag = 2000;
+        [_userView addSubview:timeLbl];
+        
+    }
+    return _userView;
+}
+
+
+- (UIView *)zjView
+{
+    if (!_zjView) {
+        _zjView = [[UIView alloc] initWithFrame:CGRectMake(10,self.adminreview.height + self.adminreview.y +10, SCREEN_WIDTH-20,1)];
+        UILabel *appendReplyLbl = [[UILabel alloc] initWithFrame:CGRectMake(0,0,SCREEN_WIDTH, 1)];
+        appendReplyLbl.textColor = CONTENTCOLOR;
+        appendReplyLbl.numberOfLines = 0;
+        appendReplyLbl.font = FONT(12.0);
+        appendReplyLbl.tag = 4000;
+        [_zjView addSubview:appendReplyLbl];
+        UILabel *appendTimeLbl = [[UILabel alloc] initWithFrame:CGRectMake(0, _zjView.height -15, _zjView.width, 15)];
+        appendTimeLbl.tag = 5000;
+        appendTimeLbl.textColor = LIGHTCOLOR;
+        appendTimeLbl.font = FONT(12.);
+        [_zjView addSubview:appendTimeLbl];
+    }
+    return _zjView;
+}
+- (UILabel *)standLbl
+{
+    if (!_standLbl) {
+        _standLbl = [[UILabel alloc] initWithFrame:CGRectMake(10,self.contentView.height - 25, SCREEN_WIDTH-20, 15)];
+        _standLbl.textColor = LIGHTCOLOR;
+        _standLbl.font = FONT(12.0f);
+    }
+    return _standLbl;
+}
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+}
+- (void)setEvaModel:(CYEvaluationModel *)evaModel
+{
+    _evaModel = evaModel;
+     _starView.show_star = [_evaModel.score integerValue]/2;
+    NSDictionary *user = _evaModel.user;
+    _userNameLbl.text = [user objectForJSONKey:@"nickname"];
+    NSString *avatar = [user objectForJSONKey:@"avatar"];
+    if (avatar) {
+        NSURL *url = [NSURL URLWithString:avatar];
+        [_showImg sd_setImageWithURL:url placeholderImage:nil];
+    }
+    [self.zjView removeFromSuperview];
+    [self.adminreview removeFromSuperview];
+    CGFloat offect_y = 0.0f;
+    //买家评价
+    NSString *userComm = [NSString stringWithFormat:@"[买家评价]：%@",_evaModel.content];
+    CGFloat labHeight = [self lableHeightWithString:userComm Size:CGSizeMake(SCREEN_WIDTH-20,MAXFLOAT)];
+    self.contentLable.height = labHeight;
+    self.contentLable.text = userComm;
+    //首次评价时间
+    UILabel *usertimeLbl = (UILabel *)[_userView viewWithTag:2000];
+    usertimeLbl.text = _evaModel.created;
+    usertimeLbl.y = self.contentLable.y+self.contentLable.height +10;
+    self.userView.height = labHeight +37;
+    //买家评论相关加载完成 后的偏移量
+    offect_y = self.userView.y +self.userView.height;
+    
+    //追加
+    if (_evaModel.secreview.count) {
+        [self.contentView addSubview:self.zjView];
+        self.zjView.y = offect_y;
+        NSDictionary *secDic = _evaModel.secreview[0];
+        NSString *appendStr = [NSString stringWithFormat:@"[追加评价]：%@",[secDic objectForJSONKey:@"content"]];
+        CGFloat appendViewHeight = [self lableHeightWithString:appendStr Size:CGSizeMake(SCREEN_WIDTH-40,MAXFLOAT)]+5;
+        self.zjView.height = appendViewHeight;
+        UILabel *appendReplyLbl = (UILabel *)[self.zjView viewWithTag:4000];
+        appendReplyLbl.y = 0;
+        appendReplyLbl.height = appendViewHeight;
+        appendReplyLbl.text = appendStr;
+        //追加评价时间
+        UILabel *appendTimeLbl = (UILabel *)[self.zjView viewWithTag:5000];
+        appendTimeLbl.text = [secDic objectForJSONKey:@"created"];
+        appendTimeLbl.y = appendViewHeight+10;
+        
+        self.zjView.height = appendViewHeight +27;
+        
+        offect_y = self.zjView.y +self.zjView.height +10;
+    }
+    
+    //卖家回复
+    if (_evaModel.adminreview.count) {
+         self.adminreview.y = offect_y;
+        [self.contentView addSubview:self.adminreview];
+        NSDictionary *adminreviewDic = [_evaModel.adminreview objectAtIndex:0];
+        NSString *adminStr =[NSString stringWithFormat:@"[卖家回复]：%@",adminreviewDic[@"content"]];
+        CGFloat adminlabHeight = [self lableHeightWithString:adminStr Size:CGSizeMake(SCREEN_WIDTH-40,MAXFLOAT)];
+        UILabel *adminreLbl = (UILabel *)[self.adminreview viewWithTag:3000];
+        adminreLbl.y = 0;
+        adminreLbl.height = adminlabHeight;
+        adminreLbl.text = adminStr;
+        self.adminreview.height = adminreLbl.height;
+        //卖家回复之后的偏移量
+        offect_y = self.adminreview.y + self.adminreview.height + 10;
+    }
+
+
+    //规格
+    if (!_evaModel.spec || ![_evaModel.spec isKindOfClass:[NSNull class]] ) {
+        
+        if (_evaModel.spec.length) {
+           self.standLbl.text = [NSString stringWithFormat:@"规格：%@",_evaModel.spec];
+        }
+        
+    }else{
+        self.standLbl.text = @"";
+    }
+    
+       self.standLbl.y = offect_y;
+    
+}
+
++ (CGFloat)tableViewCellHeight:(id)data
+{
+    CYEvaluationModel *model = data;
+    
+    CGFloat height = 60;
+    NSString *userComm = [NSString stringWithFormat:@"[买家评价]：%@",model.content];
+    //买家第一次评价
+    //第一次评价内容
+    NSDictionary *attribute = @{NSFontAttributeName: [UIFont systemFontOfSize:12.]};
+    CGSize lableSize = [userComm boundingRectWithSize:CGSizeMake(SCREEN_WIDTH-20,MAXFLOAT) options:NSStringDrawingTruncatesLastVisibleLine | NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:attribute context:nil].size;
+    CGFloat labHeight = lableSize.height;
+    height +=labHeight;
+    //买家第一次评价时间 加 时间相对于评价间隔10像素
+    height +=27;
+    //间隔10
+    height +=10;
+    
+    //追加
+    if (model.secreview.count) {
+        NSDictionary *secDic = model.secreview[0];
+        NSString *appendStr = [NSString stringWithFormat:@"[追加评价]：%@",[secDic objectForJSONKey:@"content"]];
+        lableSize = [appendStr boundingRectWithSize:CGSizeMake(SCREEN_WIDTH-40,MAXFLOAT) options:NSStringDrawingTruncatesLastVisibleLine | NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:attribute context:nil].size;
+        CGFloat appendViewHeight = lableSize.height;
+        height +=appendViewHeight;
+        //追评时间 加间隔10
+        height +=27;
+        
+        //间隔10
+        height +=10;
+    }
+    
+    //卖家回复
+    if (model.adminreview.count) {
+        NSDictionary *secDic = model.adminreview[0];
+        NSString *appendStr = [NSString stringWithFormat:@"[追加评价]：%@",[secDic objectForJSONKey:@"content"]];
+        lableSize = [appendStr boundingRectWithSize:CGSizeMake(SCREEN_WIDTH-40,MAXFLOAT) options:NSStringDrawingTruncatesLastVisibleLine | NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:attribute context:nil].size;
+        CGFloat adminlabHeight = lableSize.height;
+        height += adminlabHeight;
+        //间隔10
+        height +=10;
+    }
+    
+    
+    if (model.spec.length) {
+        height +=27;
+    }
+    
+    return height;
+}
+
+-(CGFloat)lableHeightWithString:(NSString *)string Size:(CGSize )size
+{
+    NSDictionary *attribute = @{NSFontAttributeName: [UIFont systemFontOfSize:12.]};
+    CGSize lableSize = [string boundingRectWithSize:size options:NSStringDrawingTruncatesLastVisibleLine | NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:attribute context:nil].size;
+    return lableSize.height;
+}
+
+
+@end

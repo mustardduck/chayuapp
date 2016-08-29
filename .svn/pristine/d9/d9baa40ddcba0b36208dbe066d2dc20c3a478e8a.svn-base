@@ -1,0 +1,102 @@
+//
+//  CYMyCommentViewController.m
+//  茶语
+//
+//  Created by Leen on 16/2/23.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYMyCommentViewController.h"
+#import "CYToolBar.h"
+#import "CYMyCommentCell.h"
+#import "CYMyCommentModel.h"
+#import "CYArticleDetailViewController.h"
+#import "CYArticleInfo.h"
+#import "CYTeaReviewDetailViewController.h"
+
+@interface CYMyCommentViewController ()<UITableViewDataSource, UITableViewDelegate>
+{
+    NSArray *mToolsBtnNameList;
+    
+    //茶评
+    NSMutableArray *arr_chaping;
+    NSInteger page_chaping;
+    
+    //文章
+    NSMutableArray *arr_arc;
+    NSInteger page_arc;
+}
+
+@property (weak, nonatomic) IBOutlet CYToolBar *toolBar;
+
+
+- (IBAction)goback:(id)sender;
+
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+
+@end
+
+@implementation CYMyCommentViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    
+    self.title = @"我的评论";
+
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [MobClick beginLogPageView:self.title];
+}
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:self.title];
+}
+
+
+#pragma mark -
+#pragma mark UITableViewDataSource method
+-(NSInteger )tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return 10;
+}
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView{
+    return 1;
+}
+
+-(CGFloat )tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 50.f;
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString *identify = @"";
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identify];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identify];
+    }
+    return cell;
+}
+
+#pragma mark -
+#pragma mark UITableViewDelegate method
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+}
+
+
+
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+@end

@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="AFx-E9-UhO" customClass="CYBuyerMainHeaderView">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="265"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <subviews>
+                <view tag="1200" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Brr-6J-HTo">
+                    <rect key="frame" x="0.0" y="200" width="375" height="65"/>
+                    <subviews>
+                        <button opaque="NO" tag="200" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cRW-2P-YwD">
+                            <rect key="frame" x="0.0" y="38" width="94" height="16"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="16" id="iSJ-Fs-IwM"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <state key="normal" title="推荐">
+                                <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                            </state>
+                            <state key="selected">
+                                <color key="titleColor" red="0.53725490200000003" green="0.24313725489999999" blue="0.12549019610000001" alpha="1" colorSpace="calibratedRGB"/>
+                            </state>
+                        </button>
+                        <button opaque="NO" tag="100" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="top" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Dgx-Ho-9su">
+                            <rect key="frame" x="0.0" y="0.0" width="94" height="65"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="10" maxX="0.0" maxY="0.0"/>
+                            <state key="normal" image="buyerRecommendIcon">
+                                <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                            </state>
+                            <state key="selected" image="buyerRecommendIconSelected">
+                                <color key="titleColor" red="0.75294117650000003" green="0.31764705879999999" blue="0.1215686275" alpha="1" colorSpace="calibratedRGB"/>
+                            </state>
+                            <connections>
+                                <action selector="selectTopMenu_click:" destination="AFx-E9-UhO" eventType="touchUpInside" id="hs6-qB-q52"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" tag="201" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="u1O-tz-pTD">
+                            <rect key="frame" x="94" y="38" width="94" height="16"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="16" id="Ybt-bX-B57"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <state key="normal" title="最新">
+                                <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                            </state>
+                            <state key="selected">
+                                <color key="titleColor" red="0.53725490200000003" green="0.24313725489999999" blue="0.12549019610000001" alpha="1" colorSpace="calibratedRGB"/>
+                            </state>
+                        </button>
+                        <button opaque="NO" tag="101" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="top" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="EA2-aZ-5aJ">
+                            <rect key="frame" x="94" y="0.0" width="94" height="65"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="10" maxX="0.0" maxY="0.0"/>
+                            <state key="normal" image="buyerLatestIcon">
+                                <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                            </state>
+                            <state key="selected" image="buyerLatestIconSelected">
+                                <color key="titleColor" red="0.75294117650000003" green="0.31764705879999999" blue="0.1215686275" alpha="1" colorSpace="calibratedRGB"/>
+                            </state>
+                            <connections>
+                                <action selector="selectTopMenu_click:" destination="AFx-E9-UhO" eventType="touchUpInside" id="Owr-gT-up5"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" tag="202" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mxi-uX-HeQ">
+                            <rect key="frame" x="188" y="38" width="93" height="16"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="16" id="5f6-z3-eSt"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <state key="normal" title="人气">
+                                <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                            </state>
+                            <state key="selected">
+                                <color key="titleColor" red="0.53725490200000003" green="0.24313725489999999" blue="0.12549019610000001" alpha="1" colorSpace="calibratedRGB"/>
+                            </state>
+                        </button>
+                        <button clipsSubviews="YES" tag="102" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="top" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mkc-L8-J22">
+                            <rect key="frame" x="188" y="0.0" width="93" height="65"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="10" maxX="0.0" maxY="0.0"/>
+                            <state key="normal" image="buyerHotestIcon">
+                                <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                            </state>
+                            <state key="selected" image="buyerHotestIconSelected">
+                                <color key="titleColor" red="0.75294117650000003" green="0.31764705879999999" blue="0.1215686275" alpha="1" colorSpace="calibratedRGB"/>
+                            </state>
+                            <connections>
+                                <action selector="selectTopMenu_click:" destination="AFx-E9-UhO" eventType="touchUpInside" id="HF2-n6-PtV"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" tag="203" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Tb6-iv-s5P">
+                            <rect key="frame" x="281" y="38" width="94" height="16"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="16" id="j0S-Ol-4qn"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <state key="normal" title="全部茗星">
+                                <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                            </state>
+                            <state key="selected">
+                                <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                            </state>
+                            <state key="highlighted">
+                                <color key="titleColor" red="0.53725490200000003" green="0.24313725489999999" blue="0.12549019610000001" alpha="1" colorSpace="calibratedRGB"/>
+                            </state>
+                        </button>
+                        <button opaque="NO" tag="103" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="top" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5Ux-oC-3NJ">
+                            <rect key="frame" x="281" y="0.0" width="94" height="65"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="10" maxX="0.0" maxY="0.0"/>
+                            <state key="normal" image="buyerAllSellerIcon">
+                                <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                            </state>
+                            <state key="selected">
+                                <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                            </state>
+                            <connections>
+                                <action selector="selectTopMenu_click:" destination="AFx-E9-UhO" eventType="touchUpInside" id="P7s-Gt-byP"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstItem="mxi-uX-HeQ" firstAttribute="leading" secondItem="mkc-L8-J22" secondAttribute="leading" id="47q-xB-dFT"/>
+                        <constraint firstAttribute="bottom" secondItem="mkc-L8-J22" secondAttribute="bottom" id="4CT-Q1-xrJ"/>
+                        <constraint firstItem="mkc-L8-J22" firstAttribute="height" secondItem="Dgx-Ho-9su" secondAttribute="height" id="5aM-eT-bNR"/>
+                        <constraint firstItem="Dgx-Ho-9su" firstAttribute="height" secondItem="Brr-6J-HTo" secondAttribute="height" id="5gm-Gy-Fl9"/>
+                        <constraint firstItem="5Ux-oC-3NJ" firstAttribute="width" secondItem="Dgx-Ho-9su" secondAttribute="width" id="6WE-O2-L5z"/>
+                        <constraint firstAttribute="height" constant="65" id="7Jc-89-A54"/>
+                        <constraint firstItem="u1O-tz-pTD" firstAttribute="width" secondItem="EA2-aZ-5aJ" secondAttribute="width" id="IF8-Tr-OTG"/>
+                        <constraint firstItem="mkc-L8-J22" firstAttribute="leading" secondItem="EA2-aZ-5aJ" secondAttribute="trailing" id="IHo-1g-FF8"/>
+                        <constraint firstItem="EA2-aZ-5aJ" firstAttribute="top" secondItem="Brr-6J-HTo" secondAttribute="top" id="Ism-Q6-7V8"/>
+                        <constraint firstItem="5Ux-oC-3NJ" firstAttribute="leading" secondItem="mkc-L8-J22" secondAttribute="trailing" id="Ixa-41-L0d"/>
+                        <constraint firstAttribute="bottom" secondItem="u1O-tz-pTD" secondAttribute="bottom" constant="11" id="JHz-2H-o3K"/>
+                        <constraint firstAttribute="bottom" secondItem="EA2-aZ-5aJ" secondAttribute="bottom" id="Kt9-EZ-jOi"/>
+                        <constraint firstItem="cRW-2P-YwD" firstAttribute="width" secondItem="Dgx-Ho-9su" secondAttribute="width" id="Pr9-ue-XEE"/>
+                        <constraint firstItem="EA2-aZ-5aJ" firstAttribute="height" secondItem="Dgx-Ho-9su" secondAttribute="height" id="UMz-zu-Xnf"/>
+                        <constraint firstItem="mkc-L8-J22" firstAttribute="top" secondItem="Brr-6J-HTo" secondAttribute="top" id="VEU-tO-ZRK"/>
+                        <constraint firstItem="mxi-uX-HeQ" firstAttribute="width" secondItem="mkc-L8-J22" secondAttribute="width" id="Vhc-UV-rMp"/>
+                        <constraint firstItem="EA2-aZ-5aJ" firstAttribute="leading" secondItem="Dgx-Ho-9su" secondAttribute="trailing" id="YJg-UR-IHJ"/>
+                        <constraint firstItem="cRW-2P-YwD" firstAttribute="leading" secondItem="Dgx-Ho-9su" secondAttribute="leading" id="YQW-E0-TU1"/>
+                        <constraint firstAttribute="bottom" secondItem="mxi-uX-HeQ" secondAttribute="bottom" constant="11" id="YzU-wP-tLq"/>
+                        <constraint firstItem="Dgx-Ho-9su" firstAttribute="top" secondItem="Brr-6J-HTo" secondAttribute="top" id="ZAS-Qd-2FT"/>
+                        <constraint firstAttribute="bottom" secondItem="5Ux-oC-3NJ" secondAttribute="bottom" id="bQR-HF-t9k"/>
+                        <constraint firstItem="EA2-aZ-5aJ" firstAttribute="width" secondItem="Dgx-Ho-9su" secondAttribute="width" id="c4g-fw-c1U"/>
+                        <constraint firstAttribute="bottom" secondItem="Tb6-iv-s5P" secondAttribute="bottom" constant="11" id="c8b-Im-dov"/>
+                        <constraint firstAttribute="bottom" secondItem="Dgx-Ho-9su" secondAttribute="bottom" id="dBg-gw-LDz"/>
+                        <constraint firstItem="Dgx-Ho-9su" firstAttribute="top" secondItem="Brr-6J-HTo" secondAttribute="top" id="fkf-gh-Htw"/>
+                        <constraint firstItem="Tb6-iv-s5P" firstAttribute="leading" secondItem="5Ux-oC-3NJ" secondAttribute="leading" id="hIM-K8-ZhA"/>
+                        <constraint firstAttribute="bottom" secondItem="cRW-2P-YwD" secondAttribute="bottom" constant="11" id="i74-Ov-8so"/>
+                        <constraint firstItem="u1O-tz-pTD" firstAttribute="leading" secondItem="EA2-aZ-5aJ" secondAttribute="leading" id="jQf-oh-uLP"/>
+                        <constraint firstItem="Tb6-iv-s5P" firstAttribute="width" secondItem="5Ux-oC-3NJ" secondAttribute="width" id="mqL-v6-A6o"/>
+                        <constraint firstItem="Dgx-Ho-9su" firstAttribute="leading" secondItem="Brr-6J-HTo" secondAttribute="leading" id="t7h-YJ-hnT"/>
+                        <constraint firstAttribute="trailing" secondItem="5Ux-oC-3NJ" secondAttribute="trailing" id="x4d-pS-Yxn"/>
+                        <constraint firstItem="5Ux-oC-3NJ" firstAttribute="height" secondItem="Dgx-Ho-9su" secondAttribute="height" id="yCQ-Nh-NmJ"/>
+                        <constraint firstItem="mkc-L8-J22" firstAttribute="width" secondItem="Dgx-Ho-9su" secondAttribute="width" id="ztf-kE-ck0"/>
+                        <constraint firstItem="5Ux-oC-3NJ" firstAttribute="top" secondItem="Brr-6J-HTo" secondAttribute="top" id="zvc-LS-dDO"/>
+                    </constraints>
+                    <variation key="default">
+                        <mask key="constraints">
+                            <exclude reference="ZAS-Qd-2FT"/>
+                            <exclude reference="UMz-zu-Xnf"/>
+                            <exclude reference="5aM-eT-bNR"/>
+                            <exclude reference="yCQ-Nh-NmJ"/>
+                        </mask>
+                    </variation>
+                </view>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="750×400" translatesAutoresizingMaskIntoConstraints="NO" id="pgv-6u-cm6">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="200"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="pgv-6u-cm6" secondAttribute="height" multiplier="375:200" id="EzO-um-PWL"/>
+                    </constraints>
+                </imageView>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="pgv-6u-cm6" firstAttribute="top" secondItem="AFx-E9-UhO" secondAttribute="top" id="Esz-lH-zH3"/>
+                <constraint firstItem="Brr-6J-HTo" firstAttribute="top" secondItem="pgv-6u-cm6" secondAttribute="bottom" id="Hl2-yi-MnF"/>
+                <constraint firstItem="pgv-6u-cm6" firstAttribute="leading" secondItem="AFx-E9-UhO" secondAttribute="leading" id="RUM-Nw-uH7"/>
+                <constraint firstAttribute="trailing" secondItem="pgv-6u-cm6" secondAttribute="trailing" id="a67-i9-hgj"/>
+                <constraint firstAttribute="trailing" secondItem="Brr-6J-HTo" secondAttribute="trailing" id="aeV-Ao-AIU"/>
+                <constraint firstItem="Brr-6J-HTo" firstAttribute="top" secondItem="pgv-6u-cm6" secondAttribute="bottom" id="d8f-0B-AiS"/>
+                <constraint firstItem="Brr-6J-HTo" firstAttribute="leading" secondItem="AFx-E9-UhO" secondAttribute="leading" id="qQi-yw-B7D"/>
+                <constraint firstItem="pgv-6u-cm6" firstAttribute="leading" secondItem="AFx-E9-UhO" secondAttribute="leading" id="sni-Eb-vHo"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <variation key="default">
+                <mask key="constraints">
+                    <exclude reference="RUM-Nw-uH7"/>
+                    <exclude reference="d8f-0B-AiS"/>
+                </mask>
+            </variation>
+            <connections>
+                <outlet property="imgView" destination="pgv-6u-cm6" id="Ddc-yQ-Aoa"/>
+                <outlet property="recomBtn" destination="Dgx-Ho-9su" id="EWw-V1-ftj"/>
+                <outlet property="topView" destination="Brr-6J-HTo" id="Sog-4e-VaR"/>
+            </connections>
+            <point key="canvasLocation" x="418.5" y="123.5"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="750×400" width="375" height="200"/>
+        <image name="buyerAllSellerIcon" width="24" height="24"/>
+        <image name="buyerHotestIcon" width="24" height="24"/>
+        <image name="buyerHotestIconSelected" width="24" height="24"/>
+        <image name="buyerLatestIcon" width="24" height="24"/>
+        <image name="buyerLatestIconSelected" width="24" height="24"/>
+        <image name="buyerRecommendIcon" width="24" height="24"/>
+        <image name="buyerRecommendIconSelected" width="24" height="24"/>
+    </resources>
+</document>

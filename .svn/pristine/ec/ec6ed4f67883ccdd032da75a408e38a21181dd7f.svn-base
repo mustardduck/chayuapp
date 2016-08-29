@@ -1,0 +1,219 @@
+//
+//  CYTeaQuanBuChaPingController.m
+//  茶语
+//
+//  Created by Chayu on 16/7/28.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYTeaQuanBuChaPingController.h"
+#import "CYTeaCommentCell.h"
+#import "CYPublicPostCardController.h"
+@interface CYTeaQuanBuChaPingController ()<UITableViewDelegate,UITableViewDataSource>
+{
+    NSMutableArray *commArr;//评论数据源
+    NSInteger page;
+}
+- (IBAction)goback:(id)sender;
+
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+
+
+@end
+
+@implementation CYTeaQuanBuChaPingController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    page = 1;
+    commArr = [NSMutableArray array];
+      __weak __typeof(self) weakSelf = self;
+    _tableView.header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        [weakSelf loadCommListArr:NO];
+        
+    }];
+    [_tableView.header beginRefreshing];
+    
+    
+    _tableView.footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+        [weakSelf loadCommListArr:YES];
+    }];
+}
+
+
+-(void)loadCommListArr:(BOOL)hasMore
+{
+    if (hasMore) {
+        page ++;
+    }else{
+        page =1;
+    }
+    
+    __weak __typeof(self) weakSelf = self;
+    [CYWebClient Post:@"reviewList" parametes:@{@"teaid":_teaId,@"pageNo":@"1",@"pageSize":@"10"} success:^(id responObject) {
+        if (!hasMore) {
+            [commArr removeAllObjects];
+            [weakSelf.tableView reloadData];
+        }
+        if (hasMore) {
+            [weakSelf.tableView.footer endRefreshing];
+        }else{
+            [weakSelf.tableView.header endRefreshing];
+        }
+        NSArray *review = [responObject objectForKey:@"review"];
+        
+        if ([review count]<10) {
+            [weakSelf.tableView.footer endRefreshingWithNoMoreData];
+        }else{
+            [weakSelf.tableView.footer resetNoMoreData];
+        }
+        
+        
+        [commArr addObjectsFromArray:[CYEvaCommentInfo objectArrayWithKeyValuesArray:review]];
+        if ([commArr count]<10) {
+            weakSelf.tableView.footer = nil;
+        }
+        [_tableView reloadData];
+        
+        
+        
+    } failure:^(id error) {
+        
+    }];
+}
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+#pragma mark -
+#pragma mark UITableViewDataSource method
+-(NSInteger )tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return [commArr count];
+}
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView{
+    return 1;
+}
+
+-(CGFloat )tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CYEvaCommentInfo *info = commArr[indexPath.row];
+    CGFloat tableheight = [CYTeaCommentCell calcCellHeight:info];
+    if (info.replys.count) {
+        tableheight +=10;
+    }
+    return tableheight;
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CYTeaCommentCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYTeaCommentCell"];
+    if (!cell) {
+        cell = [[[NSBundle mainBundle] loadNibNamed:@"CYTeaCommentCell" owner:nil options:nil] firstObject];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    }
+    cell.commBtn.tag = 60000+indexPath.row;
+    [cell.commBtn addTarget:self action:@selector(huifumoren_click:) forControlEvents:UIControlEventTouchUpInside];
+    cell.zanBtn.tag = 90000+indexPath.row;
+    [cell.zanBtn addTarget:self action:@selector(dianzan_click:) forControlEvents:UIControlEventTouchUpInside];
+    CYEvaCommentInfo *info = commArr[indexPath.row];
+    [cell parseData:info];
+    cell.zhankaiBlock = ^(){
+        info.isOpen = YES;
+        [_tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil] withRowAnimation:UITableViewRowAnimationNone];
+    };
+    cell.huifuBlock = ^(NSDictionary *info){
+        
+        CYPublicPostCardController *vc= viewControllerInStoryBoard(@"CYPublicPostCardController", @"WenZhang");
+        vc.pid = [[info objectForKey:@"reviewid"] description];
+        vc.touid = [[info objectForKey:@"touid"] description];
+        vc.huifutype = HuiFuTypeWenChaPing;
+        vc.postcardbackBlock = ^(){
+            [commArr removeAllObjects];
+            [self loadCommListArr:NO];
+        };
+        [self.navigationController pushViewController:vc animated:YES];
+    };
+    return cell;
+}
+
+#pragma mark -
+#pragma mark UITableViewDelegate method
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+}
+
+
+
+
+//恢复某人
+-(void)huifumoren_click:(UIButton *)sender
+{
+    
+    NSInteger selectIndex = sender.tag - 60000;
+    CYEvaCommentInfo *info = commArr[selectIndex];
+    CYPublicPostCardController *vc= viewControllerInStoryBoard(@"CYPublicPostCardController", @"WenZhang");
+    vc.pid = info.id;
+    vc.touid = info.uid;
+    vc.huifutype = HuiFuTypeWenChaPing;
+    vc.postcardbackBlock = ^(){
+        [commArr removeAllObjects];
+        [self loadCommListArr:NO];
+    };
+    [self.navigationController pushViewController:vc animated:YES];
+}
+//点赞
+-(void)dianzan_click:(UIButton *)sender
+{
+    NSInteger selectIndex = sender.tag - 90000;
+    NSIndexPath *index = [NSIndexPath indexPathForRow:selectIndex inSection:5];
+    CYEvaCommentInfo *info = commArr[selectIndex];
+    __block NSInteger suports = [info.support integerValue];
+    NSString *class = info.is_support?@"0":@"1";
+    NSString *itemid = info.id;
+    __weak __typeof(self) weakSelf = self;
+    [SVProgressHUD setBackgroundColor:CLEARCOLOR];
+    [SVProgressHUD setForegroundColor:[UIColor blackColor]];
+    [SVProgressHUD show];
+    [CYWebClient basePost:@"do_suport" parametes:@{@"itemid":itemid,@"type":@"2",@"class":class} success:^(id responObject) {
+        NSInteger state = [[responObject objectForKey:@"state"] integerValue];
+        if (state == 400) {
+            NSInteger isSuported = [[responObject objectForKey:@"do"] integerValue];
+            if (isSuported == 1) {
+                info.is_support = YES;
+                suports ++;
+            }else{
+                info.is_support = NO;
+                suports --;
+            }
+            info.support = [NSString stringWithFormat:@"%d",(int)suports];
+            [commArr replaceObjectAtIndex:selectIndex withObject:info];
+            NSArray *inexArr = [NSArray arrayWithObjects:index, nil];
+            [weakSelf.tableView reloadRowsAtIndexPaths:inexArr  withRowAnimation:UITableViewRowAnimationNone];
+            
+        }
+    } failure:^(id error) {
+        
+    }];
+}
+
+
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+@end

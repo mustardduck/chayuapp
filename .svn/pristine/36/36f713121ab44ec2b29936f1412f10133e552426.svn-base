@@ -1,0 +1,146 @@
+//
+//  CYTeaProcessViewController.m
+//  茶语
+//
+//  Created by 李峥 on 16/2/24.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYTeaProcessViewController.h"
+#import "CYTeaProcessCell.h"
+#import "CYTeaProcessInfo.h"
+
+@interface CYTeaProcessViewController ()<UITableViewDataSource,UITableViewDelegate>
+
+@property (weak, nonatomic) IBOutlet UITableView *mTable;
+@property (nonatomic, strong) CYTeaProcessInfo *mProcessInfo;
+
+@end
+
+@implementation CYTeaProcessViewController
+
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+//        self.hidesBottomBarWhenPushed = YES;
+    }
+    
+    return self;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
+    self.title = @"冲泡过程";
+    [self loadDetailData];
+}
+
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [MobClick beginLogPageView:self.title];
+}
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:self.title];
+}
+
+
+- (void)loadDetailData
+{
+    [CYWebClient Post:@"teaCook" parametes:@{@"teaid":_mTeaid} success:^(id responObject) {
+        self.mProcessInfo = [CYTeaProcessInfo objectWithKeyValues:responObject];
+        if (self.mProcessInfo != nil) {
+            [self.mTable reloadData];
+        }
+    } failure:^(id error) {
+        
+    }];
+}
+
+#pragma mark - UITableView Delegate
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    if (self.mProcessInfo == nil) {
+        return 0;
+    }
+    return 4;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    switch (section) {
+        case 0:
+            return 1;
+        case 1:
+            return 1;
+        case 2:
+            return self.mProcessInfo.cook.count;
+        case 3:
+            return 1;
+        default:
+            return 0;
+    }
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    switch (indexPath.section) {
+        case 0:
+            return [CYTeaProcessCell calcCellHeight:self.mProcessInfo.drytea atIndex:indexPath.section];
+        case 1:
+            return [CYTeaProcessCell calcCellHeight:self.mProcessInfo.ready_pao atIndex:indexPath.section];
+        case 2:
+            return [CYTeaProcessCell calcCellHeight:[self.mProcessInfo.cook objectAtIndex:indexPath.row] atIndex:indexPath.section];
+        case 3:
+            return [CYTeaProcessCell calcCellHeight:self.mProcessInfo.leaves atIndex:indexPath.section];
+        default:
+            return 0;
+    }
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CYTeaProcessCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYTeaProcessCell"];
+    if (!cell) {
+        cell = [[[NSBundle mainBundle] loadNibNamed:@"CYTeaProcessCell" owner:nil options:nil] objectAtIndex:0];
+    }
+    
+    if (indexPath.section == 0) {
+        
+        [cell parseData:self.mProcessInfo.drytea atIndex:indexPath.section];
+        
+    }else if (indexPath.section == 1){
+        [cell parseData:self.mProcessInfo.ready_pao atIndex:indexPath.section];
+
+    }else if (indexPath.section == 2){
+        [cell parseData:[self.mProcessInfo.cook objectAtIndex:indexPath.row] atIndex:indexPath.section];
+
+    }else if (indexPath.section == 3){
+        [cell parseData:self.mProcessInfo.leaves atIndex:indexPath.section];
+    }
+    
+    
+    return cell;
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

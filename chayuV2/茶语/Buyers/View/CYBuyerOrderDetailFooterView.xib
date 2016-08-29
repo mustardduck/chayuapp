@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clipsSubviews="YES" contentMode="scaleToFill" id="SPx-8r-CAK" userLabel="CYBuyerOrderDetailFooterView" customClass="CYBuyerOrderDetailFooterView">
+            <rect key="frame" x="0.0" y="0.0" width="600" height="80"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="￥0.00" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Yqq-2A-cEs">
+                    <rect key="frame" x="542" y="10" width="43" height="17"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <color key="textColor" red="0.75294117650000003" green="0.31764705879999999" blue="0.1215686275" alpha="1" colorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="实付款" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HrZ-2B-JH5">
+                    <rect key="frame" x="501" y="11" width="36" height="15"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                    <color key="textColor" red="0.40000000000000002" green="0.40000000000000002" blue="0.40000000000000002" alpha="1" colorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <button hidden="YES" opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="KXp-DR-Ehu">
+                    <rect key="frame" x="270" y="0.0" width="60" height="15"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="15" id="Yy4-lp-shg"/>
+                        <constraint firstAttribute="width" constant="60" id="suk-Kh-Ohn"/>
+                    </constraints>
+                    <state key="normal" image="icon_showUp"/>
+                    <state key="selected" image="icon_showDown"/>
+                    <connections>
+                        <action selector="unfoldcell_click:" destination="SPx-8r-CAK" eventType="touchUpInside" id="W1D-Md-wQA"/>
+                    </connections>
+                </button>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="待发货" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UEU-U0-OJU">
+                    <rect key="frame" x="10" y="10" width="42" height="17"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <color key="textColor" red="0.75294117650000003" green="0.31764705879999999" blue="0.1215686275" alpha="1" colorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="数量：0" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Gvt-Ws-JGH">
+                    <rect key="frame" x="442" y="11" width="44" height="15"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                    <color key="textColor" red="0.40000000000000002" green="0.40000000000000002" blue="0.40000000000000002" alpha="1" colorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nUY-qg-WTU" customClass="CYBorderButton">
+                    <rect key="frame" x="525" y="45" width="65" height="25"/>
+                    <color key="backgroundColor" red="0.53333333329999999" green="0.2784313725" blue="0.1960784314" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="25" id="e1o-Ha-UGh"/>
+                        <constraint firstAttribute="width" constant="65" id="ogx-zO-LRj"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                    <state key="normal" title="评价">
+                        <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="titleShadowColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    </state>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="3"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                            <real key="value" value="1"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                            <color key="value" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="evaluation_click:" destination="SPx-8r-CAK" eventType="touchUpInside" id="riv-lW-IeA"/>
+                    </connections>
+                </button>
+                <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ti5-fc-mFx" customClass="CYBorderButton">
+                    <rect key="frame" x="450" y="45" width="65" height="25"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="65" id="2Gq-MI-b4B"/>
+                        <constraint firstAttribute="height" constant="25" id="uiO-ME-shV"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                    <state key="normal" title="删除订单">
+                        <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="3"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                            <real key="value" value="1"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                            <color key="value" red="0.80000000000000004" green="0.80000000000000004" blue="0.80000000000000004" alpha="1" colorSpace="calibratedRGB"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="delete_click:" destination="SPx-8r-CAK" eventType="touchUpInside" id="ZfT-E5-KBy"/>
+                    </connections>
+                </button>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text=" " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="muV-Pp-r6X">
+                    <rect key="frame" x="586" y="10" width="4" height="17"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <color key="textColor" red="0.40000000000000002" green="0.40000000000000002" blue="0.40000000000000002" alpha="1" colorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="nUY-qg-WTU" secondAttribute="trailing" constant="10" id="0N6-St-mTq"/>
+                <constraint firstItem="KXp-DR-Ehu" firstAttribute="top" secondItem="SPx-8r-CAK" secondAttribute="top" id="3vs-W2-A1l"/>
+                <constraint firstAttribute="trailing" secondItem="muV-Pp-r6X" secondAttribute="trailing" constant="10" id="OUR-tQ-Th7"/>
+                <constraint firstItem="UEU-U0-OJU" firstAttribute="top" secondItem="SPx-8r-CAK" secondAttribute="top" constant="10" id="SeK-hn-oUd"/>
+                <constraint firstItem="Yqq-2A-cEs" firstAttribute="leading" secondItem="HrZ-2B-JH5" secondAttribute="trailing" constant="5" id="WxH-AB-qLj"/>
+                <constraint firstItem="Gvt-Ws-JGH" firstAttribute="centerY" secondItem="HrZ-2B-JH5" secondAttribute="centerY" id="adI-5K-8dg"/>
+                <constraint firstItem="Yqq-2A-cEs" firstAttribute="leading" secondItem="HrZ-2B-JH5" secondAttribute="trailing" constant="5" id="c1b-Kq-9t0"/>
+                <constraint firstItem="HrZ-2B-JH5" firstAttribute="leading" secondItem="Gvt-Ws-JGH" secondAttribute="trailing" constant="15" id="cOJ-z3-gSx"/>
+                <constraint firstItem="muV-Pp-r6X" firstAttribute="leading" secondItem="Yqq-2A-cEs" secondAttribute="trailing" constant="1" id="k8O-IS-zJB"/>
+                <constraint firstItem="KXp-DR-Ehu" firstAttribute="centerX" secondItem="SPx-8r-CAK" secondAttribute="centerX" id="mEe-bj-5C0"/>
+                <constraint firstItem="HrZ-2B-JH5" firstAttribute="centerY" secondItem="Yqq-2A-cEs" secondAttribute="centerY" id="mNY-0W-mV3"/>
+                <constraint firstItem="UEU-U0-OJU" firstAttribute="leading" secondItem="SPx-8r-CAK" secondAttribute="leading" constant="10" id="pAb-6B-fZ5"/>
+                <constraint firstItem="nUY-qg-WTU" firstAttribute="leading" secondItem="ti5-fc-mFx" secondAttribute="trailing" constant="10" id="q0a-rV-1y4"/>
+                <constraint firstItem="nUY-qg-WTU" firstAttribute="top" secondItem="muV-Pp-r6X" secondAttribute="bottom" constant="18" id="rRO-r9-RzN"/>
+                <constraint firstItem="muV-Pp-r6X" firstAttribute="top" secondItem="SPx-8r-CAK" secondAttribute="top" constant="10" id="rrU-wy-jKL"/>
+                <constraint firstItem="ti5-fc-mFx" firstAttribute="top" secondItem="nUY-qg-WTU" secondAttribute="top" id="vqO-LP-Lvi"/>
+                <constraint firstItem="Yqq-2A-cEs" firstAttribute="top" secondItem="SPx-8r-CAK" secondAttribute="top" constant="10" id="wRR-yh-mfS"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="deleteBtn" destination="ti5-fc-mFx" id="7Zd-gN-lbp"/>
+                <outlet property="eva_cons" destination="ogx-zO-LRj" id="wdk-hG-HJW"/>
+                <outlet property="evaluationBtn" destination="nUY-qg-WTU" id="Usd-YA-zOX"/>
+                <outlet property="gaiLbl" destination="muV-Pp-r6X" id="xwM-pe-ibw"/>
+                <outlet property="numLbl" destination="Gvt-Ws-JGH" id="WbM-6W-fnM"/>
+                <outlet property="orderTypeLbl" destination="UEU-U0-OJU" id="Uim-8E-tAc"/>
+                <outlet property="priceLbl" destination="Yqq-2A-cEs" id="fdq-w0-EHj"/>
+                <outlet property="uofoldBtn" destination="KXp-DR-Ehu" id="9Eu-si-LG8"/>
+            </connections>
+            <point key="canvasLocation" x="393" y="338"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="icon_showDown" width="30" height="15"/>
+        <image name="icon_showUp" width="30" height="15"/>
+    </resources>
+</document>

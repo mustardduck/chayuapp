@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="CYMasterCell" id="hkY-gU-Klw" customClass="CYMasterCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="244"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="hkY-gU-Klw" id="akD-5c-dhz">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="243"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="zwt" translatesAutoresizingMaskIntoConstraints="NO" id="YyH-NX-KeX">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="174"/>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yDn-PT-s3g">
+                        <rect key="frame" x="15" y="189" width="134" height="40"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="40" id="CZL-LH-nvk"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <color key="textColor" red="0.26666666666666666" green="0.26666666666666666" blue="0.26666666666666666" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="afD-Ti-okC" customClass="BaseButton">
+                        <rect key="frame" x="232" y="196" width="57" height="25"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="25" id="29w-LJ-AUy"/>
+                            <constraint firstAttribute="width" constant="57" id="Kiu-Im-sdF"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                        <state key="normal" title="+关注">
+                            <color key="titleColor" red="0.53333333329999999" green="0.2784313725" blue="0.1960784314" alpha="1" colorSpace="calibratedRGB"/>
+                        </state>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                <real key="value" value="2"/>
+                            </userDefinedRuntimeAttribute>
+                            <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                <real key="value" value="1"/>
+                            </userDefinedRuntimeAttribute>
+                            <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                <color key="value" red="0.53333333329999999" green="0.2784313725" blue="0.1960784314" alpha="1" colorSpace="calibratedRGB"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                        <connections>
+                            <action selector="addtention_click:" destination="hkY-gU-Klw" eventType="touchUpInside" id="2mF-a2-CeY"/>
+                        </connections>
+                    </button>
+                    <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1NS-J4-CnX" customClass="BaseButton">
+                        <rect key="frame" x="165" y="196" width="57" height="25"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="57" id="1Lo-zj-mna"/>
+                            <constraint firstAttribute="height" constant="25" id="73n-fI-n0I"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                        <state key="normal" title="大师介绍">
+                            <color key="titleColor" red="0.53333333329999999" green="0.2784313725" blue="0.1960784314" alpha="1" colorSpace="calibratedRGB"/>
+                        </state>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                <real key="value" value="2"/>
+                            </userDefinedRuntimeAttribute>
+                            <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                <real key="value" value="1"/>
+                            </userDefinedRuntimeAttribute>
+                            <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                <color key="value" red="0.53333333329999999" green="0.2784313725" blue="0.1960784314" alpha="1" colorSpace="calibratedRGB"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </button>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="bottom" secondItem="afD-Ti-okC" secondAttribute="bottom" constant="22" id="1qL-7p-TJY"/>
+                    <constraint firstItem="1NS-J4-CnX" firstAttribute="leading" secondItem="yDn-PT-s3g" secondAttribute="trailing" constant="16" id="2jj-p6-9wi"/>
+                    <constraint firstItem="YyH-NX-KeX" firstAttribute="leading" secondItem="akD-5c-dhz" secondAttribute="leading" id="60e-kH-qH5"/>
+                    <constraint firstItem="YyH-NX-KeX" firstAttribute="top" secondItem="akD-5c-dhz" secondAttribute="top" id="7cL-EK-9Ah"/>
+                    <constraint firstItem="1NS-J4-CnX" firstAttribute="centerY" secondItem="afD-Ti-okC" secondAttribute="centerY" id="8Rh-yq-qt9"/>
+                    <constraint firstItem="yDn-PT-s3g" firstAttribute="top" secondItem="YyH-NX-KeX" secondAttribute="bottom" constant="15" id="GOn-wY-jxg"/>
+                    <constraint firstItem="afD-Ti-okC" firstAttribute="leading" secondItem="1NS-J4-CnX" secondAttribute="trailing" constant="10" id="HKS-Kx-BKz"/>
+                    <constraint firstAttribute="trailing" secondItem="afD-Ti-okC" secondAttribute="trailing" constant="31" id="PwL-jd-4Ud"/>
+                    <constraint firstItem="yDn-PT-s3g" firstAttribute="leading" secondItem="akD-5c-dhz" secondAttribute="leading" constant="15" id="oni-iQ-UhP"/>
+                    <constraint firstAttribute="bottom" secondItem="yDn-PT-s3g" secondAttribute="bottom" constant="14" id="rZi-gu-bZP"/>
+                    <constraint firstAttribute="trailing" secondItem="YyH-NX-KeX" secondAttribute="trailing" id="yJF-Ya-1Zm"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="attendBtn" destination="afD-Ti-okC" id="xJB-y3-QaX"/>
+                <outlet property="contentLbl" destination="yDn-PT-s3g" id="to1-mf-5lK"/>
+                <outlet property="publicBtn" destination="1NS-J4-CnX" id="fwU-yk-Z6S"/>
+                <outlet property="showImg" destination="YyH-NX-KeX" id="tB3-vt-m5i"/>
+            </connections>
+            <point key="canvasLocation" x="406" y="320.5"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="zwt" width="375" height="176"/>
+    </resources>
+</document>

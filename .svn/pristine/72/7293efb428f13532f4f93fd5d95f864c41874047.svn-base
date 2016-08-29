@@ -1,0 +1,33 @@
+//
+//  CYTeaReviewCell.m
+//  茶语
+//
+//  Created by 李峥 on 16/2/19.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYTeaReviewCell.h"
+
+@implementation CYTeaReviewCell
+
+- (void)parseData:(id)data
+{
+    CYTeaReviewInfo *info = [CYTeaReviewInfo objectWithKeyValues:data];
+    
+    [_mImageView sd_setImageWithURL:[NSURL URLWithString:info.thumb] placeholderImage:[UIImage imageNamed:@"320x320"]];
+    
+    _mTitleLabel.text = [NSString stringWithFormat:@"[%@]%@", info.brand, info.title];
+    _mOfficialLabel.text = info.review_score;
+    _mComplexLabel.text = info.score;
+//    _clickLbl.text = info.clicks;
+    _mAddressLabel.text = [NSString stringWithFormat:@"参考价：￥%@",info.price];
+    _mTypeLabel.text = info.catename;
+    _kucunLbl.text = [NSString stringWithFormat:@"茶样库存：%@",info.remain];
+    if ([info.remain integerValue]<=0) {
+        _kucunLbl.text = @"暂无茶样";
+    }
+//    _mComments.text = info.comments;
+    self.mClickData = info;
+}
+
+@end

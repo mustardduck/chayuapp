@@ -1,0 +1,349 @@
+//
+//  CYRefundDetailViewController.m
+//  TeaMall
+//
+//  Created by Leen on 15/11/24.
+//  Copyright © 2015年 Chayu. All rights reserved.
+//
+
+#import "CYRefundDetailViewController.h"
+#import <SDWebImage/UIImageView+WebCache.h>
+#import "CYSendBackViewController.h"
+#import "CYApplyRerundViewController.h"
+#import "CYRefundDetailCell.h"
+#import "PreviewViewController.h"
+@interface CYRefundDetailViewController ()<UITableViewDataSource,UITableViewDelegate>
+{
+    NSArray *arr_data;
+    NSString *backId;
+}
+
+
+- (IBAction)cancel_click:(id)sender;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *table_bottom_cons;
+@property (weak, nonatomic) IBOutlet UIButton *buttonbtn;
+@property (weak, nonatomic) IBOutlet UIView *returnView;
+
+@property (weak, nonatomic) IBOutlet UIButton *jihuiBtn;
+
+- (IBAction)jihui_click:(id)sender;
+
+
+@end
+@implementation CYRefundDetailViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    
+    self.automaticallyAdjustsScrollViewInsets = NO;
+    arr_data = [[NSArray alloc] init];
+    
+    if ([_model.refundType isEqualToString:@"1"]) {
+        self.title = @"协商仅退款";
+    }else if([_model.refundType isEqualToString:@"2"]){
+        self.title = @"退货详情";
+    }
+    
+    NSInteger refundType = [_model.refundType integerValue];
+    if (refundType == 1) {
+        NSInteger status = [_model.status integerValue];
+        if (status == 0 || status == 2) {
+            _table_bottom_cons.constant = 45.0f;
+            if (status == 2) {
+                _returnView.hidden = NO;
+                [_jihuiBtn setTitle:@"修改退款申请" forState:UIControlStateNormal];
+            }
+        }
+    }else{
+        NSInteger shippingStatus = [_model.shippingStatus integerValue];
+        if (shippingStatus == 3 || shippingStatus ==4 ||shippingStatus == 7) {
+            _table_bottom_cons.constant = 45.0f;
+            //            [_buttonbtn setTitle:@"寄回物品" forState:UIControlStateNormal];
+            if (shippingStatus == 4 || shippingStatus == 7) {
+                _returnView.hidden = NO;
+                if (shippingStatus == 7) {
+                    [_jihuiBtn setTitle:@"修改退货申请" forState:UIControlStateNormal];
+                }else{
+                    [_jihuiBtn setTitle:@"寄回物品" forState:UIControlStateNormal];
+                }
+            }else{
+                [_buttonbtn setTitle:@"取消退货申请" forState:UIControlStateNormal];
+            }
+        }
+    }
+    [CYWebClient Post:@"RefundDetailList" parametes:@{@"orderSn":self.model.orderSn,@"specDataId":self.model.specDataId,@"refundType":self.model.refundType} success:^(id responObject) {
+        arr_data = [arr_data arrayByAddingObjectsFromArray:responObject];
+        if ([arr_data count]>0) {
+            backId = arr_data[[arr_data count]-1][@"backId"];
+        }
+        [_refundTbl reloadData];
+    } failure:^(id error) {
+        
+    }];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [MobClick beginLogPageView:self.title];
+}
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:self.title];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+ #pragma mark - Navigation
+ 
+ // In a storyboard-based application, you will often want to do a little preparation before navigation
+ - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+ // Get the new view controller using [segue destinationViewController].
+ // Pass the selected object to the new view controller.
+ }
+ */
+
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return 1;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return arr_data.count;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if ([[arr_data[indexPath.row] objectForKey:@"source"] integerValue]==1) {
+        NSDictionary *dic = arr_data[indexPath.row];
+        CGFloat heigt = 100;
+        NSArray *list = [dic objectForKey:@"list"];
+        if (list.count ==0) {
+            heigt +=40;
+        }else{
+            heigt +=([list count]*32); 
+        }
+        
+        NSArray *imgArr = [dic objectForKey:@"imgs"];
+        if ([imgArr count] ==0) {
+            
+        }else{
+            heigt +=50;
+        }
+        return heigt;
+        
+    }else{
+        return 160;
+    }
+}
+
+
+//Here is something trouble when set value for view.Watch the view tag in the xib,it can help you.
+- (UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString *UserCellIdentifier = @"UserCell";
+    static NSString *SellerCellIdentifier = @"SellerCell";
+    NSInteger row = indexPath.row;
+    CYRefundDetailCell *cell = nil;
+    if ([[arr_data[row] objectForKey:@"source"] integerValue]==1) {
+        cell = [tableView dequeueReusableCellWithIdentifier:UserCellIdentifier];
+        
+        if (cell == nil) {
+            cell = [[[NSBundle mainBundle] loadNibNamed:@"CYRefundDetailCell" owner:self options:nil] objectAtIndex:0];
+        }
+        UILabel *time = (UILabel*)[cell viewWithTag:101];
+        UILabel *name = (UILabel*)[cell viewWithTag:102];
+        UIImageView *avatar = (UIImageView*)[cell viewWithTag:103];
+        UILabel *title = (UILabel*)[cell viewWithTag:104];
+        
+        NSDictionary *dic = arr_data[row];
+        time.text = [NSString stringWithFormat:@" %@   ",dic[@"created"]];
+        name.text = dic[@"name"];
+        title.text = dic[@"title"];
+        
+        NSArray *arr = dic[@"list"];
+        if ([arr count]==0) {
+            cell.contentHeight.constant = 37;
+        }
+        for (NSInteger i = 0; i<arr.count; i++) {
+            UILabel *lb = (UILabel*)[cell viewWithTag:105 + i];
+            NSDictionary *content = arr[i];
+            lb.text = [NSString stringWithFormat:@"%@:%@",content[@"name"],content[@"data"]];
+        }
+        
+        
+        
+        UIView *view  = [cell viewWithTag:9989];
+        //        view.height = 228;
+        NSArray *imgArr = [dic objectForKey:@"imgs"];
+        if ([imgArr count]>0) {
+            cell.contentHeight.constant = 210;
+        }
+        for (int j = 0; j<imgArr.count; j++) {
+            NSLog(@"view.height = %f",view.height);
+            //            view.height = 228;
+            UIImageView *showImg = [[UIImageView alloc] initWithFrame:CGRectMake(40*j+10*(j+1),cell.contentHeight.constant - 50, 40, 40)];
+            showImg.userInteractionEnabled = YES;
+            UITapGestureRecognizer *sender = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showBigImg:)];
+            showImg.tag = 3212 +j;
+            [showImg addGestureRecognizer:sender];
+            if (j >0) {
+                showImg.x = 10+44*j;
+            }
+            [showImg sd_setImageWithURL:imgArr[j] placeholderImage:SQUARE];
+            [view addSubview:showImg];
+            
+        }
+        
+        //防后台
+        NSString *url = dic[@"avatar"];
+        if (!url || [url isKindOfClass:Nil]) {
+            url = @"";
+        }
+        [avatar sd_setImageWithURL:[NSURL URLWithString:url] placeholderImage:DEFAULTHEADER];
+        
+    }
+    else{
+        cell = [tableView dequeueReusableCellWithIdentifier:SellerCellIdentifier];
+        if (cell == nil) {
+            cell = [[[NSBundle mainBundle] loadNibNamed:@"CYRefundDetailCell" owner:self options:nil] objectAtIndex:1];
+        }
+        
+        UILabel *time = (UILabel*)[cell viewWithTag:101];
+        UILabel *name = (UILabel*)[cell viewWithTag:102];
+        UIImageView *avatar = (UIImageView*)[cell viewWithTag:103];
+        UILabel *title = (UILabel*)[cell viewWithTag:104];
+        
+        NSDictionary *dic = arr_data[row];
+        time.text = [NSString stringWithFormat:@" %@   ",dic[@"created"]];
+        name.text = [dic objectForJSONKey:@"name"];
+        title.text = [dic objectForJSONKey:@"title"];
+        
+        NSArray *arr = dic[@"list"];
+        for (NSInteger i = 0; i<arr.count; i++) {
+            UILabel *lb = (UILabel*)[cell viewWithTag:105 + i];
+            NSDictionary *content = arr[i];
+            lb.text = [NSString stringWithFormat:@"%@:%@",content[@"name"],content[@"data"]];
+        }
+        
+        //防后台
+        NSString *url = dic[@"avatar"];
+        if (!url || [url isKindOfClass:Nil]) {
+            url = @"";
+        }
+        [avatar sd_setImageWithURL:[NSURL URLWithString:url] placeholderImage:DEFAULTHEADER];
+    }
+    
+    return cell;
+}
+
+-(void)showBigImg:(UITapGestureRecognizer *)sender
+{
+    UIImageView *showimg = (UIImageView *)sender.view;
+    NSInteger index = showimg.tag -3212;
+    UIViewController* vc = viewControllerInStoryBoard(@"PreviewViewController", @"Main");
+    NSDictionary *info = arr_data[0];
+    NSArray *imgs =[info objectForKey:@"imgsArr"];
+    if(imgs)
+    {
+        NSMutableArray * imgArr = [NSMutableArray array];
+        
+        for(int i = 0; i < [imgs count]; i ++)
+        {
+            NSString * url = imgs[i];
+            
+            NSMutableDictionary * dic = [NSMutableDictionary dictionary];
+            
+            [dic setObject:url forKey:@"PictureUrl"];
+            
+            [imgArr addObject:dic];
+        }
+        
+        ((PreviewViewController*)vc).dataArray = imgArr;
+        
+    }
+    ((PreviewViewController*)vc).currentPage = index;
+    
+    [self.navigationController presentViewController:vc animated:YES completion:nil];
+}
+
+- (IBAction)cancel_click:(id)sender {
+    
+    
+    __weak __typeof(self) weakSelf = self;
+    [CYWebClient Post:@"refund_cancel" parametes:@{@"backId":backId} success:^(id responObject) {
+        [self performSelector:@selector(goback:) withObject:nil afterDelay:0.5];
+        if (weakSelf.refundcancelBlock) {
+            weakSelf.refundcancelBlock();
+        }
+    } failure:^(id error) {
+        
+    }];
+}
+- (IBAction)jihui_click:(id)sender {
+    
+    NSInteger refundType = [_model.refundType integerValue];
+    NSInteger status = [_model.status integerValue];
+    if (refundType == 1) {
+        if (status == 2) {
+            CYShopTrolleyModel *model = [[CYShopTrolleyModel alloc] init];
+            CYOrderDetailModel *detailModel = [[CYOrderDetailModel alloc] init];
+            detailModel.orderSn = self.model.orderSn;
+            model.specdataId = self.model.specDataId;
+            model.name = self.model.name;
+            model.goods_id = self.model.good_id;
+            model.commodityPrice = self.model.money;
+            model.refund_price = self.model.refund_price;
+            model.goods_id = self.model.good_id;
+            CYApplyRerundViewController *vc = viewControllerInStoryBoard(@"CYApplyRerundViewController", @"My");
+            vc.model = model;
+            vc.orderModel = detailModel;
+            vc.states = _model.orderState;
+            vc.applyBlock = ^(){
+                [self goback:nil];
+            };
+            [self.navigationController pushViewController:vc animated:YES];
+            return;
+        }
+    }else{
+        
+        NSInteger shippingStatus = [_model.shippingStatus integerValue];
+        if (shippingStatus == 7) {
+            CYShopTrolleyModel *model = [[CYShopTrolleyModel alloc] init];
+            CYOrderDetailModel *detailModel = [[CYOrderDetailModel alloc] init];
+            detailModel.orderSn = self.model.orderSn;
+            model.specdataId = self.model.specDataId;
+            model.name = self.model.name;
+            model.goods_id = self.model.good_id;
+            model.commodityPrice = self.model.money;
+            model.refund_price = self.model.refund_price;
+            CYApplyRerundViewController *vc = viewControllerInStoryBoard(@"CYApplyRerundViewController", @"My");
+            vc.model = model;
+            vc.orderModel = detailModel;
+            vc.states = _model.orderState;
+            vc.applyBlock = ^(){
+                [self goback:nil];
+            };
+            [self.navigationController pushViewController:vc animated:YES];
+            return;
+        }
+        
+    }
+    
+    CYSendBackViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"CYSendBackViewController"];
+    vc.orderId = backId;
+    [self.navigationController pushViewController:vc animated:YES];
+    
+}
+@end

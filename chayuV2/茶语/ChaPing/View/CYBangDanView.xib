@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="CYBangDanView">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="442"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" scrollEnabled="NO" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="FE5-bP-Kge">
+                    <rect key="frame" x="0.0" y="127" width="375" height="315"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                </tableView>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Rjg-ga-pMi">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="117"/>
+                    <subviews>
+                        <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Mhf-iJ-VIX">
+                            <rect key="frame" x="20" y="0.0" width="335" height="117"/>
+                        </scrollView>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstItem="Mhf-iJ-VIX" firstAttribute="leading" secondItem="Rjg-ga-pMi" secondAttribute="leading" constant="20" id="QtY-0d-TBg"/>
+                        <constraint firstItem="Mhf-iJ-VIX" firstAttribute="top" secondItem="Rjg-ga-pMi" secondAttribute="top" id="UUu-5T-NQC"/>
+                        <constraint firstAttribute="bottom" secondItem="Mhf-iJ-VIX" secondAttribute="bottom" id="dyh-rb-MSr"/>
+                        <constraint firstAttribute="trailing" secondItem="Mhf-iJ-VIX" secondAttribute="trailing" constant="20" id="fD0-D4-5jP"/>
+                        <constraint firstAttribute="height" constant="117" id="wTH-8J-ZwR"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <color key="backgroundColor" red="0.97647058823529409" green="0.97647058823529409" blue="0.97647058823529409" alpha="1" colorSpace="calibratedRGB"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="FE5-bP-Kge" secondAttribute="trailing" id="FV3-Sy-0tK"/>
+                <constraint firstItem="FE5-bP-Kge" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="Z92-yp-n7H"/>
+                <constraint firstItem="Rjg-ga-pMi" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="b8f-lD-jG6"/>
+                <constraint firstAttribute="bottom" secondItem="FE5-bP-Kge" secondAttribute="bottom" id="gFF-EC-Tt7"/>
+                <constraint firstItem="FE5-bP-Kge" firstAttribute="top" secondItem="Rjg-ga-pMi" secondAttribute="bottom" constant="10" id="iay-1v-SZc"/>
+                <constraint firstItem="Rjg-ga-pMi" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="teL-w0-18T"/>
+                <constraint firstAttribute="trailing" secondItem="Rjg-ga-pMi" secondAttribute="trailing" id="xvJ-uq-6pu"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="tableView" destination="FE5-bP-Kge" id="v59-A8-jje"/>
+                <outlet property="topScro" destination="Mhf-iJ-VIX" id="zFV-5b-kkP"/>
+            </connections>
+        </view>
+    </objects>
+</document>

@@ -1,0 +1,479 @@
+//
+//  CYMyCommentViewController.m
+//  茶语
+//
+//  Created by Leen on 16/2/23.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYMyCommentViewController.h"
+#import "CYToolBar.h"
+#import "CYMyCommentCell.h"
+#import "CYMyCommentModel.h"
+#import "CYArticleDetailViewController.h"
+#import "CYArticleInfo.h"
+#import "CYTeaReviewDetailViewController.h"
+#import "CYWoDePingLunCell.h"
+#import "CYPublicPostCardController.h"
+typedef NS_ENUM(NSInteger,PingLunType){
+    PingLunTypeWode =0,
+    PingLunTypeHuiFu
+};
+
+@interface CYMyCommentViewController ()<UITableViewDataSource, UITableViewDelegate>
+{
+    
+    //我的评论
+    NSMutableArray *mypinglunArr;;
+    NSInteger page_chaping;
+    
+    //回复我的
+    NSMutableArray *replyArr;;
+    NSInteger page_arc;
+    
+}
+
+@property (nonatomic,assign)PingLunType pingluntype;
+
+
+@property (weak, nonatomic) IBOutlet UITableView *replyTab;
+
+- (IBAction)goback:(id)sender;
+
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *lin_leading_cons;
+
+@property (weak, nonatomic) IBOutlet UIView *topBg;
+
+@end
+
+@implementation CYMyCommentViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    page_chaping = 1;
+    page_arc =1;
+    _pingluntype = PingLunTypeWode;
+    mypinglunArr =[NSMutableArray array];
+    replyArr = [NSMutableArray array];
+    self.title = @"我的评论";
+    hiddenSepretor(_tableView);
+    hiddenSepretor(_replyTab);
+    __weak __typeof(self) weakSelf = self;
+    _tableView.header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        [weakSelf loadwodepinglunData:NO];
+        
+    }];
+    [_tableView.header beginRefreshing];
+    _tableView.footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+        [weakSelf loadwodepinglunData:YES];
+    }];
+    
+    
+    
+    _replyTab.header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        [weakSelf loadHuifuwodeData:NO];
+        
+    }];
+    _replyTab.footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+        [weakSelf loadHuifuwodeData:YES];
+    }];
+    
+}
+
+
+-(void)loadwodepinglunData:(BOOL)hasMore
+{
+//    MyArcComment
+    if (hasMore) {
+        page_chaping ++;
+    }else{
+        page_chaping =1 ;
+    }
+    __weak __typeof(self) weakSelf = self;
+    [CYWebClient Post:@"MyArcComment" parametes:@{@"p":@(page_chaping),@"pageSize":@"10"} success:^(id responObj) {
+        if (hasMore) {
+            [weakSelf.tableView.footer endRefreshing];
+        }else{
+            [weakSelf.tableView.header endRefreshing];
+            [mypinglunArr removeAllObjects];
+            [weakSelf.tableView reloadData];
+        }
+        NSArray *arr = [responObj objectForKey:@"items"];
+        if ([arr count]<10) {
+            [weakSelf.tableView.footer endRefreshingWithNoMoreData];
+            
+        }else{
+            [weakSelf.tableView.footer resetNoMoreData];
+        }
+        
+        [mypinglunArr addObjectsFromArray:arr];
+        [weakSelf.tableView reloadData];
+        
+        if (mypinglunArr.count<10) {
+            weakSelf.tableView.footer = nil;
+        }else{
+            [weakSelf.tableView.footer resetNoMoreData];
+        }
+        
+        
+    } failure:^(id err) {
+        if (hasMore) {
+            [weakSelf.tableView.footer endRefreshing];
+        }else{
+            [weakSelf.tableView.header endRefreshing];
+        }
+    }];
+    
+    
+}
+
+
+-(void)loadHuifuwodeData:(BOOL)hasMore{
+//    2.0comment.article_reply
+    if (hasMore) {
+        page_arc ++;
+    }else{
+        page_arc =1 ;
+    }
+    __weak __typeof(self) weakSelf = self;
+    [CYWebClient Post:@"2.0comment.article_reply" parametes:@{@"p":@(page_chaping),@"pageSize":@"10"} success:^(id responObj) {
+        if (hasMore) {
+            [weakSelf.replyTab.footer endRefreshing];
+        }else{
+            [weakSelf.replyTab.header endRefreshing];
+            [replyArr removeAllObjects];
+            [weakSelf.replyTab reloadData];
+        }
+         NSArray *arr = [responObj objectForKey:@"items"];
+        if ([arr count]<10) {
+            [weakSelf.replyTab.footer endRefreshingWithNoMoreData];
+            
+        }else{
+            [weakSelf.replyTab.footer resetNoMoreData];
+        }
+        
+        [replyArr addObjectsFromArray:arr];
+        [weakSelf.replyTab reloadData];
+        
+        if (replyArr.count<10) {
+            weakSelf.replyTab.footer = nil;
+        }else{
+            [weakSelf.replyTab.footer resetNoMoreData];
+        }
+        
+        
+    } failure:^(id err) {
+        if (hasMore) {
+            [weakSelf.replyTab.footer endRefreshing];
+        }else{
+            [weakSelf.replyTab.header endRefreshing];
+        }
+    }];
+    
+}
+
+
+
+- (IBAction)topmenu_click:(id)sender {
+    UIButton *selectButton = (UIButton *)sender;
+    for (int i = 6325; i<6327; i++) {
+        UIButton *button = (UIButton *)[_topBg viewWithTag:i];
+        if (button.tag == selectButton.tag) {
+            button.selected = YES;
+        }else{
+            button.selected = NO;
+        }
+    }
+    
+    
+    switch (selectButton.tag) {
+        case 6325://我的评论
+        {
+             _pingluntype = PingLunTypeWode;
+            _tableView.hidden = NO;
+            _replyTab.hidden = YES;
+            if ([mypinglunArr count]==0) {
+                [self loadwodepinglunData:NO];
+            }
+            break;
+        }
+        case 6326://回复我的
+        {
+            _tableView.hidden = YES;
+            _replyTab.hidden = NO;
+             _pingluntype = PingLunTypeHuiFu;
+            if ([replyArr count]==0) {
+                [self loadHuifuwodeData:NO];
+            }
+            break;
+        }
+            
+        default:
+            break;
+    }
+    [UIView animateWithDuration:0.25 animations:^{
+        _lin_leading_cons.constant = selectButton.x;
+        [_topBg layoutIfNeeded];
+    }];
+    
+}
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [MobClick beginLogPageView:self.title];
+}
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:self.title];
+}
+
+
+#pragma mark -
+#pragma mark UITableViewDataSource method
+-(NSInteger )tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    if (_pingluntype == PingLunTypeWode) {
+        return [mypinglunArr count];
+    }else{
+        return [replyArr count];
+    }
+}
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView{
+    return 1;
+}
+
+-(CGFloat )tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSDictionary *info = nil;
+    if (_pingluntype == PingLunTypeWode) {
+        info = mypinglunArr[indexPath.row];
+    }else{
+        info = replyArr[indexPath.row];
+    }
+    return [CYWoDePingLunCell tableCellHeight:info andType:_pingluntype];
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+    if (_pingluntype == PingLunTypeWode) {
+        CYWoDePingLunCell *cell = [_tableView dequeueReusableCellWithIdentifier:@"CYWoDePingLunCell"];
+        NSDictionary *info = mypinglunArr[indexPath.row];
+        cell.contentLbl.text = [info objectForKey:@"content"];
+        cell.nameLbl.text = MANAGER.nickname;
+        [cell.showImg sd_setImageWithURL:[NSURL URLWithString:MANAGER.avatar] placeholderImage:DEFAULTHEADER];
+        NSDictionary *article = [info objectForKey:@"article"];
+        cell.replyLbl.text = [NSString stringWithFormat:@"原文 |%@",[article objectForKey:@"title"]];
+        cell.timeLbl.text = [self dataWithSince:[[info objectForKey:@"created"] doubleValue]];;
+        cell.zanLbl.text = [info objectForJSONKey:@"suports"];
+        cell.dianzanBtn.tag = 6000 +indexPath.row;
+         cell.dianzanBtn.showsTouchWhenHighlighted = NO;
+        [cell.dianzanBtn addTarget:self action:@selector(dianzan_click:) forControlEvents:UIControlEventTouchUpInside];
+        cell.huifuBtn.tag = 9000 +indexPath.row;
+          cell.huifuBtn.showsTouchWhenHighlighted = NO;
+        [cell.huifuBtn addTarget:self action:@selector(huifu_click:)  forControlEvents:UIControlEventTouchUpInside];
+        cell.shanchuBtn.tag = 15000 +indexPath.row;
+        cell.shanchuBtn.showsTouchWhenHighlighted = NO;
+        [cell.shanchuBtn addTarget:self action:@selector(shanchu_click:) forControlEvents:UIControlEventTouchUpInside];
+        
+        return cell;
+    }else{
+        CYWoDePingLunCell *cell = [_replyTab dequeueReusableCellWithIdentifier:@"CYHuiFuWoDeIdentify"];
+        NSDictionary *info = replyArr[indexPath.row];
+        NSDictionary *article = [info objectForKey:@"reply"];
+        cell.contentLbl.text = [article objectForKey:@"content"];
+        cell.nameLbl.text = [info objectForKey:@"nickname"];
+        NSString *avatar = [info objectForKey:@"avatar"];
+        if (avatar.length) {
+             [cell.showImg sd_setImageWithURL:[NSURL URLWithString:avatar] placeholderImage:DEFAULTHEADER];
+        }
+        cell.replyLbl.text = [NSString stringWithFormat:@"我的评论 |%@",[info objectForKey:@"parentContent"]];
+        cell.timeLbl.text = [self dataWithSince:[[article objectForKey:@"created"] doubleValue]];;
+        cell.zanLbl.text = [article objectForJSONKey:@"suports"];
+        
+        cell.dianzanBtn.tag = 26000 +indexPath.row;
+        [cell.dianzanBtn addTarget:self action:@selector(huifudianzan_click:) forControlEvents:UIControlEventTouchUpInside];
+        cell.huifuBtn.tag = 36000 +indexPath.row;
+        [cell.huifuBtn addTarget:self action:@selector(huifuhuifu_click:)  forControlEvents:UIControlEventTouchUpInside];
+        cell.shanchuBtn.tag = 46000 +indexPath.row;
+        [cell.shanchuBtn addTarget:self action:@selector(huifushanchu_click:) forControlEvents:UIControlEventTouchUpInside];
+        
+        return cell;
+    }
+  
+}
+
+- (NSString *)dataWithSince:(NSTimeInterval )dataString
+{
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"YYYY-MM-dd HH:mm"];
+    NSDate *confromTimesp = [NSDate dateWithTimeIntervalSince1970:dataString];
+    NSString *confromTimespStr = [formatter stringFromDate:confromTimesp];
+    
+    return confromTimespStr;
+}
+
+//回复我的点赞
+-(void)huifudianzan_click:(UIButton *)sender
+{
+    NSInteger selectIndex = sender.tag - 26000;
+    NSDictionary *info = replyArr[selectIndex];
+    NSIndexPath *index = [NSIndexPath indexPathForRow:selectIndex inSection:0];
+    __block NSInteger suports = [[info objectForKey:@"suports"] integerValue];
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithDictionary:info];
+    NSString *itemId =[info objectForKey:@"itemid"];
+    NSString *isSuported = [[info objectForJSONKey:@"isSuported"] integerValue] == 1?@"0":@"1";
+    __weak __typeof(self) weakSelf = self;
+    [CYWebClient basePost:@"do_suport" parametes:@{@"itemid":itemId,@"type":@"10",@"class":isSuported} success:^(id responObject) {
+        NSInteger state = [[responObject objectForKey:@"state"] integerValue];
+        if (state == 400) {
+            NSInteger isSuported = [[responObject objectForKey:@"do"] integerValue];
+            if (isSuported == 1) {
+                [params setObject:@"1" forKey:@"isSuported"];
+                suports ++;
+            }else{
+                [params setObject:@"0" forKey:@"isSuported"];
+                suports --;
+            }
+            [params setObject:@(suports) forKey:@"suports"];
+            [replyArr replaceObjectAtIndex:selectIndex withObject:params];
+            NSArray *inexArr = [NSArray arrayWithObjects:index, nil];
+            [weakSelf.replyTab reloadRowsAtIndexPaths:inexArr  withRowAnimation:UITableViewRowAnimationNone];
+            
+        }
+    } failure:^(id error) {
+        
+    }];
+}
+//回复我的回复（评论）
+-(void)huifuhuifu_click:(UIButton *)sender
+{
+    __weak __typeof(self) weakSelf = self;
+    NSInteger selectIndex = sender.tag - 36000;
+    NSDictionary *info = replyArr[selectIndex];
+    NSString *itemId =[info objectForKey:@"itemid"];
+    NSDictionary *reply = [info objectForJSONKey:@"reply"];
+    NSString *uid = [reply objectForKey:@"uid"];
+    NSString *pid = [reply objectForKey:@"pid"];
+    CYPublicPostCardController *vc = viewControllerInStoryBoard(@"CYPublicPostCardController", @"WenZhang");
+    vc.mItemid = itemId;
+    vc.touid = uid;
+    vc.pid = pid;
+    vc.postcardbackBlock = ^(){
+        [weakSelf loadHuifuwodeData:NO];
+    };
+    [self.navigationController pushViewController:vc animated:YES];
+}
+//回复我的删除
+-(void)huifushanchu_click:(UIButton *)sender
+{
+    __weak __typeof(self) weakSelf = self;
+    NSInteger selectIndex = sender.tag - 46000;
+    NSDictionary *info = replyArr[selectIndex];
+    NSIndexPath *index = [NSIndexPath indexPathForRow:selectIndex inSection:0];
+    NSString *itemId = [info objectForKey:@"id"];
+    //    2.0_comment.article_delete
+    [CYWebClient basePost:@"2.0_comment.article_delete" parametes:@{@"id":itemId} success:^(id responObj) {
+        NSInteger state = [[responObj objectForKey:@"state"] integerValue];
+        if (state == 400) {
+            [replyArr removeObjectAtIndex:selectIndex];
+            [weakSelf.replyTab reloadData];
+            [weakSelf.replyTab deleteRowsAtIndexPaths:[NSArray arrayWithObject:index] withRowAnimation:UITableViewRowAnimationNone];
+        }
+    } failure:^(id err) {
+        NSLog(@"%@",err);
+    }];
+}
+
+//点赞
+-(void)dianzan_click:(UIButton *)sender
+{
+    NSInteger selectIndex = sender.tag -6000;
+    NSDictionary *info = mypinglunArr[selectIndex];
+     NSString *itemId =[info objectForKey:@"id"];
+    NSIndexPath *index = [NSIndexPath indexPathForRow:selectIndex inSection:0];
+   __block NSInteger suports = [[info objectForKey:@"suports"] integerValue];
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithDictionary:info];
+   
+    NSString *isSuported = [[info objectForJSONKey:@"isSuported"] integerValue] == 1?@"0":@"1";
+    __weak __typeof(self) weakSelf = self;
+    [CYWebClient basePost:@"do_suport" parametes:@{@"itemid":itemId,@"type":@"10",@"class":isSuported} success:^(id responObject) {
+        NSInteger state = [[responObject objectForKey:@"state"] integerValue];
+        if (state == 400) {
+            NSInteger isSuported = [[responObject objectForKey:@"do"] integerValue];
+            if (isSuported == 1) {
+                [params setObject:@"1" forKey:@"isSuported"];
+                suports ++;
+            }else{
+                [params setObject:@"0" forKey:@"isSuported"];
+                suports --;
+            }
+            [params setObject:@(suports) forKey:@"suports"];
+            [mypinglunArr replaceObjectAtIndex:selectIndex withObject:params];
+            NSArray *inexArr = [NSArray arrayWithObjects:index, nil];
+            [weakSelf.tableView reloadRowsAtIndexPaths:inexArr  withRowAnimation:UITableViewRowAnimationNone];
+
+        }
+    } failure:^(id error) {
+        
+    }];
+}
+
+//回复某人(文章)
+-(void)huifu_click:(UIButton *)sender
+{
+    __weak __typeof(self) weakSelf = self;
+    NSInteger selectIndex = sender.tag -9000;
+    NSDictionary *info = mypinglunArr[selectIndex];
+    NSString *itemId =[info objectForKey:@"itemid"];
+    CYPublicPostCardController *vc = viewControllerInStoryBoard(@"CYPublicPostCardController", @"WenZhang");
+    vc.mItemid = itemId;
+    vc.postcardbackBlock = ^(){
+        [weakSelf loadwodepinglunData:NO];
+    };
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+//删除
+-(void)shanchu_click:(UIButton *)sender
+{
+    __weak __typeof(self) weakSelf = self;
+    NSInteger selectIndex = sender.tag -15000;
+    NSDictionary *info = mypinglunArr[selectIndex];
+    NSIndexPath *index = [NSIndexPath indexPathForRow:selectIndex inSection:0];
+    NSString *itemId = [info objectForKey:@"id"];
+    //    2.0_comment.article_delete
+    [CYWebClient basePost:@"2.0_comment.article_delete" parametes:@{@"id":itemId} success:^(id responObj) {
+        NSInteger state = [[responObj objectForKey:@"state"] integerValue];
+        if (state == 400) {
+            [mypinglunArr removeObjectAtIndex:selectIndex];
+            [weakSelf.tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:index] withRowAnimation:UITableViewRowAnimationNone];
+        }
+    } failure:^(id err) {
+        NSLog(@"%@",err);
+    }];
+}
+
+#pragma mark -
+#pragma mark UITableViewDelegate method
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+}
+
+
+
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+@end

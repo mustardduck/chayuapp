@@ -1,0 +1,112 @@
+//
+//  BBGuidePageView.m
+//  CannesClub
+//
+//  Created by box on 14/11/7.
+//  Copyright (c) 2014年 box. All rights reserved.
+//
+
+#import "BBGuidePageView.h"
+
+@interface BBGuidePageView()
+{
+}
+//引导页的image数组
+//@property (strong, nonatomic) NSArray *guidePageImageArr;
+
+
+@end
+
+@implementation BBGuidePageView
+
+- (id)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self) {
+        // Initialization code
+    }
+    return self;
+}
+
+/*
+// Only override drawRect: if you perform custom drawing.
+// An empty implementation adversely affects performance during animation.
+- (void)drawRect:(CGRect)rect
+{
+    // Drawing code
+}
+*/
+
+
+
+
++ (void)showGuidePageWithPageImageArr:(NSArray *)guidePageImageArr
+{
+    UIWindow *window = [[[UIApplication sharedApplication]delegate]window];
+    BBGuidePageView *guidePageView = [[BBGuidePageView alloc]initWithFrame:window.frame];
+//    guidePageView.delegate = guidePageView;
+    guidePageView.pagingEnabled = YES;
+    guidePageView.guidePageImageArr = guidePageImageArr;
+    guidePageView.bounces = NO;
+    guidePageView.showsHorizontalScrollIndicator = NO;
+    [window addSubview:guidePageView];
+}
+
+- (void)setGuidePageImageArr:(NSArray *)guidePageImageArr
+{
+    _guidePageImageArr = guidePageImageArr;
+    for (UIView *subView in self.subviews) {
+        [subView removeFromSuperview];
+    }
+    UIWindow *window = [[[UIApplication sharedApplication]delegate]window];
+    CGRect frame = window.bounds;
+    for (NSInteger i=0; i<_guidePageImageArr.count; i++) {
+        UIImage *image = _guidePageImageArr[i];
+        frame.origin.x = frame.size.width*i;
+        UIImageView *imageView = [[UIImageView alloc]initWithFrame:frame];
+        imageView.image = image;
+        [self addSubview:imageView];
+        
+        if (i == _guidePageImageArr.count-1) {
+//            CGRect bf = CGRectZero;
+//            bf.size = CGSizeMake(147, 39);
+//            bf.origin.x = frame.origin.x + (frame.size.width - bf.size.width) / 2.;
+//            bf.origin.y = frame.size.height - bf.size.height - 20.f;
+//            UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
+//            btn.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
+//            btn.frame = bf;
+//            [btn setImage:[UIImage imageNamed:@"start.png"] forState:UIControlStateNormal];
+//            [btn addTarget:self
+//                    action:@selector(onTapLastGuidePage:)
+//          forControlEvents:UIControlEventTouchUpInside];
+//            [self addSubview:btn];
+            
+            imageView.userInteractionEnabled = YES;
+            UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(onTapLastGuidePage:)];
+            [imageView addGestureRecognizer:tap];
+        }
+    }
+    
+    self.contentSize = CGSizeMake(frame.size.width*_guidePageImageArr.count, frame.size.height);
+    self.contentOffset = CGPointZero;
+ 
+    
+}
+
+- (void)onTapLastGuidePage:(id)sender
+{
+    if (self.selectLastBlock) {
+        self.selectLastBlock();
+    }
+    [UIView animateWithDuration:1.0 animations:^{
+        self.alpha = 0.;
+    }completion:^(BOOL finished) {
+        [self removeFromSuperview];
+    }];
+}
+
+
+
+
+
+@end

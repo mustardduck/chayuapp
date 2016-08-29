@@ -1,0 +1,46 @@
+//
+//  CYCollectTeaReviewCell.m
+//  茶语
+//
+//  Created by Leen on 16/5/30.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYCollectTeaReviewCell.h"
+
+@implementation CYCollectTeaReviewCell
+
+- (void)parseData:(id)data
+{
+    CYTeaReviewInfo *info = [CYTeaReviewInfo objectWithKeyValues:data];
+    
+    [_mImageView sd_setImageWithURL:[NSURL URLWithString:info.thumb] placeholderImage:SQUARE];
+    
+    _mTitleLabel.text = info.title;
+    _mOfficialLabel.text = info.review_score;
+    _mComplexLabel.text = info.score;
+    _mAddressLabel.text = [NSString stringWithFormat:@"参考价：￥%@",info.price];
+    _mTypeLabel.text = [NSString stringWithFormat:@"%@ 〉%@",info.bigcate,info.smallcate];
+    self.mClickData = info;
+}
+
++ (instancetype)cellWidthTableView:(UITableView *)tableView
+{
+    static NSString *cellName = @"CYCollectTeaReviewCell";
+    CYCollectTeaReviewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellName];
+    if (cell == nil) {
+        cell = [[[NSBundle mainBundle] loadNibNamed:@"CYCollectTeaReviewCell" owner:nil options:nil] firstObject];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    }
+    
+    return cell;
+}
+
+- (IBAction)selectBtnClicked:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(selectCollectTeaReviewCell:)]) {
+        [self.delegate selectCollectTeaReviewCell:self];
+    }
+}
+
+@end
+

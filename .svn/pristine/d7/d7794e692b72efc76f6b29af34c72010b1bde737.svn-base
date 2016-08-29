@@ -1,0 +1,342 @@
+//
+//  CYWenZhangDetailsController.m
+//  茶语
+//
+//  Created by Chayu on 16/7/15.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYWenZhangDetailsController.h"
+#import "BBWebView.h"
+#import "CYPublicPostCardController.h"
+#import "CYWenZhangCommentCell.h"
+#import "CYWenZhangAllCommentsVC.h"
+#import "CYWenZhangCommentView.h"
+
+@interface CYWenZhangDetailsController ()<BBWebViewSizeAdjust,CYWenZhangCommentViewDelegate,UIWebViewDelegate>
+{
+    NSMutableDictionary *info;
+    
+    CGFloat commentHeight;
+    OSMessage *message;
+    BOOL isLoadingFinished;
+    NSString *htmlStr;
+
+}
+@property (nonatomic,strong)BBWebView *webView;
+@property (nonatomic, strong) CYWenZhangCommentView * commentView;
+
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+
+- (IBAction)pinglun_click:(id)sender;
+
+- (IBAction)goback:(id)sender;
+- (IBAction)shoucang_click:(id)sender;
+@property (weak, nonatomic) IBOutlet UIButton *shoucangBtn;
+@property (weak, nonatomic) IBOutlet UIButton *zanBtn;
+- (IBAction)zan_click:(id)sender;
+
+@end
+
+@implementation CYWenZhangDetailsController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    message = [[OSMessage alloc] init];
+    _tableView.hidden = YES;
+    self.webView.sizeDelegate = self;
+    isLoadingFinished = NO;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.01 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        _tableView.tableHeaderView = self.webView;
+        _tableView.tableFooterView.hidden = YES;
+    });
+    hiddenSepretor(_tableView);
+    [self loadViewsData];
+}
+
+
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    [APP_DELEGATE setTabbarHidden:YES animated:animated];
+}
+
+
+-(void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick beginLogPageView:@"文章详情"];
+}
+
+-(void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:@"文章详情"];
+}
+
+
+-(void)loadViewsData
+{
+    if (_wenzhangId.length) {
+        
+        [CYWebClient Post:@"2.0_article.detail" parametes:@{@"id":_wenzhangId} success:^(id responObject) {
+//            NSInteger state = [[responObject objectForKey:@"state"] integerValue];
+//            NSDictionary *data = [responObject objectForKey:@"data"];
+//            if (state == 400) {
+                NSDictionary * shareInfo = [responObject objectForJSONKey:@"share"];
+                if ([shareInfo isKindOfClass:[NSDictionary class]] && [shareInfo count]>0)
+                {
+                    message.title = [shareInfo objectForKey:@"title"];
+                    message.link = [shareInfo objectForKey:@"url"];
+                    message.desc = [shareInfo objectForKey:@"description"];
+                    message.imgUrl  = [shareInfo objectForKey:@"thumb"];
+                }
+            
+                info = [NSMutableDictionary dictionaryWithDictionary:responObject];
+                BOOL isFavorate = [[info objectForKey:@"isFavorate"] integerValue] ==1?YES:NO;
+                _shoucangBtn.selected = isFavorate;
+                BOOL isSuported = [[info objectForKey:@"isSuported"] integerValue] ==1?YES:NO;
+                _zanBtn.selected = isSuported;
+               htmlStr = [info objectForKey:@"html"];
+                [self.webView loadHTMLString:htmlStr baseURL:[NSURL URLWithString:@"http://app.chayu.com"]];
+
+          
+//            }
+            
+         
+        } failure:^(id error) {
+            
+        }];
+    }
+}
+
+
+- (BBWebView *)webView{
+    if (!_webView) {
+        _webView = [[BBWebView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 1)];
+//        _webView.delegate = self;
+//        _webView.scalesPageToFit = YES;
+    }
+    return _webView;
+}
+
+- (CYWenZhangCommentView *) commentView
+{
+    if(!_commentView)
+    {
+        _commentView = [[[NSBundle mainBundle] loadNibNamed:@"CYWenZhangCommentView" owner:nil options:nil] firstObject];
+        _commentView.delegate = self;
+        _commentView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 1);
+        _commentView.pageSize = 10;
+        _commentView.itemid = _wenzhangId;
+    }
+    
+    return _commentView;
+}
+
+#pragma mark -
+#pragma mark CYBuyerEvaluationViewDelegate method
+- (void)evaluationViewendHeight:(CGFloat)endheight
+{
+    self.tableView.tableFooterView.hidden = NO;
+    self.tableView.tableFooterView = self.commentView;
+//    
+//    if(count)
+//    {
+//        _titleLbl.text = [NSString stringWithFormat:@"评论(%ld)", count];
+//    }
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+
+#pragma mark -
+#pragma mark BBWebViewSizeAdjust method
+- (void)bbweb:(BBWebView *)web didAdjustSizeTo:(CGSize)endSize from:(CGSize)startSize
+{
+    if (endSize.height >startSize.height) {
+        self.webView.height = endSize.height;
+        _tableView.tableHeaderView = self.webView;
+        _tableView.tableFooterView = self.commentView;
+          _tableView.hidden = NO;
+    }
+}
+//- (void)webViewDidFinishLoad:(UIWebView *)webView
+//{
+//    NSString *meta = [NSString stringWithFormat:@"document.getElementsByName(\"viewport\")[0].content = \"width=%f, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no\"", webView.frame.size.width];
+//    [webView stringByEvaluatingJavaScriptFromString:meta];
+//
+//}
+
+
+- (IBAction)pinglun_click:(id)sender {
+    CYPublicPostCardController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"CYPublicPostCardController"];
+    vc.mItemid = _wenzhangId;
+    vc.postcardbackBlock = ^(){
+        
+        [_commentView loadTableViewData:NO];
+    };
+    [self.navigationController pushViewController:vc animated:YES];
+    
+}
+
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (IBAction)shoucang_click:(id)sender {
+    if (!MANAGER.isLoged) {
+        [APP_DELEGATE showLogView];
+        return;
+    }
+    [SVProgressHUD setBackgroundColor:CLEARCOLOR];
+    [SVProgressHUD setForegroundColor:[UIColor blackColor]];
+    [SVProgressHUD show];
+    [CYWebClient Post:@"favorite" parametes:@{@"itemid":_wenzhangId,@"type":@"1"} success:^(id responObject) {
+        
+        if ([[responObject objectForKey:@"do"] integerValue] ==0) {
+            _shoucangBtn.selected = NO;
+        }else{
+
+            _shoucangBtn.selected = YES;
+        }
+    } failure:^(id error) {
+        
+    }];
+    
+}
+- (IBAction)zan_click:(id)sender {
+    
+    [SVProgressHUD setBackgroundColor:CLEARCOLOR];
+    [SVProgressHUD setForegroundColor:[UIColor blackColor]];
+    [SVProgressHUD show];
+    NSString *class = _zanBtn.selected?@"0":@"1";
+    [CYWebClient Post:@"do_suport" parametes:@{@"itemid":_wenzhangId,@"type":@"1",@"class":class} success:^(id responObject) {
+        if ([[responObject objectForKey:@"do"] integerValue] ==0) {
+            _zanBtn.selected = NO;
+        }else{
+            _zanBtn.selected = YES;
+        }
+    } failure:^(id error) {
+        
+    }];
+}
+
+- (void)huifu_click
+{
+    [self pinglun_click:nil];
+}
+
+- (void)commentBtnClicked:(CYWenZhangCommentModel *)model
+{
+//    __weak __typeof(self) weakSelf = self;
+    
+    CYPublicPostCardController * vc = viewControllerInStoryBoard(@"CYPublicPostCardController", @"WenZhang");
+    
+    vc.mItemid = model.itemid;//文章ID
+    vc.pid = model.commentId;//回复ID
+    vc.touid = model.uid;//回复人ID
+    //文章评价
+    vc.huifutype = HuiFuTypeWenZhang;
+    
+    vc.postcardbackBlock = ^(){
+        [_commentView loadTableViewData:NO];
+    };
+    
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (IBAction)share_click:(id)sender {
+    [[SDWebImageDownloader sharedDownloader] downloadImageWithURL:[NSURL URLWithString:message.imgUrl] options:SDWebImageDownloaderUseNSURLCache progress:^(NSInteger receivedSize, NSInteger expectedSize) {
+        
+    } completed:^(UIImage *image, NSData *data, NSError *error, BOOL finished) {
+        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+        appDelegate.at = kAuthorizeTypeOpenShare;
+        if (image) {
+            message.image = UIImageJPEGRepresentation(image, 0.1);
+        }else
+        {
+            message.image = UIImagePNGRepresentation([UIImage imageNamed:@"AppIcon60x60@2x.png"]);
+        }
+        CYActionSheet *sheet = [[CYActionSheet alloc] initWithTitles:nil iconNames:nil];
+        sheet.shareMessage = message;
+        [sheet showActionSheetWithClickBlock:^(int btnIndex) {
+            
+        } cancelBlock:^{
+            
+        }];
+    }];
+}
+
+
+- (IBAction)zhijiefenxiang_click:(UIButton *)sender {
+    
+    switch (sender.tag) {
+        case 320:
+        {
+            [self sharePengYouQuan:message];
+            break;
+        }
+        case 321:
+        {
+            [self shareWeiXin:message];
+            break;
+        }
+        case 322:
+        {
+            [self shareQQ:message];
+            break;
+        }
+        case 2:
+        {
+            [self navBarClicked:self.navigationController tag:((UIButton *)sender).tag shareMessage:message];
+            break;
+        }
+            
+        default:
+            break;
+    }
+    
+}
+
+- (void)showAllEvaluation
+{
+    CYWenZhangAllCommentsVC * vc = viewControllerInStoryBoard(@"CYWenZhangAllCommentsVC", @"WenZhang");
+    vc.itemid = _wenzhangId;
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+#pragma mark -
+#pragma mark UITableViewDataSource method
+-(NSInteger )tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return 0;
+}
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView{
+    return 1;
+}
+
+-(CGFloat )tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return commentHeight;
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CYWenZhangCommentCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CYWenZhangCommentCell"];
+//    cell.delegate = self;
+    cell.wenzhangId = _wenzhangId;
+    cell.reloadBlock = ^(CGFloat height)
+    {
+        commentHeight = height;
+        [tableView reloadSections:[NSIndexSet indexSetWithIndex: indexPath.section] withRowAnimation:UITableViewRowAnimationNone];
+    };
+    return cell;
+}
+
+@end

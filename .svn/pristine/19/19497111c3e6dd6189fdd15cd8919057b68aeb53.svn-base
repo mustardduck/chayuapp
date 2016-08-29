@@ -1,0 +1,208 @@
+//
+//  CYTeaListViewController.m
+//  TeaMall
+//
+//  Created by Chayu on 15/10/27.
+//  Copyright © 2015年 Chayu. All rights reserved.
+//
+
+#import "CYTeaListViewController.h"
+#import "CYTeaListCell.h"
+#import "CYProductDetViewController.h"
+#import "CYProFooterVIew.h"
+#import "CYMasterDetailViewController.h"
+@interface CYTeaListViewController ()<UITableViewDataSource,UITableViewDelegate,CYProFooterVIewDelegate>
+{
+    NSInteger page;
+    NSMutableArray *_dataArr;
+}
+- (IBAction)goback:(id)sender;
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+
+/**
+ *  底部大师相关+其他人买
+ */
+@property (nonatomic,strong)CYProFooterVIew *footerView;
+@end
+
+@implementation CYTeaListViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    page =1;
+    _dataArr = [[NSMutableArray alloc] init];
+    hiddenSepretor(_tableView);
+    __weak __typeof(self) weakSelf = self;
+    _tableView.header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        [weakSelf loadTableViewData:NO];
+        
+    }];
+    [_tableView.header beginRefreshing];
+    
+    
+    _tableView.footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+        [weakSelf loadTableViewData:YES];
+    }];
+    
+//    self.title = _masterStr;
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [MobClick beginLogPageView:self.title];
+}
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [MobClick endLogPageView:self.title];
+}
+
+
+
+-(void)loadTableViewData:(BOOL)loadMore
+{
+    if (loadMore) {
+        page ++;
+    }else{
+        page =1;
+    }
+    __weak __typeof(self) weakSelf = self;
+    [CYWebClient Post:@"SellerGoodsList" parametes:@{@"sellerUid":weakSelf.uid,@"p":@(page),@"pageSize":@"10"} success:^(id responObj) {
+        NSArray *goodsList = [responObj objectForKey:@"goodsList"];
+        if (!loadMore) {
+            [_dataArr removeAllObjects];
+        }
+        NSMutableDictionary *sellerInfo = [NSMutableDictionary dictionary];
+        [sellerInfo setObject:[responObj objectForKey:@"sellerAvatar"] forKey:@"avatar"];
+        [sellerInfo setObject:[responObj objectForKey:@"sellerDescription"] forKey:@"description"];
+        [sellerInfo setObject:[responObj objectForKey:@"sellerName"] forKey:@"sellerName"];
+        [sellerInfo setObject:[responObj objectForKey:@"sellerUid"] forKey:@"sellerUid"];
+        [sellerInfo setObject:[responObj objectForJSONKey:@"isAttend"] forKey:@"isAttend"];
+        [sellerInfo setObject:[responObj objectForJSONKey:@"gid"] forKey:@"gid"];
+        weakSelf.footerView.seller = sellerInfo;
+        weakSelf.footerView.height = 190.;
+        weakSelf.footerView.sellerUid = [responObj objectForKey:@"sellerUid"];
+        _tableView.tableHeaderView = weakSelf.footerView;
+        weakSelf.title = [NSString stringWithFormat:@"%@·商品",[responObj objectForKey:@"sellerName"]];
+ 
+        if (loadMore) {
+            [weakSelf.tableView.footer endRefreshing];
+        }else{
+            [weakSelf.tableView.header endRefreshing];
+        }
+        
+        if ([goodsList count]<10) {
+            [weakSelf.tableView.footer endRefreshingWithNoMoreData];
+        }else{
+            [weakSelf.tableView.footer resetNoMoreData];
+        }
+        
+        if ([_dataArr count]<10) {
+            weakSelf.tableView.footer = nil;
+        }
+        
+        [_dataArr addObjectsFromArray:[CYTeaListModel objectArrayWithKeyValuesArray:goodsList]];
+        [weakSelf.tableView reloadData];
+        
+        
+        
+        if (![goodsList isKindOfClass:[NSNull class]] && [goodsList count] < PAGESIZE) {
+            [weakSelf.tableView.footer endRefreshingWithNoMoreData];
+        }
+
+        if (_dataArr.count == 0) {
+             [weakSelf.view addSubview:[self emptyView]];
+        }else{
+            UIView *view = [weakSelf.view viewWithTag:1000002];
+            if (view) {
+                [view removeFromSuperview];
+            }
+          
+        }
+        
+    } failure:^(id err) {
+        if (loadMore) {
+            [weakSelf.tableView.footer endRefreshing];
+        }else{
+            [weakSelf.tableView.header endRefreshing];
+        }
+    }];
+
+}
+
+
+- (CYProFooterVIew *)footerView{
+    if (!_footerView) {
+        _footerView = [[[NSBundle mainBundle] loadNibNamed:@"CYProFooterVIew" owner:nil options:nil] firstObject];
+        _footerView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 190);
+        _footerView.onlyShowTop = YES;
+        _footerView.delegate = self;
+    }
+    return _footerView;
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+#pragma mark -
+#pragma mark UITableViewDataSource method
+-(NSInteger )tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return [_dataArr count];
+}
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView{
+    return 1;
+}
+
+-(CGFloat )tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 185.f;
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CYTeaListCell *cell = [CYTeaListCell cellWidthTableView:tableView];
+    cell.teaModel = _dataArr[indexPath.row];
+    return cell;
+}
+
+#pragma mark -
+#pragma mark UITableViewDelegate method
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CYTeaListModel *model = _dataArr[indexPath.row];
+    CYProductDetViewController *vc = viewControllerInStoryBoard(@"CYProductDetViewController", @"TeaMall");
+    vc.goodId = model.goods_id;
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+
+#pragma mark -
+#pragma mark CYProFooterVIewDelegate method
+- (void)mingjiajieshao:(NSString *)uid
+{
+    CYMasterDetailViewController *vc = viewControllerInStoryBoard(@"CYMasterDetailViewController", @"TeaMall");
+    vc.uid = uid;
+    [self.navigationController pushViewController:vc animated:YES];
+}
+-(void)selectGoodsAtIndex:(NSString *)goodsId
+{
+
+}
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+@end

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="CYSearchDefaultHeader">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="125"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Kze-9t-bfY">
+                    <rect key="frame" x="20" y="0.0" width="84" height="125"/>
+                    <state key="normal" image="sousuo_ico_chaping"/>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xo6-N5-tk7">
+                    <rect key="frame" x="104" y="0.0" width="84" height="125"/>
+                    <inset key="imageEdgeInsets" minX="-10" minY="0.0" maxX="0.0" maxY="0.0"/>
+                    <state key="normal" image="sousuo_ico_shiji"/>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="c2g-0l-PkS">
+                    <rect key="frame" x="188" y="0.0" width="84" height="125"/>
+                    <inset key="imageEdgeInsets" minX="10" minY="0.0" maxX="0.0" maxY="0.0"/>
+                    <state key="normal" image="sousuo_ico_quanzi"/>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TMt-aY-Sj7">
+                    <rect key="frame" x="272" y="0.0" width="84" height="125"/>
+                    <state key="normal" image="sousuo_ico_wenzhang"/>
+                </button>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xyZ-Xm-wO7">
+                    <rect key="frame" x="0.0" y="124" width="375" height="1"/>
+                    <color key="backgroundColor" red="0.93333333333333335" green="0.93333333333333335" blue="0.93333333333333335" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="1" id="Lrs-cS-ibp"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="c2g-0l-PkS" firstAttribute="leading" secondItem="xo6-N5-tk7" secondAttribute="trailing" id="1FP-z7-9On"/>
+                <constraint firstAttribute="bottom" secondItem="xo6-N5-tk7" secondAttribute="bottom" id="6L6-Mi-I0m"/>
+                <constraint firstItem="xo6-N5-tk7" firstAttribute="width" secondItem="Kze-9t-bfY" secondAttribute="width" id="AB8-pi-dKk"/>
+                <constraint firstItem="Kze-9t-bfY" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="Ops-HY-qoa"/>
+                <constraint firstItem="c2g-0l-PkS" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="OzM-sK-mzD"/>
+                <constraint firstItem="xo6-N5-tk7" firstAttribute="leading" secondItem="Kze-9t-bfY" secondAttribute="trailing" id="RiR-eD-lJw"/>
+                <constraint firstItem="c2g-0l-PkS" firstAttribute="width" secondItem="xo6-N5-tk7" secondAttribute="width" id="Rxq-ve-btS"/>
+                <constraint firstAttribute="bottom" secondItem="TMt-aY-Sj7" secondAttribute="bottom" id="TDP-N1-dQJ"/>
+                <constraint firstItem="xo6-N5-tk7" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="Vcm-q2-7da"/>
+                <constraint firstAttribute="trailing" secondItem="TMt-aY-Sj7" secondAttribute="trailing" constant="19" id="W3x-fB-u2I"/>
+                <constraint firstItem="TMt-aY-Sj7" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="Xam-MX-1v1"/>
+                <constraint firstAttribute="trailing" secondItem="xyZ-Xm-wO7" secondAttribute="trailing" id="Ypa-cg-FPc"/>
+                <constraint firstAttribute="bottom" secondItem="Kze-9t-bfY" secondAttribute="bottom" id="aSe-Q5-ItN"/>
+                <constraint firstAttribute="bottom" secondItem="c2g-0l-PkS" secondAttribute="bottom" id="kZW-wf-can"/>
+                <constraint firstItem="TMt-aY-Sj7" firstAttribute="leading" secondItem="c2g-0l-PkS" secondAttribute="trailing" id="kk4-4g-JVf"/>
+                <constraint firstItem="TMt-aY-Sj7" firstAttribute="width" secondItem="c2g-0l-PkS" secondAttribute="width" id="spr-oq-57P"/>
+                <constraint firstItem="Kze-9t-bfY" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="20" id="w2L-Ic-ibc"/>
+                <constraint firstAttribute="bottom" secondItem="xyZ-Xm-wO7" secondAttribute="bottom" id="wdi-bF-hOh"/>
+                <constraint firstItem="xyZ-Xm-wO7" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="zHJ-v2-ay5"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="221.5" y="325.5"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="sousuo_ico_chaping" width="55" height="84"/>
+        <image name="sousuo_ico_quanzi" width="55" height="83"/>
+        <image name="sousuo_ico_shiji" width="55" height="84"/>
+        <image name="sousuo_ico_wenzhang" width="55" height="84"/>
+    </resources>
+</document>

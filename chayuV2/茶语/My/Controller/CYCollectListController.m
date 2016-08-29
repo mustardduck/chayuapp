@@ -1,0 +1,893 @@
+//
+//  CYCollectListController.m
+//  茶语
+//
+//  Created by Leen on 16/5/27.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYCollectListController.h"
+#import "CYTeaReviewInfo.h"
+#import "CYCollectTeaReviewCell.h"
+#import "CYCollectTeaSampleCell.h"
+#import "CYCollectTopicCell.h"
+#import "CYCollectGoodCell.h"
+#import "CYCollectArticleCell.h"
+#import "CYTeaReviewDetailViewController.h"
+//#import "CYTeaSampleDetailViewController.h"
+#import "CYArticleDetailViewController.h"
+#import "CYProductDetViewController.h"
+#import "CYTopicDetailController.h"
+#import "CYArticleInfo.h"
+#import "CYWenZhangDetailsController.h"
+#import "CYTeaSampleDetailViewController.h"
+#import "CYExchangeTeaViewController.h"
+static const int REQUEST_COUNT = 10;
+
+@interface CYCollectListController ()<UITableViewDataSource, UITableViewDelegate, CYCollectTeaReviewCellDelegate, CYCollectTeaSampleCellDelegate,CYCollectArticleCellDelegate, CYCollectGoodCellDelegate, CYCollectTopicCellDelegate>
+{
+    //    UIButton *_rightBtn;
+    
+    __block int page;
+    
+    NSString * _titleName;
+    
+    NSMutableArray *_selectedIndexPathArray;
+    NSInteger allGoodsNum;
+    
+    NSString * _type;
+    NSString * _collectTypeName;
+    
+}
+@property (weak, nonatomic) IBOutlet UILabel *emptyLbl;
+@property (weak, nonatomic) IBOutlet UIButton *rightBtn;
+
+@property (weak, nonatomic) IBOutlet UIView *bottomView;
+@property (weak, nonatomic) IBOutlet UIButton *cancelBtn;
+@property (weak, nonatomic) IBOutlet UIButton *selectAllBtn;
+@property (weak, nonatomic) IBOutlet UIView *emptyView;
+@property (nonatomic, weak) IBOutlet UITableView *mainTable;
+@property (nonatomic, strong) NSMutableArray *topics;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *tableBottomCons;
+@property (weak, nonatomic) IBOutlet UILabel *titleLbl;
+
+- (IBAction)goback:(id)sender;
+
+@end
+
+@implementation CYCollectListController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
+    //self.barStyle = NavBarStyleNone;
+    [self initTitleView];
+    [self initVariable];
+    //    [self addNavigationItem];
+    
+    self.mainTable.tableFooterView = [UIView new];
+    
+    self.topics = [NSMutableArray array];
+    self.mainTable.header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        [self loadFirstPageData];
+    }];
+    self.mainTable.footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+        [self loadMoreData];
+    }];
+    
+    AppDelegate *applegate = APP_DELEGATE;
+    applegate.searchType = CYSearchTypeArticle;
+    
+}
+
+- (void)loadFirstPageData
+{
+    page = 1;
+    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+    
+    [params setObject:@(page) forKey:@"p"];
+    [params setObject:@(REQUEST_COUNT) forKey:@"pageSize"];
+    
+    NSString * apiUrlName = [NSString stringWithFormat:@"myCollect_%@", _type];
+    
+    [CYWebClient Post:apiUrlName parametes:params success:^(id responObject) {
+        
+        NSArray *listArr = nil;
+        if ([responObject isKindOfClass:[NSDictionary class]])
+        {
+            listArr = [responObject objectForKey:@"items"];
+        }else
+        {
+            listArr = responObject;
+        }
+        
+        [self.topics removeAllObjects];
+        [self.topics addObjectsFromArray:listArr];
+        
+        if (self.topics == nil || [self.topics count] == 0)
+        {
+            _emptyView.hidden = NO;
+            
+            
+            [_rightBtn setTitle:@"" forState:UIControlStateNormal];
+            _rightBtn.userInteractionEnabled = NO;
+        }
+        else
+        {
+            _emptyView.hidden = YES;
+            NSString *rightTiele = _bottomView.hidden?@"编辑":@"完成";
+            [_rightBtn setTitle:rightTiele forState:UIControlStateNormal];
+            //            [_rightBtn sizeToFit];
+            _rightBtn.userInteractionEnabled = YES;
+            _bottomView.hidden = [_rightBtn.titleLabel.text isEqualToString:@"编辑"] ? YES : NO;
+            _mainTable.hidden = NO;
+            _tableBottomCons.constant = _bottomView.hidden ? 0 : 50;
+        }
+        
+        [self.mainTable reloadData];
+        
+        BOOL hasMore = [listArr count] == REQUEST_COUNT;
+        if (hasMore) {
+            self.mainTable.footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+                [self loadMoreData];
+            }];
+        } else {
+            self.mainTable.footer = nil;
+            
+        }
+        
+        [self.mainTable.header endRefreshing];
+    } failure:^(id error) {
+        [self.mainTable.header endRefreshing];
+    }];
+}
+
+- (void)loadMoreData
+{
+    page ++;
+    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+    
+    [params setObject:@(page) forKey:@"p"];
+    [params setObject:@(REQUEST_COUNT) forKey:@"pageSize"];
+    
+    NSString * apiUrlName = [NSString stringWithFormat:@"myCollect_%@", _type];
+    
+    [CYWebClient Post:apiUrlName parametes:params success:^(id responObject) {
+        
+        NSArray *listArr = nil;
+        if ([responObject isKindOfClass:[NSDictionary class]])
+        {
+            listArr = [responObject objectForKey:@"items"];
+            
+        }else
+        {
+            listArr = responObject;
+        }
+        
+        [self.topics addObjectsFromArray:listArr];
+        [self.mainTable reloadData];
+        BOOL hasMore = [listArr count] == REQUEST_COUNT;
+        if (hasMore) {
+            self.mainTable.footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+                [self loadMoreData];
+            }];
+        } else {
+            self.mainTable.footer = nil;
+            
+        }
+    } failure:^(id error) {
+        [self.mainTable.footer endRefreshing];
+    }];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (void)initTitleView
+{
+    //    UIView *titleView = [[UIView alloc] initWithFrame:CGRectMake(0,20, 140, 44)];
+    //    titleView.backgroundColor = CLEARCOLOR;
+    //    UILabel *titleLbl = [[UILabel alloc] initWithFrame:CGRectMake(0,12, 140, 20)];
+    _titleName = @"我收藏的茶评";
+    switch (_collectType) {
+        case CYMyColectTypeTea:
+            
+            break;
+        case CYMyColectTypeSample:
+            _titleName = @"我收藏的茶样";
+            break;
+        case CYMyColectTypeArticle:
+            _titleName = @"我收藏的文章";
+            
+            break;
+        case CYMyColectTypeGoods:
+            _titleName = @"我收藏的商品";
+            break;
+        case CYMyColectTypeGroupTopic:
+            _titleName = @"我收藏的话题";
+            break;
+    }
+    
+    //    titleLbl.text = _titleName;
+    //    titleLbl.x = titleView.center.x-70;
+    //    titleLbl.font = FONT(17.0f);
+    //    titleLbl.textColor = NAVTITLECOLOR;
+    //    titleLbl.textAlignment = NSTextAlignmentCenter;
+    //    titleLbl.backgroundColor = CLEARCOLOR;
+    //    [titleView addSubview:titleLbl];
+    //
+    //    self.navigationItem.titleView = titleView;
+    _titleLbl.text = _titleName;
+}
+
+-(void)viewDidAppear:(BOOL)animated
+{
+    //    [MobClick beginLogPageView:_titleName];
+    
+    _selectAllBtn.selected = NO;
+    
+    [_selectedIndexPathArray removeAllObjects];
+    
+    NSIndexPath *idxPath = [self.mainTable indexPathForSelectedRow];
+    if (idxPath) {
+        [self.mainTable deselectRowAtIndexPath:idxPath animated:YES];
+    } else if (self.topics.count == 0) {
+        [self.mainTable.header beginRefreshing];
+    }
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    //    [MobClick endLogPageView:_titleName];
+}
+
+-(void)initVariable
+{
+    _topics = [NSMutableArray array];
+    
+    _selectedIndexPathArray = [[NSMutableArray alloc]init];
+    
+    allGoodsNum = 0;
+    
+    _type = @"tea_comment";
+    _collectTypeName = @"茶评";
+    
+    if(_collectType == CYMyColectTypeSample)
+    {
+        _type = @"tea_sample";
+        _collectTypeName = @"茶样";
+    }
+    else if (_collectType == CYMyColectTypeGoods)
+    {
+        _type = @"goods";
+        _collectTypeName = @"商品";
+    }
+    else if (_collectType == CYMyColectTypeArticle)
+    {
+        _type = @"article";
+        _collectTypeName = @"文章";
+    }
+    else if (_collectType == CYMyColectTypeGroupTopic)
+    {
+        _type = @"topic";
+        _collectTypeName = @"话题";
+    }
+    
+    _emptyLbl.text = [NSString stringWithFormat:@"您还没有收藏任何%@哟", _collectTypeName];
+}
+
+//- (void)addNavigationItem
+//{
+//    _rightBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+//    [_rightBtn setTitle:@"" forState:UIControlStateNormal];
+//    _rightBtn.userInteractionEnabled = NO;
+//    [_rightBtn setTitleColor:NAVTITLECOLOR forState:UIControlStateNormal];
+//    [_rightBtn addTarget:self action:@selector(editBtnclick:) forControlEvents:UIControlEventTouchUpInside];
+//    [_rightBtn sizeToFit];
+//    _rightBtn.titleLabel.font = FONT(16.0f);
+//    //    rightBtn.frame = CGRectMake(0, 0, 80, 44);
+//    UIBarButtonItem *rightItem = [[UIBarButtonItem alloc] initWithCustomView:_rightBtn];
+//    self.navigationItem.rightBarButtonItem = rightItem;
+//    
+//}
+
+-(void)duihuanchayang:(UIButton *)sender
+{
+    NSInteger selectIndex = sender.tag - 3560;
+    CYTeaReviewInfo *info = [CYTeaReviewInfo objectWithKeyValues:_topics[selectIndex]];
+    CYExchangeTeaViewController *vc = viewControllerInStoryBoard(@"CYExchangeTeaViewController", @"Eva");
+    vc.goodsId = info.sampleId;
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+-(IBAction)editBtnclick:(UIButton *)sender
+{
+    _bottomView.hidden = !_bottomView.hidden;
+    NSString *rightTiele = _bottomView.hidden?@"编辑":@"完成";
+    [_rightBtn setTitle:rightTiele forState:UIControlStateNormal];
+    
+    _tableBottomCons.constant = _bottomView.hidden ? 0 : 50;
+    
+    [_mainTable reloadData];
+    
+}
+
+#pragma mark - UITableViewDataSource methods
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return _topics.count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if(_collectType == CYMyColectTypeTea)
+    {
+        CYCollectTeaReviewCell *cell = [CYCollectTeaReviewCell cellWidthTableView:tableView];
+        
+        [cell parseData:[self.topics objectAtIndex:indexPath.row]];
+        cell.cellLeadingCons.constant =  !_bottomView.hidden ? 40 : 14;
+        cell.selectBtn.hidden = !_bottomView.hidden ? NO : YES;
+        cell.totalPointLeadingConsFor4Inch.constant = ((screen_width == 320) && !_bottomView.hidden)? 6: 15;
+        cell.delegate = self;
+        cell.duihuanBtn.tag = 3560 +indexPath.row;
+        [cell.duihuanBtn addTarget:self action:@selector(duihuanchayang:) forControlEvents:UIControlEventTouchUpInside];
+        
+        for (NSIndexPath *selectIndexPath in _selectedIndexPathArray) {
+            if (selectIndexPath.row == indexPath.row) {
+                cell.selectBtn.selected = YES;
+            }else{
+                cell.selectBtn.selected = NO;
+            }
+        }
+        
+        if ([_selectedIndexPathArray count]==0) {
+            cell.selectBtn.selected = NO;
+        }
+        
+        return cell;
+    }
+    else if (_collectType == CYMyColectTypeSample)
+    {
+        CYCollectTeaSampleCell *cell = [CYCollectTeaSampleCell cellWidthTableView:tableView];
+        
+        [cell parseData:[self.topics objectAtIndex:indexPath.row]];
+        
+        cell.imageLeadingCons.constant =  !_bottomView.hidden ? 40 : 14;
+        cell.selectBtn.hidden = !_bottomView.hidden ? NO : YES;
+        cell.delegate = self;
+        
+        for (NSIndexPath *selectIndexPath in _selectedIndexPathArray) {
+            if (selectIndexPath.row == indexPath.row) {
+                cell.selectBtn.selected = YES;
+            }else{
+                cell.selectBtn.selected = NO;
+            }
+        }
+        
+        if ([_selectedIndexPathArray count]==0) {
+            cell.selectBtn.selected = NO;
+        }
+        
+        
+        return cell;
+    }
+    else if (_collectType == CYMyColectTypeGroupTopic)
+    {
+        CYCollectTopicCell *cell = [CYCollectTopicCell cellWidthTableView:tableView];
+        
+        [cell parseData:[self.topics objectAtIndex:indexPath.row]];
+        cell.cellLeadingCons.constant =  !_bottomView.hidden ? 40 : 14;
+        cell.selectBtn.hidden = !_bottomView.hidden ? NO : YES;
+        cell.delegate = self;
+        
+        for (NSIndexPath *selectIndexPath in _selectedIndexPathArray) {
+            if (selectIndexPath.row == indexPath.row) {
+                cell.selectBtn.selected = YES;
+            }else{
+                cell.selectBtn.selected = NO;
+            }
+        }
+        
+        if ([_selectedIndexPathArray count]==0) {
+            cell.selectBtn.selected = NO;
+        }
+        
+        
+        return cell;
+    }
+    else if (_collectType == CYMyColectTypeArticle)
+    {
+        CYCollectArticleCell *cell = [CYCollectArticleCell cellWidthTableView:tableView];
+        
+        [cell parseData:[self.topics objectAtIndex:indexPath.row]];
+        
+        cell.cellLeadingCons.constant =  !_bottomView.hidden ? 40 : 14;
+        cell.selectBtn.hidden = !_bottomView.hidden ? NO : YES;
+        cell.delegate = self;
+        
+        for (NSIndexPath *selectIndexPath in _selectedIndexPathArray) {
+            if (selectIndexPath.row == indexPath.row) {
+                cell.selectBtn.selected = YES;
+            }else{
+                cell.selectBtn.selected = NO;
+            }
+        }
+        if ([_selectedIndexPathArray count]==0) {
+            cell.selectBtn.selected = NO;
+        }
+        
+        
+        return cell;
+    }
+    else if (_collectType == CYMyColectTypeGoods)
+    {
+        CYCollectGoodCell *cell = [CYCollectGoodCell cellWidthTableView:tableView];
+        
+        [cell parseData:[self.topics objectAtIndex:indexPath.row]];
+        
+        cell.cellLeadingCons.constant =  !_bottomView.hidden ? 40 : 14;
+        cell.selectBtn.hidden = !_bottomView.hidden ? NO : YES;
+        cell.delegate = self;
+        
+        for (NSIndexPath *selectIndexPath in _selectedIndexPathArray) {
+            if (selectIndexPath.row == indexPath.row) {
+                cell.selectBtn.selected = YES;
+            }else{
+                cell.selectBtn.selected = NO;
+            }
+        }
+        if ([_selectedIndexPathArray count]==0) {
+            cell.selectBtn.selected = NO;
+        }
+        
+        
+        return cell;
+    }
+    return nil;
+}
+
+#pragma mark -
+#pragma mark CYCollectTeaSampleCellDelegate method
+- (void)selectCollectTeaSampleCell:(CYCollectTeaSampleCell *)cell
+{
+    NSIndexPath *indexPath  = [_mainTable indexPathForCell:cell];
+    
+    for (NSIndexPath *myIndexPath in _selectedIndexPathArray) {
+        if (indexPath.section == myIndexPath.section) {
+            if (myIndexPath.row == indexPath.row) {//取消选中
+                NSLog(@"myIndexPath.row = %d  And indexPath.row = %d",(int)myIndexPath.row,(int)indexPath.row);
+                allGoodsNum --;
+                NSString *allNum = [NSString stringWithFormat:@"取消收藏 (%d)",(int)allGoodsNum];
+                [_cancelBtn setTitle:allNum forState:UIControlStateNormal];
+                [cell.selectBtn setSelected:NO];
+                [_selectedIndexPathArray removeObject:myIndexPath];
+                //全部取消，头部取消
+                NSInteger cancelSection = indexPath.section;
+                NSInteger totalSectionRow = 0;
+                for (int i=0; i<_selectedIndexPathArray.count; i++) {
+                    NSIndexPath *currentIndex = _selectedIndexPathArray[i];
+                    if (currentIndex.section == cancelSection) {
+                        totalSectionRow ++;
+                    }
+                }
+                _selectAllBtn.selected = NO;
+                return;
+            }
+        }
+    }
+    [_selectedIndexPathArray addObject:indexPath];
+    [cell.selectBtn setSelected:YES];
+    //选中全部 头部选中
+    NSInteger addSection = indexPath.section;
+    NSInteger totalSectionRow = 0;
+    
+    allGoodsNum = 0;
+    for (int i=0; i<_selectedIndexPathArray.count; i++) {
+        allGoodsNum ++;
+        NSIndexPath *currentIndex = _selectedIndexPathArray[i];
+        if (currentIndex.section == addSection) {
+            totalSectionRow ++;
+        }
+    }
+    
+    NSString *allNum = [NSString stringWithFormat:@"取消收藏 (%d)",(int)allGoodsNum];
+    [_cancelBtn setTitle:allNum forState:UIControlStateNormal];
+    
+    if (totalSectionRow == [_topics count]) {
+        _selectAllBtn.selected = YES;
+        [_mainTable reloadData];
+    }
+}
+
+#pragma mark -
+#pragma mark CYCollectTeaReviewCellDelegate method
+- (void)selectCollectTeaReviewCell:(CYCollectTeaReviewCell *)cell
+{
+    NSIndexPath *indexPath  = [_mainTable indexPathForCell:cell];
+    
+    for (NSIndexPath *myIndexPath in _selectedIndexPathArray) {
+        if (indexPath.section == myIndexPath.section) {
+            if (myIndexPath.row == indexPath.row) {//取消选中
+                NSLog(@"myIndexPath.row = %d  And indexPath.row = %d",(int)myIndexPath.row,(int)indexPath.row);
+                allGoodsNum --;
+                NSString *allNum = [NSString stringWithFormat:@"取消收藏 (%d)",(int)allGoodsNum];
+                [_cancelBtn setTitle:allNum forState:UIControlStateNormal];
+                [cell.selectBtn setSelected:NO];
+                [_selectedIndexPathArray removeObject:myIndexPath];
+                //全部取消，头部取消
+                NSInteger cancelSection = indexPath.section;
+                NSInteger totalSectionRow = 0;
+                for (int i=0; i<_selectedIndexPathArray.count; i++) {
+                    NSIndexPath *currentIndex = _selectedIndexPathArray[i];
+                    if (currentIndex.section == cancelSection) {
+                        totalSectionRow ++;
+                    }
+                }
+                _selectAllBtn.selected = NO;
+                return;
+            }
+        }
+    }
+    [_selectedIndexPathArray addObject:indexPath];
+    [cell.selectBtn setSelected:YES];
+    //选中全部 头部选中
+    NSInteger addSection = indexPath.section;
+    NSInteger totalSectionRow = 0;
+    
+    allGoodsNum = 0;
+    for (int i=0; i<_selectedIndexPathArray.count; i++) {
+        allGoodsNum ++;
+        NSIndexPath *currentIndex = _selectedIndexPathArray[i];
+        if (currentIndex.section == addSection) {
+            totalSectionRow ++;
+        }
+    }
+    
+    NSString *allNum = [NSString stringWithFormat:@"取消收藏 (%d)",(int)allGoodsNum];
+    [_cancelBtn setTitle:allNum forState:UIControlStateNormal];
+    
+    if (totalSectionRow == [_topics count]) {
+        _selectAllBtn.selected = YES;
+        [_mainTable reloadData];
+    }
+}
+
+#pragma mark -
+#pragma mark CYCollectTopicCellDelegate method
+- (void)selectCollectTopicCell:(CYCollectTopicCell *)cell
+{
+    NSIndexPath *indexPath  = [_mainTable indexPathForCell:cell];
+    
+    for (NSIndexPath *myIndexPath in _selectedIndexPathArray) {
+        if (indexPath.section == myIndexPath.section) {
+            if (myIndexPath.row == indexPath.row) {//取消选中
+                NSLog(@"myIndexPath.row = %d  And indexPath.row = %d",(int)myIndexPath.row,(int)indexPath.row);
+                allGoodsNum --;
+                NSString *allNum = [NSString stringWithFormat:@"取消收藏 (%d)",(int)allGoodsNum];
+                [_cancelBtn setTitle:allNum forState:UIControlStateNormal];
+                [cell.selectBtn setSelected:NO];
+                [_selectedIndexPathArray removeObject:myIndexPath];
+                //全部取消，头部取消
+                NSInteger cancelSection = indexPath.section;
+                NSInteger totalSectionRow = 0;
+                for (int i=0; i<_selectedIndexPathArray.count; i++) {
+                    NSIndexPath *currentIndex = _selectedIndexPathArray[i];
+                    if (currentIndex.section == cancelSection) {
+                        totalSectionRow ++;
+                    }
+                }
+                _selectAllBtn.selected = NO;
+                return;
+            }
+        }
+    }
+    [_selectedIndexPathArray addObject:indexPath];
+    [cell.selectBtn setSelected:YES];
+    //选中全部 头部选中
+    NSInteger addSection = indexPath.section;
+    NSInteger totalSectionRow = 0;
+    
+    allGoodsNum = 0;
+    for (int i=0; i<_selectedIndexPathArray.count; i++) {
+        allGoodsNum ++;
+        NSIndexPath *currentIndex = _selectedIndexPathArray[i];
+        if (currentIndex.section == addSection) {
+            totalSectionRow ++;
+        }
+    }
+    
+    NSString *allNum = [NSString stringWithFormat:@"取消收藏 (%d)",(int)allGoodsNum];
+    [_cancelBtn setTitle:allNum forState:UIControlStateNormal];
+    
+    if (totalSectionRow == [_topics count]) {
+        _selectAllBtn.selected = YES;
+        [_mainTable reloadData];
+    }
+}
+
+#pragma mark -
+#pragma mark CYCollectGoodCellDelegate method
+- (void)selectCollectGoodCell:(CYCollectGoodCell *)cell
+{
+    NSIndexPath *indexPath  = [_mainTable indexPathForCell:cell];
+    
+    for (NSIndexPath *myIndexPath in _selectedIndexPathArray) {
+        if (indexPath.section == myIndexPath.section) {
+            if (myIndexPath.row == indexPath.row) {//取消选中
+                NSLog(@"myIndexPath.row = %d  And indexPath.row = %d",(int)myIndexPath.row,(int)indexPath.row);
+                allGoodsNum --;
+                NSString *allNum = [NSString stringWithFormat:@"取消收藏 (%d)",(int)allGoodsNum];
+                [_cancelBtn setTitle:allNum forState:UIControlStateNormal];
+                [cell.selectBtn setSelected:NO];
+                [_selectedIndexPathArray removeObject:myIndexPath];
+                //全部取消，头部取消
+                NSInteger cancelSection = indexPath.section;
+                NSInteger totalSectionRow = 0;
+                for (int i=0; i<_selectedIndexPathArray.count; i++) {
+                    NSIndexPath *currentIndex = _selectedIndexPathArray[i];
+                    if (currentIndex.section == cancelSection) {
+                        totalSectionRow ++;
+                    }
+                }
+                _selectAllBtn.selected = NO;
+                return;
+            }
+        }
+    }
+    [_selectedIndexPathArray addObject:indexPath];
+    [cell.selectBtn setSelected:YES];
+    //选中全部 头部选中
+    NSInteger addSection = indexPath.section;
+    NSInteger totalSectionRow = 0;
+    
+    allGoodsNum = 0;
+    for (int i=0; i<_selectedIndexPathArray.count; i++) {
+        allGoodsNum ++;
+        NSIndexPath *currentIndex = _selectedIndexPathArray[i];
+        if (currentIndex.section == addSection) {
+            totalSectionRow ++;
+        }
+    }
+    
+    NSString *allNum = [NSString stringWithFormat:@"取消收藏 (%d)",(int)allGoodsNum];
+    [_cancelBtn setTitle:allNum forState:UIControlStateNormal];
+    
+    if (totalSectionRow == [_topics count]) {
+        _selectAllBtn.selected = YES;
+        [_mainTable reloadData];
+    }
+}
+
+#pragma mark -
+#pragma mark CYCollectArticleCellDelegate method
+- (void)selectCollectArticleCell:(CYCollectArticleCell *)cell
+{
+    NSIndexPath *indexPath  = [_mainTable indexPathForCell:cell];
+    
+    for (NSIndexPath *myIndexPath in _selectedIndexPathArray) {
+        if (indexPath.section == myIndexPath.section) {
+            if (myIndexPath.row == indexPath.row) {//取消选中
+                NSLog(@"myIndexPath.row = %d  And indexPath.row = %d",(int)myIndexPath.row,(int)indexPath.row);
+                allGoodsNum --;
+                NSString *allNum = [NSString stringWithFormat:@"取消收藏 (%d)",(int)allGoodsNum];
+                [_cancelBtn setTitle:allNum forState:UIControlStateNormal];
+                [cell.selectBtn setSelected:NO];
+                [_selectedIndexPathArray removeObject:myIndexPath];
+                //全部取消，头部取消
+                NSInteger cancelSection = indexPath.section;
+                NSInteger totalSectionRow = 0;
+                for (int i=0; i<_selectedIndexPathArray.count; i++) {
+                    NSIndexPath *currentIndex = _selectedIndexPathArray[i];
+                    if (currentIndex.section == cancelSection) {
+                        totalSectionRow ++;
+                    }
+                }
+                _selectAllBtn.selected = NO;
+                return;
+            }
+        }
+    }
+    [_selectedIndexPathArray addObject:indexPath];
+    [cell.selectBtn setSelected:YES];
+    //选中全部 头部选中
+    NSInteger addSection = indexPath.section;
+    NSInteger totalSectionRow = 0;
+    
+    allGoodsNum = 0;
+    for (int i=0; i<_selectedIndexPathArray.count; i++) {
+        allGoodsNum ++;
+        NSIndexPath *currentIndex = _selectedIndexPathArray[i];
+        if (currentIndex.section == addSection) {
+            totalSectionRow ++;
+        }
+    }
+    
+    NSString *allNum = [NSString stringWithFormat:@"取消收藏 (%d)",(int)allGoodsNum];
+    [_cancelBtn setTitle:allNum forState:UIControlStateNormal];
+    
+    if (totalSectionRow == [_topics count]) {
+        _selectAllBtn.selected = YES;
+        [_mainTable reloadData];
+    }
+}
+
+#pragma mark - UITableViewDelegate methods
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if(_collectType == CYMyColectTypeTea)
+    {
+        return 140;
+    }
+    else if (_collectType == CYMyColectTypeSample)
+    {
+        return 140;
+    }
+    else if (_collectType == CYMyColectTypeArticle)
+    {
+        return 106;
+    }
+    else if (_collectType == CYMyColectTypeGoods)
+    {
+        return 131;
+    }
+    else if (_collectType == CYMyColectTypeGroupTopic)
+    {
+        return 144;
+    }
+    return 140;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if(_collectType == CYMyColectTypeTea)
+    {
+        CYTeaReviewDetailViewController *vc = [[CYTeaReviewDetailViewController alloc] initWithNibName:@"CYTeaReviewDetailViewController" bundle:nil];
+        vc.mTeaId = [_topics[indexPath.row] objectForJSONKey:@"id"];
+        [self.navigationController pushViewController:vc animated:YES];
+    }
+    else if (_collectType == CYMyColectTypeSample)
+    {
+        CYTeaSampleDetailViewController *vc = viewControllerInStoryBoard(@"CYTeaSampleDetailViewController", @"Eva");
+        vc.mSampleid = [_topics[indexPath.row] objectForJSONKey:@"id"];
+        [self.navigationController pushViewController:vc animated:YES];
+    }
+    else if (_collectType == CYMyColectTypeArticle)
+    {
+        CYWenZhangDetailsController *vc = viewControllerInStoryBoard(@"CYWenZhangDetailsController", @"WenZhang");
+        
+        //        CYArticleInfo * info = [CYArticleInfo objectWithKeyValues:_topics[indexPath.row]];
+        //        info.itemid = [_topics[indexPath.row] objectForJSONKey:@"id"];
+        vc.wenzhangId =[_topics[indexPath.row] objectForJSONKey:@"id"];
+        [self.navigationController pushViewController:vc animated:YES];
+        
+    }
+    else if (_collectType == CYMyColectTypeGoods)
+    {
+        CYProductDetViewController *vc= viewControllerInStoryBoard(@"CYProductDetViewController", @"TeaMall");
+        vc.goodId = [_topics[indexPath.row] objectForJSONKey:@"id"];
+        [self.navigationController pushViewController:vc animated:YES];
+    }
+    else if (_collectType == CYMyColectTypeGroupTopic)
+    {
+        CYTopicDetailController *tdc = viewControllerInStoryBoard(@"CYTopicDetailController", @"BBS");
+        //        tdc.hidesBottomBarWhenPushed = YES;
+        tdc.tid = [_topics[indexPath.row] objectForJSONKey:@"id"];
+        [self.navigationController pushViewController:tdc animated:YES];
+    }
+}
+
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    for (NSIndexPath *myindexPath in _selectedIndexPathArray) {
+        if (myindexPath.section == indexPath.section) {
+            if (myindexPath.row == indexPath.row) {
+                if(_collectType == CYMyColectTypeTea)
+                {
+                    CYCollectTeaReviewCell *myCell = (CYCollectTeaReviewCell *)cell;
+                    myCell.selectBtn.selected = YES;
+                }
+                else if (_collectType == CYMyColectTypeSample)
+                {
+                    CYCollectTeaSampleCell *myCell = (CYCollectTeaSampleCell *)cell;
+                    myCell.selectBtn.selected = YES;
+                }
+                else if (_collectType == CYMyColectTypeGoods)
+                {
+                    CYCollectGoodCell *myCell = (CYCollectGoodCell *)cell;
+                    myCell.selectBtn.selected = YES;
+                }
+                else if (_collectType == CYMyColectTypeArticle)
+                {
+                    CYCollectArticleCell *myCell = (CYCollectArticleCell *)cell;
+                    myCell.selectBtn.selected = YES;
+                }
+                else if (_collectType == CYMyColectTypeGroupTopic)
+                {
+                    CYCollectTopicCell *myCell = (CYCollectTopicCell *)cell;
+                    myCell.selectBtn.selected = YES;
+                }
+            }
+        }
+        
+    }
+}
+
+#pragma mark -
+#pragma mark 按钮点击事件 method
+/**
+ *  选择所有商品
+ */
+- (IBAction)selectAllGoods_click:(UIButton *)sender {
+    
+    [_selectedIndexPathArray removeAllObjects];
+    NSInteger totalNum = 0;
+    if (!sender.selected) {
+        [sender setSelected:YES];
+        totalNum +=([_topics count]);
+        for (int j=0; j<[_topics count]; j++) {
+            [_selectedIndexPathArray addObject:[NSIndexPath indexPathForRow:j inSection:0]];
+        }
+    }
+    else{
+        totalNum = 0;
+        [sender setSelected:NO];
+        [_selectedIndexPathArray removeAllObjects];
+    }
+    allGoodsNum = totalNum;
+    NSString *allNum = [NSString stringWithFormat:@"取消收藏 (%d)",(int)totalNum];
+    [_cancelBtn setTitle:allNum forState:UIControlStateNormal];
+    [_mainTable reloadData];
+}
+
+
+/**
+ *  取消收藏
+ *
+ *  @param IBAction <#IBAction description#>
+ *
+ *  @return <#return value description#>
+ */
+
+
+- (IBAction)cancelCollect_click:(id)sender {
+    
+    NSMutableArray *specdataIdArr = [NSMutableArray array];
+    for (int i =0; i<[_selectedIndexPathArray count]; i++) {
+        NSIndexPath *indexPath = [_selectedIndexPathArray objectAtIndex:i];
+        
+        NSDictionary * dic = [_topics objectAtIndex:indexPath.row];
+        [specdataIdArr addObject:[dic objectForKey:@"id"]];
+        
+    }
+    
+    if ([specdataIdArr count]>0) {
+        
+        NSMutableString * collectStr = [NSMutableString string];
+        
+        for (NSString * collectId in specdataIdArr) {
+            [collectStr appendString:[NSString stringWithFormat:@"%@,",collectId]];
+        }
+        
+        NSString * collStr = [collectStr substringToIndex:collectStr.length - 1];
+        
+        [CYWebClient Post:@"myCollect_delete" parametes:@{@"ids":collStr, @"type": _type } success:^(id responObject) {
+            [_cancelBtn setTitle:@"取消收藏 (0)" forState:UIControlStateNormal];
+            [_topics removeAllObjects];
+            [_selectedIndexPathArray removeAllObjects];
+            [self loadFirstPageData];
+            //            [self.mainTable.header beginRefreshing];
+        } failure:^(id error) {
+            
+        }];
+    }else{
+        [Itost showMsg:[NSString stringWithFormat:@"请选择要取消的%@！", _collectTypeName] inView:WINDOW];
+    }
+}
+
+- (IBAction)goback:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+@end

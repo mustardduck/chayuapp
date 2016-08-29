@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="CYTeaCommentListViewController">
+            <connections>
+                <outlet property="iTable" destination="oGe-Rf-t1g" id="RG8-We-Qov"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+                <outlet property="writeCommentBtn" destination="0fr-FT-VaR" id="AW8-Xe-mru"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="oGe-Rf-t1g" customClass="CYPullTableView">
+                    <rect key="frame" x="0.0" y="64" width="320" height="504"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <color key="separatorColor" red="0.8666666666666667" green="0.8666666666666667" blue="0.8666666666666667" alpha="1" colorSpace="calibratedRGB"/>
+                    <inset key="separatorInset" minX="15" minY="0.0" maxX="15" maxY="0.0"/>
+                </tableView>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="spO-g7-Kbk">
+                    <rect key="frame" x="0.0" y="495" width="320" height="73"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0fr-FT-VaR">
+                            <rect key="frame" x="12" y="14" width="296" height="45"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="45" id="vUu-5D-6Fx"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                            <state key="normal" title="发表评鉴">
+                                <color key="titleColor" red="0.53725490200000003" green="0.24313725489999999" blue="0.12549019610000001" alpha="1" colorSpace="calibratedRGB"/>
+                            </state>
+                            <connections>
+                                <action selector="clickWriteComment:" destination="-1" eventType="touchUpInside" id="Oxj-eU-WEK"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstItem="0fr-FT-VaR" firstAttribute="leading" secondItem="spO-g7-Kbk" secondAttribute="leading" constant="12" id="K6g-YO-8zw"/>
+                        <constraint firstAttribute="height" constant="73" id="Mub-Q3-Pf5"/>
+                        <constraint firstAttribute="trailing" secondItem="0fr-FT-VaR" secondAttribute="trailing" constant="12" id="gBO-Ca-Wwb"/>
+                        <constraint firstItem="0fr-FT-VaR" firstAttribute="centerY" secondItem="spO-g7-Kbk" secondAttribute="centerY" id="tBF-cu-5ne"/>
+                        <constraint firstItem="0fr-FT-VaR" firstAttribute="centerX" secondItem="spO-g7-Kbk" secondAttribute="centerX" id="wdp-sF-4iP"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="oGe-Rf-t1g" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="D48-PB-FgJ"/>
+                <constraint firstAttribute="bottom" secondItem="oGe-Rf-t1g" secondAttribute="bottom" id="F2J-k2-mUp"/>
+                <constraint firstItem="oGe-Rf-t1g" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="64" id="FjM-hx-FBt"/>
+                <constraint firstItem="spO-g7-Kbk" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="KIJ-tQ-1G7"/>
+                <constraint firstAttribute="trailing" secondItem="spO-g7-Kbk" secondAttribute="trailing" id="Rg3-b6-Lcw"/>
+                <constraint firstAttribute="trailing" secondItem="oGe-Rf-t1g" secondAttribute="trailing" id="VSR-Q7-hv6"/>
+                <constraint firstAttribute="bottom" secondItem="spO-g7-Kbk" secondAttribute="bottom" id="lbB-5g-QM3"/>
+            </constraints>
+            <point key="canvasLocation" x="219" y="283"/>
+        </view>
+    </objects>
+</document>

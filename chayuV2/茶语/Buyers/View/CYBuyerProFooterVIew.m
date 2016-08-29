@@ -1,0 +1,103 @@
+//
+//  CYBuyerProFooterVIew.m
+//  茶语
+//
+//  Created by Leen on 16/7/14.
+//  Copyright © 2016年 Chayu. All rights reserved.
+//
+
+#import "CYBuyerProFooterVIew.h"
+
+@interface CYBuyerProFooterVIew ()
+
+@property (weak, nonatomic) IBOutlet UIView *contentView;
+@property (weak, nonatomic) IBOutlet UIImageView *sellerImg;
+@property (weak, nonatomic) IBOutlet UILabel *sellerName;
+@property (weak, nonatomic) IBOutlet UILabel *sellerIns;
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *goods_top_cons;
+
+@property (weak, nonatomic) IBOutlet UIView *goodsView;
+@property (weak, nonatomic) IBOutlet UIButton *attentionBtn;
+
+- (IBAction)mingjiajieshao_click:(id)sender;
+
+- (IBAction)attention_click:(id)sender;
+
+@property (weak, nonatomic) IBOutlet UIButton *publicBtn;
+
+
+@end
+
+@implementation CYBuyerProFooterVIew
+
+-(void)awakeFromNib
+{
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(mingjiajieshao_click:)];
+    [_sellerImg addGestureRecognizer:tap];
+    _sellerImg.layer.cornerRadius = _sellerImg.height/2.0;
+    _sellerImg.layer.borderWidth  = 2.;
+    _sellerImg.layer.borderColor = [UIColor whiteColor].CGColor;
+}
+
+- (void)setSeller:(NSDictionary *)seller
+{
+    _seller = seller;
+    NSString *imgPath = [_seller objectForKey:@"avatar"];
+    
+    if (imgPath.length) {
+        [_sellerImg sd_setImageWithURL:[NSURL URLWithString:imgPath] placeholderImage:DEFAULTHEADER];
+    }
+    _sellerName.text = [_seller objectForKey:@"sellerName"];
+    _sellerIns.text = [_seller objectForKey:@"description"];
+    NSInteger isAttend = [[_seller objectForKey:@"isAttend"] integerValue];
+    
+    _attentionBtn.selected = isAttend == 0 ? NO : YES;
+    
+}
+
+- (void)setOnlyShowTop:(BOOL)onlyShowTop
+{
+    _onlyShowTop = onlyShowTop;
+    if (_onlyShowTop) {
+        [_goodsView removeFromSuperview];
+    }
+}
+
+
+-(void)setOnlyShopBottom:(BOOL)onlyShopBottom
+{
+    _onlyShopBottom = onlyShopBottom;
+    if (_onlyShopBottom) {
+        if (!_onlyShowTop) {
+            [self addSubview:_goodsView];
+            _goods_top_cons.constant = -190.0f;
+        }
+    }
+}
+
+#define CONTENT_WIDTH ((SCREEN_WIDTH -60)/3)
+#define CONTENT_HEIGHT 170
+
+- (IBAction)mingjiajieshao_click:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(mingjiajieshao:)]) {
+        [self.delegate mingjiajieshao:_sellerUid];
+    }
+}
+
+- (IBAction)attention_click:(id)sender {
+    [self doAttend:_sellerUid];
+}
+
+-(void)doAttend:(NSString *)masterId
+{
+    [CYWebClient Post:@"DoAttend" parametes:@{@"sellerUid":masterId} success:^(id responObj) {
+        NSInteger status = [[responObj objectForKey:@"status"] integerValue];
+        
+        _attentionBtn.selected = status == 1 ? NO : YES;
+ 
+    } failure:^(id err) {
+        NSLog(@"%@",err);
+    }];
+}
+@end
