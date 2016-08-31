@@ -24,7 +24,7 @@
 #import "BBWebView.h"
 #import "AppDelegate.h"
 #import "UICommon.h"
-
+#import "CYTeaListModel.h"
 @interface CYMasterDetailViewController ()<UIWebViewDelegate,UITableViewDataSource,UITableViewDelegate,BBWebViewSizeAdjust>
 {
     NSString *sellerGoodsCount;
@@ -35,6 +35,8 @@
     UIView *headerView;
     BBWebView *infoWeb;
     OSMessage * _shareMsg;
+    NSMutableArray *_dataArr;
+    NSInteger page;
 }
 - (IBAction)goback:(id)sender;
 @property (weak, nonatomic) IBOutlet UIWebView *webView;
@@ -47,10 +49,25 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     sellerGoodsCount = @"";
-     _shareMsg = [[OSMessage alloc] init];
+    _dataArr = [NSMutableArray array];
+    page = 1;
+    _shareMsg = [[OSMessage alloc] init];
     infoview_height = 0.0;
     goodsId = @"";
+    hiddenSepretor(_tableView);
     __weak __typeof(self) weakSelf = self;
+    
+    _tableView.header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        [weakSelf loadTableViewData:NO];
+        
+    }];
+    
+    
+    
+    _tableView.footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+        [weakSelf loadTableViewData:YES];
+    }];
+    
     [CYWebClient basePost:@"TeaMall_SellerDetail" parametes:@{@"sellerUid":_uid} success:^(id responObj) {
         
         NSInteger state = [[responObj objectForKey:@"state"] integerValue];
@@ -61,16 +78,16 @@
             _shareMsg.link = [dic objectForJSONKey:@"url"];
             _shareMsg.imgUrl = [dic objectForJSONKey:@"thumb"];
         }
-
+        
         if (state == 400) {
             NSDictionary *dataInfo = [responObj objectForKey:@"data"];
             data = [CYMatserDetailModel objectWithKeyValues:dataInfo];
             [weakSelf resetHeader];
-            [weakSelf.tableView reloadData];
+            [weakSelf loadTableViewData:NO];
         }
-      
-
-   
+        
+        
+        
         
     } failure:^(id err) {
         NSLog(@"%@",err);
@@ -82,7 +99,60 @@
     self.automaticallyAdjustsScrollViewInsets = NO;
     _tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     [_tableView registerNib:[UINib nibWithNibName:@"CYMasterDetailCell" bundle:nil] forCellReuseIdentifier:@"MasterDetailCell"];
+    
+    
+    
 }
+
+-(void)loadTableViewData:(BOOL)loadMore
+{
+    if (loadMore) {
+        page ++;
+    }else{
+        page =1;
+    }
+    __weak __typeof(self) weakSelf = self;
+    [CYWebClient Post:@"SellerGoodsList" parametes:@{@"sellerUid":weakSelf.uid,@"p":@(page),@"pageSize":@"10"} success:^(id responObj) {
+        NSArray *goodsList = [responObj objectForKey:@"goodsList"];
+        weakSelf.title = [NSString stringWithFormat:@"%@·商品",[responObj objectForKey:@"sellerName"]];
+        
+        if (loadMore) {
+            [weakSelf.tableView.footer endRefreshing];
+        }else{
+            [weakSelf.tableView.header endRefreshing];
+            [_dataArr removeAllObjects];
+        }
+        
+        if ([goodsList count]<10) {
+            [weakSelf.tableView.footer endRefreshingWithNoMoreData];
+        }else{
+            [weakSelf.tableView.footer resetNoMoreData];
+        }
+        
+        
+        [_dataArr addObjectsFromArray:[CYTeaListModel objectArrayWithKeyValuesArray:goodsList]];
+        [weakSelf.tableView reloadData];
+        
+        
+        if (![goodsList isKindOfClass:[NSNull class]] && [goodsList count] < PAGESIZE) {
+            weakSelf.tableView.footer = nil;
+        }else{
+            weakSelf.tableView.footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+                [weakSelf loadTableViewData:YES];
+            }];
+        }
+        
+    } failure:^(id err) {
+        if (loadMore) {
+            [weakSelf.tableView.footer endRefreshing];
+        }else{
+            [weakSelf.tableView.header endRefreshing];
+        }
+    }];
+    
+}
+
+
 
 -(void)viewWillAppear:(BOOL)animated
 {
@@ -109,14 +179,14 @@
 }
 
 /*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
+ #pragma mark - Navigation
+ 
+ // In a storyboard-based application, you will often want to do a little preparation before navigation
+ - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+ // Get the new view controller using [segue destinationViewController].
+ // Pass the selected object to the new view controller.
+ }
+ */
 
 - (IBAction)goback:(id)sender {
     [self.navigationController popViewControllerAnimated:YES];
@@ -126,49 +196,49 @@
 #pragma mark UIWebViewDelegate method
 -(void)webViewDidFinishLoad:(UIWebView *)webView
 {
-//    CGFloat height = webView.scrollView.contentSize.height;
-//    CGRect frame = webView.frame;
-//    frame.size.height = height;
-//    webView.frame = frame;
-//    
-//    frame = headerView.frame;
-//    frame.size.height += height;
-//    headerView.frame = frame;
-//    
-//    self.tableView.tableHeaderView = nil;
-//    self.tableView.tableHeaderView = headerView;
+    //    CGFloat height = webView.scrollView.contentSize.height;
+    //    CGRect frame = webView.frame;
+    //    frame.size.height = height;
+    //    webView.frame = frame;
+    //    
+    //    frame = headerView.frame;
+    //    frame.size.height += height;
+    //    headerView.frame = frame;
+    //    
+    //    self.tableView.tableHeaderView = nil;
+    //    self.tableView.tableHeaderView = headerView;
 }
 
 /*
-- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
-{
-    NSLog(@"request = %@",request);
-    NSString *url = [request.URL absoluteString];
-    NSLog(@"url = %@",url);
-    if([url containsString:@"#dsjj"]){//介绍
-        return YES;
-    }else
-    if ([url containsString:@"appDetail"]){//好茶详情
-//        if ([sellerGoodsCount integerValue] == 1) {
-//               CYProductDetViewController *vc =viewControllerInStoryBoard(@"CYProductDetViewController", @"Classification");
-//            vc.goodId = goodsId;
-//            [self.navigationController pushViewController:vc animated:YES];
-//        }else{
-//            CYTeaListViewController *vc = viewControllerInStoryBoard(@"CYTeaListViewController", @"Home");
-//            vc.uid = _uid;
-//            [self.navigationController pushViewController:vc animated:YES];
-//        }
-     
-        return NO;
-        
-    }else if ([url containsString:@"appAttend"]){//关注
-        [self doAttend:_uid];
-        return NO;
-        
-    }
-    return YES;
-}
-*/
+ - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
+ {
+ NSLog(@"request = %@",request);
+ NSString *url = [request.URL absoluteString];
+ NSLog(@"url = %@",url);
+ if([url containsString:@"#dsjj"]){//介绍
+ return YES;
+ }else
+ if ([url containsString:@"appDetail"]){//好茶详情
+ //        if ([sellerGoodsCount integerValue] == 1) {
+ //               CYProductDetViewController *vc =viewControllerInStoryBoard(@"CYProductDetViewController", @"Classification");
+ //            vc.goodId = goodsId;
+ //            [self.navigationController pushViewController:vc animated:YES];
+ //        }else{
+ //            CYTeaListViewController *vc = viewControllerInStoryBoard(@"CYTeaListViewController", @"Home");
+ //            vc.uid = _uid;
+ //            [self.navigationController pushViewController:vc animated:YES];
+ //        }
+ 
+ return NO;
+ 
+ }else if ([url containsString:@"appAttend"]){//关注
+ [self doAttend:_uid];
+ return NO;
+ 
+ }
+ return YES;
+ }
+ */
 
 #pragma mark -
 #pragma mark TableView
@@ -179,7 +249,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return data.list.count;
+    return _dataArr.count;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -193,16 +263,15 @@
     
     NSInteger row = indexPath.row;
     
-    CYGoodsListModel *model = data.list[row];
+    CYTeaListModel *model = _dataArr[row];
     
     CYMasterDetailCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     if (!cell) {
         cell = [[[NSBundle mainBundle] loadNibNamed:@"CYMasterDetailCell" owner:nil options:nil] firstObject];
     }
-    [cell.iv_pic sd_setImageWithURL:[NSURL URLWithString:model.path] placeholderImage:WIDEIMG];
+    [cell.iv_pic sd_setImageWithURL:[NSURL URLWithString:model.thumb] placeholderImage:WIDEIMG];
     cell.lb_name.text = model.name;
-    cell.desc.text = model.des;
-    
+    cell.desc.text = model.desc;
     if (![model.mainid isEqualToString:@"13"]) {
         [cell.detailsBtn setTitle:@"商品详情" forState:UIControlStateNormal];
     }else{
@@ -216,7 +285,7 @@
     };
     
     cell.bunowBlock = ^(){
-     [self lijigoumai:model];
+        [self lijigoumai:model];
     };
     
     
@@ -224,7 +293,7 @@
 }
 
 
--(void)lijigoumai:(CYGoodsListModel *)info
+-(void)lijigoumai:(CYTeaListModel *)info
 {
     
     if (!MANAGER.isLoged) {
@@ -233,7 +302,7 @@
     }
     
     CYShopTrolleyModel *model = [[CYShopTrolleyModel alloc] init];
-    CGFloat price = [info.price floatValue];
+    CGFloat price = [info.price_sell floatValue];
     
     NSString *sellerid = [info.is_self boolValue]?@"1":_uid;
     
@@ -241,18 +310,18 @@
     NSString *avatar = data.avatar;
     NSMutableArray *goodsArr = [NSMutableArray array];
     NSMutableArray *detailArr  =[NSMutableArray array];
-    model.thumb = info.path;
-    model.name = info.goodsname;
+    model.thumb = info.thumb;
+    model.name = info.name;
     model.goodsNumber = @"1";
     model.goodsId = info.goods_id;
-    model.specId = info.spec_id;
-    model.specdataId = info.spec_id;
+    //    model.specId = info.spec_id;
+    //    model.specdataId = info.spec_id;
     model.commodityPrice = [NSString stringWithFormat:@"%.2f",price];
     [goodsArr addObject:model];
     NSDictionary *dataInfo = @{@"goodsList":goodsArr,
-                           @"commodityCount":@"1",
-                           @"seller":@{@"sellerName":sellerName,@"sellerAvatar":avatar,@"sellerUid":sellerid},
-                           @"orderPrice":[NSNumber numberWithFloat:price]};
+                               @"commodityCount":@"1",
+                               @"seller":@{@"sellerName":sellerName,@"sellerAvatar":avatar,@"sellerUid":sellerid},
+                               @"orderPrice":[NSNumber numberWithFloat:price]};
     
     
     CYOrderDetailModel *goodsModel = [CYOrderDetailModel objectWithKeyValues:dataInfo];
@@ -311,9 +380,9 @@
         if ([data.gid isEqualToString:@"9"]) {
             [btn setTitle:@"大师介绍" forState:UIControlStateNormal];
         }else{
-             [btn setTitle:@"名家介绍" forState:UIControlStateNormal];
+            [btn setTitle:@"名家介绍" forState:UIControlStateNormal];
         }
-       
+        
         btn.backgroundColor = COLOR(96, 92, 83, 1);
         btn.titleLabel.font = [UIFont systemFontOfSize:14];
         btn.layer.masksToBounds = YES;
@@ -329,7 +398,7 @@
         }else{
             [btn setTitle:@"好茶详情" forState:UIControlStateNormal];
         }
-   
+        
         btn.backgroundColor = COLOR(96, 92, 83, 1);
         btn.titleLabel.font = [UIFont systemFontOfSize:14];
         btn.layer.masksToBounds = YES;
@@ -338,7 +407,7 @@
         [btn addTarget:self action:@selector(btnTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
         [infoView addSubview:btn];
         
-    
+        
         if ([data.count integerValue]>0) {
             BaseLable *numLble = [BaseLable initWithFrame:CGRectMake(btn.x +btn.width -10,btn.y-10, 20, 20) TxtColor:[UIColor whiteColor] textAlignment:NSTextAlignmentCenter Font:FONT(10.0) title:data.count];
             numLble.cornerRadius = 10.0;
@@ -350,9 +419,9 @@
     {
         attendBtn = [[UIButton alloc] initWithFrame:CGRectMake(40 + (btnWidth + 10)*2, CGRectGetHeight(infoView.frame) - botton - btnHeight, btnWidth, btnHeight)];
         if ([data.isAttend boolValue]) {
-          [attendBtn setTitle:@"已关注" forState:UIControlStateNormal];
+            [attendBtn setTitle:@"已关注" forState:UIControlStateNormal];
         }else{
-               [attendBtn setTitle:@"关注" forState:UIControlStateNormal];
+            [attendBtn setTitle:@"关注" forState:UIControlStateNormal];
         }
         
         attendBtn.backgroundColor = COLOR(96, 92, 83, 1);
@@ -384,7 +453,7 @@
     infoWeb.sizeDelegate = self;
     [infoWeb loadHTMLString:data.wap_content baseURL:nil];
     infoWeb.scrollView.scrollEnabled = NO;
-//    infoWeb.scalesPageToFit = YES;
+    //    infoWeb.scalesPageToFit = YES;
     infoWeb.userInteractionEnabled = NO;
     [headerView addSubview:infoView];
     [headerView addSubview:infoWeb];
@@ -401,9 +470,9 @@
         {
             //介绍
             [_tableView scrollRectToVisible:CGRectMake(0, CGRectGetHeight(self.tableView.frame), CGRectGetWidth(self.tableView.frame), CGRectGetHeight(self.tableView.frame)) animated:YES];
-               break;
+            break;
         }
-         
+            
         case 102:
         {
             //好茶
@@ -435,8 +504,8 @@
                 }else{
                     [attendBtn setTitle:@"已关注" forState:UIControlStateNormal];
                 }
-                } failure:^(id err) {
-                    NSLog(@"%@",err);
+            } failure:^(id err) {
+                NSLog(@"%@",err);
             }];
             break;
             

@@ -415,10 +415,10 @@
     
     NSString *url = [CYWebClient urlWithName:apiName];
     NSMutableDictionary *parms = [NSMutableDictionary dictionaryWithDictionary:parameters];
-    NSString *sessionid = [[NSUserDefaults standardUserDefaults] objectForKey:@"sessionid"];
-    if (sessionid.length) {
-        [parms setObject:sessionid forKey:@"sessionid"];
-    }
+    //    NSString *sessionid = [[NSUserDefaults standardUserDefaults] objectForKey:@"sessionid"];
+    //    if (sessionid.length) {
+    //        [parms setObject:sessionid forKey:@"sessionid"];
+    //    }
     
     //    WINDOW.userInteractionEnabled = NO;
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];

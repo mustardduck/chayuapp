@@ -25,6 +25,7 @@
 
 @property (weak, nonatomic) IBOutlet CYRoundLbl *guanzhuNunLbl;
 
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *gouwuhe_width_cons;
 
 
 - (IBAction)menu_click:(id)sender;

@@ -137,4 +137,13 @@
     
 }
 
+/**
+ *  关闭 发货 查看物流 查看订单详情等
+ */
+- (IBAction)evaluation_click:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(publicCell:AndModel:)]) {
+        [self.delegate publicCell:self AndModel:_orderModel];
+    }
+}
+
 @end

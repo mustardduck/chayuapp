@@ -72,6 +72,67 @@
 }
 
 
+//检测当前APP网络状态
+-(void)jiancewangluo{
+    // 1.获得网络监控的管理者
+    
+    AFNetworkReachabilityManager *mgr = [AFNetworkReachabilityManager sharedManager];
+    
+    
+    
+    // 2.设置网络状态改变后的处理
+    
+    [mgr setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
+        
+        // 当网络状态改变了, 就会调用这个block
+        
+        switch
+        (status) {
+                
+            case
+            AFNetworkReachabilityStatusUnknown: // 未知网络
+                NSLog(@"未知网络");
+                break;
+            case
+            AFNetworkReachabilityStatusNotReachable: // 没有网络(断网)
+            {
+                
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"温馨提示"
+                                                                message:NETWORK_ERRORMESSAGE
+                                                               delegate:nil
+                                                      cancelButtonTitle:@"我知道了"
+                                                      otherButtonTitles:nil];
+                [alert show];
+                
+                break;
+            }
+            case
+            AFNetworkReachabilityStatusReachableViaWWAN: // 手机自带网络
+                
+                NSLog(@"手机自带网络");
+                
+                break;
+                
+                
+                
+            case
+            AFNetworkReachabilityStatusReachableViaWiFi: // WIFI
+                
+                NSLog(@"WIFI");
+                
+                break;
+                
+        }
+        
+    }];
+    
+    
+    
+    // 3.开始监控
+    
+    [mgr startMonitoring];
+}
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     
     
@@ -93,6 +154,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         [self showGuidePage];
     });
+    [self jiancewangluo];
     [self umengTrack];
     [self alertyingdaopingjia];
     // 1.判断沙盒中是否存在广告图片，如果存在，直接显示
@@ -168,7 +230,7 @@
     //    [OpenShare connectWeiboWithAppKey:@"4174485384"];
     //    [OpenShare connectWeixinWithAppId:@"wxea386816bae46f5a"];
     
-    [self xiaoyuzhuanqianxiangguan];
+//    [self xiaoyuzhuanqianxiangguan];
     [self jiancebanben];
     [self startHomePage];
     
@@ -773,13 +835,8 @@ didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
 //            //            [Itost showMsg:@"当前网络不可用！" inView:WINDOW];
 //            //            //            NSLog(@"当前网络不可用");
 //            
-//            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"温馨提示"
-//                                                            message:NETWORK_ERRORMESSAGE
-//                                                           delegate:nil
-//                                                  cancelButtonTitle:@"我知道了"
-//                                                  otherButtonTitles:nil];
-//            [alert show];
-//            
+
+//
 //            break;
 //        }
 //        case ReachableViaWiFi:

@@ -70,6 +70,15 @@
  */
 @property (nonatomic,strong)NSString *introduce;
 
+/**
+ *  是否售罄
+ */
 @property (nonatomic,copy)NSString *sold_out;
+
+/**
+ *  商品最终图标（新品<热销<售磬）
+ */
+@property (nonatomic,strong)NSString *icon;
+
 
 @end

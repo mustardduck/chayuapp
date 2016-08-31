@@ -19,6 +19,7 @@
 #import "CYBuyerOrderDoneDetailVC.h"
 #import "CYBuyerEditVC.h"
 #import "CYBuyerReturnMainVC.h"
+#import "CYBuyerMyOrderVC.h"
 
 
 @interface CYBuyerMyVC ()<UITableViewDelegate, UITableViewDataSource>
@@ -84,12 +85,52 @@
                  @[@{@"img":@"buyerMyProfileIcon",@"title":@"个人资料"}],
                  @[@{@"img":@"buyerMyOrderIcon",@"title":@"订单维权"}]
                  ];
+    
+    [self.imgView sd_setImageWithURL:[NSURL URLWithString:self.imgeStr] placeholderImage:DEFAULTHEADER];
+    self.nameLbl.text = self.userName;
+    self.chaBiCountLbl.text = self.chabi;
+    
+    [self loadData];
+
+}
+
+- (void)loadData{
+    [CYWebClient Post:@"2.0_mingxing_number" parametes:nil success:^(id responObject) {
+        //今日成交订单
+        NSInteger todayOrderNum = [[responObject objectForKey:@"deal_today"] integerValue];
+        [self.todayOrderBtn setTitle:[NSString stringWithFormat:@"%li",(long)todayOrderNum] forState:UIControlStateNormal];
+        
+        //待付款
+        NSInteger paymentNum = [[responObject objectForKey:@"waiting_for_payment"] integerValue];
+        self.waitingPayCountLbl.text = [NSString stringWithFormat:@"%li",(long)paymentNum];
+        
+        //待发货
+        NSInteger shipmentNum = [[responObject objectForKey:@"waiting_for_shipments"] integerValue];
+        self.waitingShipCountLbl.text = [NSString stringWithFormat:@"%li",(long)shipmentNum];
+        
+        //待收货
+        NSInteger receivingNum = [[responObject objectForKey:@"waiting_for_receiving"] integerValue];
+        self.onTheWayCountLbl.text = [NSString stringWithFormat:@"%li",(long)receivingNum];
+        
+        //已完成
+        NSInteger conmentNum = [[responObject objectForKey:@"waiting_for_comment"] integerValue];
+        
+        self.orderFinishCountLbl.text = [NSString stringWithFormat:@"%li",(long)conmentNum];
+        
+        //退款
+        NSInteger backNum = [[responObject objectForKey:@"back_number"] integerValue];
+        self.returnMoneyCountLbl.text = [NSString stringWithFormat:@"%li",(long)backNum];
+        
+        
+    } failure:^(id error) {
+        
+    }];
 
 }
 
 - (void) setLabelCountCornerRadius:(UILabel *)lbl constant:(NSLayoutConstraint *)cons
 {
-    cons.constant = lbl.boundingRectWithWidth + 10;
+    cons.constant = lbl.width;
     
     CGFloat cornerRadius = cons.constant / 2;
     
@@ -101,7 +142,7 @@
 
 - (void) setHeaderViewData
 {
-    _waitingPayCountLbl.text = @"99";
+//    _waitingPayCountLbl.text = @"99";
 
     [self setLabelCountCornerRadius:_waitingPayCountLbl constant:_waitingPayCountLblWidthCons];
     [self setLabelCountCornerRadius:_waitingShipCountLbl constant:_waitingShipCountLblWidthCons];
@@ -117,12 +158,36 @@
     
     if(btn == _allOrderBtn)//全部订单
     {
-        CYBuyerOrderDoneDetailVC * vc = viewControllerInStoryBoard(@"CYBuyerOrderDoneDetailVC", @"Buyer");
+        CYBuyerMyOrderVC * vc = viewControllerInStoryBoard(@"CYBuyerMyOrderVC", @"Buyer");
         [self.navigationController pushViewController:vc animated:YES];
     }
     else if (btn == _backToMyVCBtn)//回到个人首页
     {
         CYBuyerEditVC * vc = viewControllerInStoryBoard(@"CYBuyerEditVC", @"Buyer");
+        [self.navigationController pushViewController:vc animated:YES];
+    }
+    else if (btn == _waitingPayBtn)//待付款
+    {
+        CYBuyerMyOrderVC * vc = viewControllerInStoryBoard(@"CYBuyerMyOrderVC", @"Buyer");
+        vc.ordertype = BuyerOrderTypePendingPayment;
+        [self.navigationController pushViewController:vc animated:YES];
+    }
+    else if (btn == _waitingShipBtn)//待发货
+    {
+        CYBuyerMyOrderVC * vc = viewControllerInStoryBoard(@"CYBuyerMyOrderVC", @"Buyer");
+        vc.ordertype = BuyerOrderTypePendingShipped;
+        [self.navigationController pushViewController:vc animated:YES];
+    }
+    else if (btn == _onTheWayBtn)//已发货
+    {
+        CYBuyerMyOrderVC * vc = viewControllerInStoryBoard(@"CYBuyerMyOrderVC", @"Buyer");
+        vc.ordertype = BuyerOrderTypeOnTheWay;
+        [self.navigationController pushViewController:vc animated:YES];
+    }
+    else if (btn == _orderFinishBtn)//已完成
+    {
+        CYBuyerMyOrderVC * vc = viewControllerInStoryBoard(@"CYBuyerMyOrderVC", @"Buyer");
+        vc.ordertype = BuyerOrderTypeDone;
         [self.navigationController pushViewController:vc animated:YES];
     }
     else if (btn == _returnMoneyBtn)//退款/退货

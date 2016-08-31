@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10116" systemVersion="15G31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
@@ -2102,15 +2102,15 @@
                                                         <constraint firstAttribute="width" constant="14" id="uGK-Nf-Cvr"/>
                                                     </constraints>
                                                 </imageView>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="茶币 0" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kc7-aQ-Yg0" customClass="PYMultiLabel">
-                                                    <rect key="frame" x="112" y="64" width="247" height="16"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="茶币" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kc7-aQ-Yg0">
+                                                    <rect key="frame" x="112" y="64" width="35" height="16"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="16" id="911-Vv-mEp"/>
+                                                        <constraint firstAttribute="width" constant="35" id="B41-hD-fxu"/>
                                                         <constraint firstAttribute="width" constant="100" id="DOD-6X-6RA"/>
-                                                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="16" id="U6w-zx-5bh"/>
                                                     </constraints>
                                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                                    <color key="textColor" red="0.53725490200000003" green="0.24313725489999999" blue="0.12549019610000001" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <color key="textColor" red="0.40000000000000002" green="0.40000000000000002" blue="0.40000000000000002" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                     <variation key="default">
                                                         <mask key="constraints">
@@ -2132,6 +2132,15 @@
                                                         <action selector="touchUpInsideOn:" destination="I7b-Fb-O2o" eventType="touchUpInside" id="3br-J3-kB9"/>
                                                     </connections>
                                                 </button>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="raf-5L-nUP" customClass="PYMultiLabel">
+                                                    <rect key="frame" x="147" y="64" width="208" height="17"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="16" id="U9U-Hs-5hP"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                    <color key="textColor" red="0.53725490200000003" green="0.24313725489999999" blue="0.12549019610000001" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
                                             </subviews>
                                             <color key="backgroundColor" red="0.92156862745098034" green="0.92156862745098034" blue="0.8784313725490196" alpha="1" colorSpace="calibratedRGB"/>
                                             <constraints>
@@ -2139,6 +2148,7 @@
                                                 <constraint firstItem="1cm-Jr-wpi" firstAttribute="centerY" secondItem="OnP-aq-i9d" secondAttribute="centerY" id="3BT-nx-3ti"/>
                                                 <constraint firstItem="vSM-xL-Cbp" firstAttribute="top" secondItem="OnP-aq-i9d" secondAttribute="top" constant="36" id="61b-Sf-lbz"/>
                                                 <constraint firstItem="Qxi-gJ-zKb" firstAttribute="leading" secondItem="OnP-aq-i9d" secondAttribute="leading" constant="20" id="EMQ-Ut-BSj"/>
+                                                <constraint firstItem="raf-5L-nUP" firstAttribute="top" secondItem="vSM-xL-Cbp" secondAttribute="bottom" constant="6" id="Idb-D7-4SE"/>
                                                 <constraint firstItem="Qxi-gJ-zKb" firstAttribute="centerY" secondItem="OnP-aq-i9d" secondAttribute="centerY" id="J2b-mg-gNy"/>
                                                 <constraint firstItem="kc7-aQ-Yg0" firstAttribute="top" secondItem="vSM-xL-Cbp" secondAttribute="bottom" constant="6" id="RXs-es-Tel"/>
                                                 <constraint firstAttribute="height" constant="115" id="SE2-Kb-bt1"/>
@@ -2147,12 +2157,15 @@
                                                 <constraint firstItem="kc7-aQ-Yg0" firstAttribute="leading" secondItem="vSM-xL-Cbp" secondAttribute="trailing" constant="-100" id="WUt-8g-7LN"/>
                                                 <constraint firstAttribute="trailing" secondItem="1cm-Jr-wpi" secondAttribute="trailing" id="a5v-00-dOg"/>
                                                 <constraint firstAttribute="trailing" secondItem="kc7-aQ-Yg0" secondAttribute="trailing" constant="16" id="dpl-Rn-6uX"/>
+                                                <constraint firstAttribute="trailing" secondItem="raf-5L-nUP" secondAttribute="trailing" constant="20" id="i8g-Vg-8Ku"/>
                                                 <constraint firstItem="kc7-aQ-Yg0" firstAttribute="leading" secondItem="Qxi-gJ-zKb" secondAttribute="trailing" constant="17" id="o4P-yb-Z9Z"/>
+                                                <constraint firstItem="raf-5L-nUP" firstAttribute="leading" secondItem="kc7-aQ-Yg0" secondAttribute="trailing" id="qag-xW-F1k"/>
                                                 <constraint firstItem="vSM-xL-Cbp" firstAttribute="leading" secondItem="Qxi-gJ-zKb" secondAttribute="trailing" constant="17" id="uSR-zP-AAC"/>
                                             </constraints>
                                             <variation key="default">
                                                 <mask key="constraints">
                                                     <exclude reference="WUt-8g-7LN"/>
+                                                    <exclude reference="dpl-Rn-6uX"/>
                                                 </mask>
                                             </variation>
                                         </view>
@@ -2160,7 +2173,7 @@
                                             <rect key="frame" x="0.0" y="115" width="375" height="172"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="bottom" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FQC-96-0G3">
-                                                    <rect key="frame" x="0.0" y="0.0" width="125" height="50"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="125.5" height="50"/>
                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="50" id="Dzk-0U-j6Y"/>
@@ -2175,7 +2188,7 @@
                                                     </connections>
                                                 </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="今日成交总额" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="55P-fp-sQS">
-                                                    <rect key="frame" x="0.0" y="10" width="125" height="14"/>
+                                                    <rect key="frame" x="0.0" y="10" width="125.5" height="14"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="14" id="pBA-fs-fMo"/>
                                                     </constraints>
@@ -2184,7 +2197,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="bottom" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GiY-FY-yTT">
-                                                    <rect key="frame" x="125" y="0.0" width="126" height="50"/>
+                                                    <rect key="frame" x="125" y="0.0" width="125" height="50"/>
                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="50" id="6q4-wm-60W"/>
@@ -2199,7 +2212,7 @@
                                                     </connections>
                                                 </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="今日成交订单" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="b15-2s-mjl">
-                                                    <rect key="frame" x="125" y="10" width="126" height="14"/>
+                                                    <rect key="frame" x="125" y="10" width="125" height="14"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="14" id="JMc-xb-je9"/>
                                                     </constraints>
@@ -2208,7 +2221,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="bottom" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5YU-Nx-hco">
-                                                    <rect key="frame" x="250" y="0.0" width="125" height="50"/>
+                                                    <rect key="frame" x="249" y="0.0" width="125.5" height="50"/>
                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="50" id="gdn-5h-viH"/>
@@ -2223,7 +2236,7 @@
                                                     </connections>
                                                 </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="账户余额" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Hml-Ss-Mc8">
-                                                    <rect key="frame" x="250" y="10" width="125" height="14"/>
+                                                    <rect key="frame" x="249" y="10" width="125.5" height="14"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="14" id="jNb-T4-sbd"/>
                                                     </constraints>
@@ -2238,7 +2251,7 @@
                                                             <rect key="frame" x="20" y="45" width="281" height="66"/>
                                                             <subviews>
                                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zMR-Ge-6v4">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="70" height="66"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="70.5" height="66"/>
                                                                     <subviews>
                                                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="waitingPayIcon" translatesAutoresizingMaskIntoConstraints="NO" id="6fb-m0-Jev">
                                                                             <rect key="frame" x="7" y="14" width="22" height="19"/>
@@ -2248,7 +2261,7 @@
                                                                             </constraints>
                                                                         </imageView>
                                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="待付款" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uTB-yT-dzn">
-                                                                            <rect key="frame" x="0.0" y="40" width="70" height="14"/>
+                                                                            <rect key="frame" x="0.0" y="40" width="70.5" height="14"/>
                                                                             <constraints>
                                                                                 <constraint firstAttribute="height" constant="14" id="Rig-5I-Ghw"/>
                                                                             </constraints>
@@ -2257,7 +2270,7 @@
                                                                             <nil key="highlightedColor"/>
                                                                         </label>
                                                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="bottom" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="h5e-y9-AMQ">
-                                                                            <rect key="frame" x="0.0" y="0.0" width="70" height="66"/>
+                                                                            <rect key="frame" x="0.0" y="0.0" width="70.5" height="66"/>
                                                                             <fontDescription key="fontDescription" type="system" pointSize="11"/>
                                                                             <inset key="titleEdgeInsets" minX="-22" minY="0.0" maxX="0.0" maxY="14"/>
                                                                             <inset key="imageEdgeInsets" minX="26" minY="10" maxX="0.0" maxY="0.0"/>
@@ -2312,7 +2325,7 @@
                                                                     </variation>
                                                                 </view>
                                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="GOr-EJ-HJw">
-                                                                    <rect key="frame" x="70" y="0.0" width="71" height="66"/>
+                                                                    <rect key="frame" x="70" y="0.0" width="70" height="66"/>
                                                                     <subviews>
                                                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="waitingShipIcon" translatesAutoresizingMaskIntoConstraints="NO" id="LHN-RJ-i39">
                                                                             <rect key="frame" x="7" y="14" width="21" height="19"/>
@@ -2322,7 +2335,7 @@
                                                                             </constraints>
                                                                         </imageView>
                                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="待发货" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lWl-fh-9FE">
-                                                                            <rect key="frame" x="0.0" y="40" width="71" height="14"/>
+                                                                            <rect key="frame" x="0.0" y="40" width="70" height="14"/>
                                                                             <constraints>
                                                                                 <constraint firstAttribute="height" constant="14" id="8Vx-W9-8es"/>
                                                                             </constraints>
@@ -2331,7 +2344,7 @@
                                                                             <nil key="highlightedColor"/>
                                                                         </label>
                                                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="bottom" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Zor-mx-bD8">
-                                                                            <rect key="frame" x="0.0" y="0.0" width="71" height="66"/>
+                                                                            <rect key="frame" x="0.0" y="0.0" width="70" height="66"/>
                                                                             <fontDescription key="fontDescription" type="system" pointSize="11"/>
                                                                             <inset key="titleEdgeInsets" minX="-22" minY="0.0" maxX="0.0" maxY="14"/>
                                                                             <inset key="imageEdgeInsets" minX="26" minY="10" maxX="0.0" maxY="0.0"/>
@@ -2388,7 +2401,7 @@
                                                                     </variation>
                                                                 </view>
                                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kji-hZ-4xf">
-                                                                    <rect key="frame" x="141" y="0.0" width="70" height="66"/>
+                                                                    <rect key="frame" x="140" y="0.0" width="70.5" height="66"/>
                                                                     <subviews>
                                                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="onTheWayIcon" translatesAutoresizingMaskIntoConstraints="NO" id="hYP-JS-mbD">
                                                                             <rect key="frame" x="7" y="14" width="21" height="19"/>
@@ -2398,7 +2411,7 @@
                                                                             </constraints>
                                                                         </imageView>
                                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="已发货" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MK7-1H-Dri">
-                                                                            <rect key="frame" x="0.0" y="40" width="70" height="14"/>
+                                                                            <rect key="frame" x="0.0" y="40" width="70.5" height="14"/>
                                                                             <constraints>
                                                                                 <constraint firstAttribute="height" constant="14" id="5YD-ll-3HU"/>
                                                                             </constraints>
@@ -2407,7 +2420,7 @@
                                                                             <nil key="highlightedColor"/>
                                                                         </label>
                                                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="bottom" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mnx-Vx-0s0">
-                                                                            <rect key="frame" x="0.0" y="0.0" width="70" height="66"/>
+                                                                            <rect key="frame" x="0.0" y="0.0" width="70.5" height="66"/>
                                                                             <fontDescription key="fontDescription" type="system" pointSize="11"/>
                                                                             <inset key="titleEdgeInsets" minX="-22" minY="0.0" maxX="0.0" maxY="14"/>
                                                                             <inset key="imageEdgeInsets" minX="26" minY="10" maxX="0.0" maxY="0.0"/>
@@ -2728,7 +2741,7 @@
                                                     </constraints>
                                                 </view>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dGG-7I-eZv">
-                                                    <rect key="frame" x="250" y="10" width="1" height="30"/>
+                                                    <rect key="frame" x="249" y="10" width="1" height="30"/>
                                                     <color key="backgroundColor" red="1" green="0.086771209109999997" blue="0.034194080279999997" alpha="1" colorSpace="calibratedRGB"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="mQD-Vw-m62"/>
@@ -2893,7 +2906,7 @@
                         <outlet property="accountBalanceBtn" destination="5YU-Nx-hco" id="haP-ff-bGi"/>
                         <outlet property="allOrderBtn" destination="HWP-Ec-inZ" id="uwj-xw-Pfs"/>
                         <outlet property="backToMyVCBtn" destination="1cm-Jr-wpi" id="RKf-YW-pc6"/>
-                        <outlet property="chaBiCountLbl" destination="kc7-aQ-Yg0" id="Ri9-Uv-Tcb"/>
+                        <outlet property="chaBiCountLbl" destination="raf-5L-nUP" id="Vg4-4P-hCK"/>
                         <outlet property="headerView" destination="Nui-gu-esE" id="6zL-fR-98y"/>
                         <outlet property="imgView" destination="Qxi-gJ-zKb" id="3ZR-Cq-dJ7"/>
                         <outlet property="mainTable" destination="SeC-Eu-dDT" id="LMk-MR-BkT"/>
@@ -5062,7 +5075,7 @@
                                         <rect key="frame" x="0.0" y="1" width="320" height="64"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="LK8-7R-heV" id="55e-Qe-FXR">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="63"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="63.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="订单编号：" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9bj-bp-kRF">
@@ -7196,7 +7209,7 @@
                                             <action selector="touchUpInsideOn:" destination="FQ2-mE-JA1" eventType="touchUpInside" id="oL6-Qp-bJW"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="djc-5q-um6">
+                                    <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="djc-5q-um6">
                                         <rect key="frame" x="107" y="0.0" width="106" height="50"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                         <state key="normal" title="拒绝退款"/>

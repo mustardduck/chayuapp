@@ -23,5 +23,6 @@
 
 - (IBAction)lijigoumai_click:(id)sender;
 @property (weak, nonatomic) IBOutlet BaseButton *detailsBtn;
+@property (weak, nonatomic) IBOutlet UILabel *stateLbl;
 
 @end

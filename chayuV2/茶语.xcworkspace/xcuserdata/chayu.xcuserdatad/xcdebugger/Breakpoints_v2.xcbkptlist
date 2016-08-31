@@ -6,32 +6,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "&#x8336;&#x8bed;/QuanZi/View/CYQuanZiTopCell.m"
-            timestampString = "490700585.204138"
+            filePath = "&#x8336;&#x8bed;/TeaMall/View/CYSpecificationView.m"
+            timestampString = "493282868.449718"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "25"
-            endingLineNumber = "25"
-            landmarkName = "-menu_click:"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "&#x8336;&#x8bed;/TeaMall/Controller/CYProductDetViewController.m"
-            timestampString = "490785157.156922"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "106"
-            endingLineNumber = "106"
-            landmarkName = "-viewDidLoad"
+            startingLineNumber = "165"
+            endingLineNumber = "165"
+            landmarkName = "-creatSpecificationView:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

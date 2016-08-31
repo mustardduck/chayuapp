@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10116" systemVersion="15G31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
@@ -21,6 +21,17 @@
                             <constraint firstAttribute="width" secondItem="6Lb-t3-xJJ" secondAttribute="height" multiplier="1:1" id="p7B-sl-OIQ"/>
                         </constraints>
                     </imageView>
+                    <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="igH-Z1-Hn9">
+                        <rect key="frame" x="62" y="25" width="38" height="20"/>
+                        <color key="backgroundColor" red="0.53725490200000003" green="0.24313725489999999" blue="0.12549019610000001" alpha="1" colorSpace="calibratedRGB"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="20" id="5Ld-Vr-dGZ"/>
+                            <constraint firstAttribute="width" constant="38" id="DiH-WJ-0X0"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                        <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <nil key="highlightedColor"/>
+                    </label>
                     <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="251" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Dq0-eW-XRG" customClass="BaseButton">
                         <rect key="frame" x="71" y="324" width="82" height="26"/>
                         <constraints>
@@ -76,8 +87,8 @@
                         <constraints>
                             <constraint firstAttribute="height" constant="21" id="FZb-E7-gSb"/>
                         </constraints>
-                        <fontDescription key="fontDescription" type="boldSystem" pointSize="16"/>
-                        <color key="textColor" red="0.26666666666666666" green="0.26666666666666666" blue="0.26666666666666666" alpha="1" colorSpace="calibratedRGB"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                        <color key="textColor" red="0.40000000000000002" green="0.40000000000000002" blue="0.40000000000000002" alpha="1" colorSpace="calibratedRGB"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pgw-g7-VUm">
@@ -93,6 +104,7 @@
                 <constraints>
                     <constraint firstItem="Gp4-4X-2HR" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" constant="48" id="2et-B4-BXf"/>
                     <constraint firstAttribute="trailing" secondItem="Cvc-vv-6lt" secondAttribute="trailing" constant="52" id="7R1-a6-tNx"/>
+                    <constraint firstItem="6Lb-t3-xJJ" firstAttribute="leading" secondItem="igH-Z1-Hn9" secondAttribute="trailing" constant="-48" id="84A-ig-ZHU"/>
                     <constraint firstAttribute="trailing" secondItem="pgw-g7-VUm" secondAttribute="trailing" constant="52" id="FCv-KD-6Ab"/>
                     <constraint firstItem="Dq0-eW-XRG" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" constant="-48" id="FDA-go-JPq"/>
                     <constraint firstItem="6Lb-t3-xJJ" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" id="Fzk-dJ-M26"/>
@@ -101,6 +113,7 @@
                     <constraint firstAttribute="bottom" secondItem="Dq0-eW-XRG" secondAttribute="bottom" constant="8" id="N5J-vF-X3Z"/>
                     <constraint firstItem="pgw-g7-VUm" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="52" id="Qfn-MQ-bQo"/>
                     <constraint firstAttribute="bottom" secondItem="Gp4-4X-2HR" secondAttribute="bottom" constant="8" id="Qnw-WG-6yF"/>
+                    <constraint firstItem="6Lb-t3-xJJ" firstAttribute="top" secondItem="igH-Z1-Hn9" secondAttribute="bottom" constant="-30" id="UOS-la-pYh"/>
                     <constraint firstItem="pgw-g7-VUm" firstAttribute="top" secondItem="Cvc-vv-6lt" secondAttribute="bottom" constant="14" id="bLb-ZG-RCl"/>
                     <constraint firstItem="6Lb-t3-xJJ" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="15" id="c1h-yA-Gke"/>
                     <constraint firstItem="6Lb-t3-xJJ" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="52" id="fpP-Jp-ifM"/>
@@ -112,6 +125,7 @@
                 <outlet property="detailsBtn" destination="Dq0-eW-XRG" id="BDe-vi-TU6"/>
                 <outlet property="iv_pic" destination="6Lb-t3-xJJ" id="7zf-bP-iXl"/>
                 <outlet property="lb_name" destination="pgw-g7-VUm" id="LRq-Bc-K3W"/>
+                <outlet property="stateLbl" destination="igH-Z1-Hn9" id="Or7-4Y-Lkg"/>
             </connections>
             <point key="canvasLocation" x="495" y="356.5"/>
         </tableViewCell>

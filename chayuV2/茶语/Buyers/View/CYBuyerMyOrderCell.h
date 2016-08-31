@@ -20,7 +20,7 @@ typedef NS_ENUM(NSInteger,BuyerOrderType){
 
 #define BASECELLHEIGHT  245.0f
 
-//@protocol CYBuyerMyOrderCellDelegate;
+@protocol CYBuyerMyOrderCellDelegate;
 
 @interface CYBuyerMyOrderCell : UITableViewCell
 @property (nonatomic,strong) CYBuyerOrderInfoModel *orderModel;
@@ -37,6 +37,17 @@ typedef NS_ENUM(NSInteger,BuyerOrderType){
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *orderViewHeightCons;
 @property (weak, nonatomic) IBOutlet UILabel *totalMoneyLbl;
 @property (weak, nonatomic) IBOutlet UIButton *orderDetailBtn;
+@property (nonatomic,strong)id<CYBuyerMyOrderCellDelegate>delegate;
 
+@end
+
+@protocol CYBuyerMyOrderCellDelegate <NSObject>
+
+-(void)publicCell:(CYBuyerMyOrderCell *)cell AndModel:(CYBuyerOrderInfoModel*)model;
+//
+//-(void)deleteCell:(CYBuyerMyOrderCell *)cell WithModel:(CYBuyerOrderInfoModel *)model;
+//
+//
+//-(void)chakanwuliu:(CYOrderInfoModel *)model;
 
 @end

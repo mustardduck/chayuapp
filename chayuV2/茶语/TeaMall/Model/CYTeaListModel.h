@@ -26,4 +26,18 @@
 
 @property (nonatomic,strong)NSString *mainid;
 
+@property (nonatomic,strong)NSString *icon;
+
+/**
+ *  卖家类型 （大师/名家/茗星）
+ */
+@property (nonatomic,strong)NSString *seller_type;
+
+/**
+ *  商品描述（手制/监制）
+ */
+@property (nonatomic,strong)NSString *attribute;
+
+//是否是自营
+@property (nonatomic,strong)NSString *is_self;
 @end

@@ -2218,5 +2218,27 @@
 		<key>version</key>
 		<string>2.0</string>
 	</dict>
+	<key>2.0_mingxing_number</key>
+	<dict>
+		<key>baseUrl</key>
+		<string>Shiji</string>
+		<key>method</key>
+		<string>Post</string>
+		<key>api</key>
+		<string>mingxing_order/number</string>
+		<key>version</key>
+		<string>2.0</string>
+	</dict>
+	<key>2.0_mingxing_list</key>
+	<dict>
+		<key>baseUrl</key>
+		<string>Shiji</string>
+		<key>method</key>
+		<string>Post</string>
+		<key>api</key>
+		<string>Mingxing_order/order_list/</string>
+		<key>version</key>
+		<string>2.0</string>
+	</dict>
 </dict>
 </plist>

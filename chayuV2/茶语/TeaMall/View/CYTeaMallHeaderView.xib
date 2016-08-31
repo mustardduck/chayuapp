@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10117" systemVersion="15C50" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10116" systemVersion="15G31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
@@ -68,8 +68,7 @@
                         </button>
                         <button opaque="NO" tag="9002" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="93t-pW-Wmg">
                             <rect key="frame" x="150" y="0.0" width="75" height="70"/>
-                            <state key="normal" image="shiji_mingxin_ico_d"/>
-                            <state key="selected" image="shiji_mingxin_ico_s"/>
+                            <state key="normal" image="shiji_mingxing_ico"/>
                             <connections>
                                 <action selector="topMenu_click:" destination="iN0-l3-epB" eventType="touchUpInside" id="T3e-VK-Mwk"/>
                             </connections>
@@ -149,8 +148,7 @@
         <image name="shiji_fenlei_ico_s" width="24" height="41"/>
         <image name="shiji_mingjia_ico_d" width="24" height="41"/>
         <image name="shiji_mingjia_ico_s" width="24" height="41"/>
-        <image name="shiji_mingxin_ico_d" width="44" height="41"/>
-        <image name="shiji_mingxin_ico_s" width="44" height="41"/>
+        <image name="shiji_mingxing_ico" width="24" height="41"/>
         <image name="shiji_shangpin_ico_d" width="24" height="41"/>
         <image name="shiji_shangpin_ico_s" width="24" height="41"/>
     </resources>

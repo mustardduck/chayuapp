@@ -382,10 +382,10 @@
     [super viewDidDisappear:animated];
     //    [MobClick endLogPageView:@"茶评首页"];
     [MobClick endLogPageView:@"茶评首页"];
-    dispatch_queue_t queue =  dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
-    dispatch_async(queue, ^{
-        [self loadchaleiViewData];
-    });
+//    dispatch_queue_t queue =  dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
+//    dispatch_async(queue, ^{
+//        [self loadchaleiViewData];
+//    });
 }
 
 #pragma mark -

@@ -21,6 +21,7 @@ static NSString *teaListCellIdentify = @"CYTeaListCell";
 
 @property (weak, nonatomic) IBOutlet UIButton *clickBtn;
 @property (weak, nonatomic) IBOutlet UIView *waitView;
+@property (weak, nonatomic) IBOutlet UILabel *stateLbl;
 
 @end
 
@@ -37,13 +38,13 @@ static NSString *teaListCellIdentify = @"CYTeaListCell";
 }
 -(void)layoutSubviews
 {
-   
-
+    
+    
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
     [super setSelected:selected animated:animated];
-
+    
     // Configure the view for the selected state
 }
 
@@ -72,6 +73,13 @@ static NSString *teaListCellIdentify = @"CYTeaListCell";
         [_clickBtn setTitle:@"商品详情" forState:UIControlStateNormal];
     }else{
         [_clickBtn setTitle:@"好茶详情" forState:UIControlStateNormal];
+    }
+    
+    if (_teaModel.icon.length) {
+        _stateLbl.text = _teaModel.icon;
+        _stateLbl.hidden = NO;
+    }else{
+        _stateLbl.hidden = YES;
     }
     
 }

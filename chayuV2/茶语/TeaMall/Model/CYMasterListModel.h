@@ -113,4 +113,7 @@
 @property (nonatomic, strong)NSString * price_sell;//售价（type=2专用）
 
 
+
+
+
 @end

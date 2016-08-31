@@ -34,6 +34,8 @@
 #import "CYGonglueController.h"
 #import "CYRefundViewController.h"
 #import "CYTopWindow.h"
+#import "CYBuyerMyVC.h"
+
 @interface CYMyViewController ()<UITableViewDelegate,UITableViewDataSource,UIActionSheetDelegate,UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 {
     NSDictionary *messageInfo;
@@ -63,7 +65,7 @@
     [self creatkongNavBar];
     
     activtyArr =[NSMutableArray array];
-
+    
 }
 
 -(IBAction)setting:(UIButton *)sender
@@ -79,7 +81,7 @@
     [APP_DELEGATE setTabbarHidden:YES animated:animated];
     [self loadUserInfo];
     [self loadmyMessage];
- 
+    
     
 }
 -(void)loadmyMessage
@@ -133,20 +135,40 @@
     
 }
 
+//到我的销售后台
+- (IBAction)myBuyer:(UIButton *)sender {
+    
+    
+    
+    
+    CYBuyerMyVC *tdc = viewControllerInStoryBoard(@"CYBuyerMyVC", @"Buyer");
+    
+    NSString *avatar = [userInfo objectForKey:@"avatar"];
+    if (avatar.length>0) {
+        tdc.imgeStr = avatar;
+    }
+    NSString *nickName = [userInfo objectForKey:@"nickname"];
+    tdc.userName = nickName;
+    NSString *score = [userInfo objectForJSONKey:@"score"];
+    tdc.chabi = score;
+    
+    [self.navigationController pushViewController:tdc animated:YES];
+}
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
 
 /*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
+ #pragma mark - Navigation
+ 
+ // In a storyboard-based application, you will often want to do a little preparation before navigation
+ - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+ // Get the new view controller using [segue destinationViewController].
+ // Pass the selected object to the new view controller.
+ }
+ */
 
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -164,7 +186,7 @@
     if (indexPath.section == 0) {
         return 190.;
     }else if (indexPath.section == 1 || indexPath.section == 2){
-
+        
         if (indexPath.section == 1) {
             if ([activtyArr count]>0) {
                 return 117.0;
@@ -221,14 +243,14 @@
                 case 1://我的收藏
                 {
                     CYCollectViewController *vc = viewControllerInStoryBoard(@"CYCollectViewController", @"My");
-//                    //vc.hidesBottomBarWhenPushed = YES;
+                    //                    //vc.hidesBottomBarWhenPushed = YES;
                     [self.navigationController pushViewController:vc animated:YES];
                     break;
                 }
                 case 2://我的评论
                 {
                     CYMyCommentViewController *vc = viewControllerInStoryBoard(@"CYMyCommentViewController", @"My");
-//                    //vc.hidesBottomBarWhenPushed = YES;
+                    //                    //vc.hidesBottomBarWhenPushed = YES;
                     [self.navigationController pushViewController:vc animated:YES];
                     break;
                 }
@@ -248,19 +270,19 @@
                     vc.name = [info objectForKey:@"title"];
                     vc.url = [info objectForKey:@"url"];
                     [self.navigationController pushViewController:vc animated:YES];
-//                    CYPublicHuoDongViewController *vc = viewControllerInStoryBoard(@"CYPublicHuoDongViewController", @"Huodong");
-//                    vc.titleStr = [info objectForKey:@"title"];
-//                    vc.requstUrl = [info objectForKey:@"url"];
-//                    [self.navigationController pushViewController:vc animated:YES];
-//                    CYAddressListViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"CYAddressListViewController"];
-//                    vc.addressType = CYAddressTypeManager;
-//                    [self.navigationController pushViewController:vc animated:YES];
-//                    
+                    //                    CYPublicHuoDongViewController *vc = viewControllerInStoryBoard(@"CYPublicHuoDongViewController", @"Huodong");
+                    //                    vc.titleStr = [info objectForKey:@"title"];
+                    //                    vc.requstUrl = [info objectForKey:@"url"];
+                    //                    [self.navigationController pushViewController:vc animated:YES];
+                    //                    CYAddressListViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"CYAddressListViewController"];
+                    //                    vc.addressType = CYAddressTypeManager;
+                    //                    [self.navigationController pushViewController:vc animated:YES];
+                    //                    
                     break;
                 }
                 case 5://茶币获取攻略
                 {
-//                    NSDictionary *
+                    //                    NSDictionary *
                     NSDictionary *scoreStrategy =[messageInfo objectForKey:@"scoreStrategy"];
                     if (![scoreStrategy isKindOfClass:[NSNull class]] && scoreStrategy.count) {
                         CYGonglueController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"CYGonglueController"];
@@ -275,7 +297,7 @@
                 case 6://茶币获取攻略
                 {
                     //                    NSDictionary *
-
+                    
                     if (![myScore isKindOfClass:[NSNull class]] && myScore.count) {
                         CYGonglueController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"CYGonglueController"];
                         vc.name = [myScore objectForKey:@"title"];
@@ -326,6 +348,11 @@
         cell.daishouhuoNumLbl.text = [[messageInfo objectForJSONKey:@"wait_receive"] description];
         cell.daipingjiaNumLbl.text = [[messageInfo objectForJSONKey:@"wait_comment"] description];
         cell.gouwucheNumLbl.text = [[messageInfo objectForJSONKey:@"cart"] description];
+//        cart = 103;
+        if (cart >99) {
+            cell.gouwucheNumLbl.text = @"99+";
+            cell.gouwuhe_width_cons.constant = 25;
+        }
         cell.dikouquanNumLbl.text =[[messageInfo objectForJSONKey:@"coupon"] description];
         cell.guanzhuNunLbl.hidden = NO;
         cell.daifukuanNumLbl.hidden = NO;
@@ -357,6 +384,7 @@
             cell.gouwucheNumLbl.hidden = YES;
         }
         
+        
         if (coupon == 0) {
             cell.dikouquanNumLbl.hidden = YES;
         }
@@ -366,14 +394,14 @@
                 {
                     CYMyOrderViewController *vc = viewControllerInStoryBoard(@"CYMyOrderViewController", @"My");
                     vc.ordertype = OrderTypeAll;
-//                    //vc.hidesBottomBarWhenPushed = YES;
+                    //                    //vc.hidesBottomBarWhenPushed = YES;
                     [self.navigationController pushViewController:vc animated:YES];
                     break;
                 }
                 case 1://代付款
                 {
                     CYMyOrderViewController *vc = viewControllerInStoryBoard(@"CYMyOrderViewController", @"My");
-//                    //vc.hidesBottomBarWhenPushed = YES;
+                    //                    //vc.hidesBottomBarWhenPushed = YES;
                     vc.ordertype = OrderTypePendingPayment;
                     [self.navigationController pushViewController:vc animated:YES];
                     break;
@@ -381,24 +409,24 @@
                 case 2://待发货
                 {
                     CYMyOrderViewController *vc = viewControllerInStoryBoard(@"CYMyOrderViewController", @"My");
-//                    //vc.hidesBottomBarWhenPushed = YES;
-                     vc.ordertype = OrderTypePendingShipped;
+                    //                    //vc.hidesBottomBarWhenPushed = YES;
+                    vc.ordertype = OrderTypePendingShipped;
                     [self.navigationController pushViewController:vc animated:YES];
                     break;
                 }
                 case 3://待收货
                 {
                     CYMyOrderViewController *vc = viewControllerInStoryBoard(@"CYMyOrderViewController", @"My");
-                          vc.ordertype = OrderTypeInbound;
-//                    //vc.hidesBottomBarWhenPushed = YES;
+                    vc.ordertype = OrderTypeInbound;
+                    //                    //vc.hidesBottomBarWhenPushed = YES;
                     [self.navigationController pushViewController:vc animated:YES];
                     break;
                 }
                 case 4://待评价
                 {
                     CYMyOrderViewController *vc = viewControllerInStoryBoard(@"CYMyOrderViewController", @"My");
-//                    //vc.hidesBottomBarWhenPushed = YES;
-                           vc.ordertype = OrderTypeEvaluated;
+                    //                    //vc.hidesBottomBarWhenPushed = YES;
+                    vc.ordertype = OrderTypeEvaluated;
                     [self.navigationController pushViewController:vc animated:YES];
                     break;
                 }
@@ -406,37 +434,37 @@
                 {
                     
                     CYRefundViewController *vc = viewControllerInStoryBoard(@"CYRefundViewController", @"My");
-//                    CYMyOrderViewController *vc = viewControllerInStoryBoard(@"CYMyOrderViewController", @"My");
-//                        vc.ordertype = OrderTypeRefund;
-////                    //vc.hidesBottomBarWhenPushed = YES;
+                    //                    CYMyOrderViewController *vc = viewControllerInStoryBoard(@"CYMyOrderViewController", @"My");
+                    //                        vc.ordertype = OrderTypeRefund;
+                    ////                    //vc.hidesBottomBarWhenPushed = YES;
                     [self.navigationController pushViewController:vc animated:YES];
                     break;
                 }
                 case 6://购物车
                 {
-                 
+                    
                     CYSCartViewController *vc = viewControllerInStoryBoard(@"CYSCartViewController", @"My");
-//                    //vc.hidesBottomBarWhenPushed = YES;
+                    //                    //vc.hidesBottomBarWhenPushed = YES;
                     [self.navigationController pushViewController:vc animated:YES];
                     break;
                 }
                 case 7://抵扣券
                 {
                     CYHongBaoViewController *vc = viewControllerInStoryBoard(@"CYHongBaoViewController", @"My");
-//                    //vc.hidesBottomBarWhenPushed = YES;
+                    //                    //vc.hidesBottomBarWhenPushed = YES;
                     [self.navigationController pushViewController:vc animated:YES];
                     break;
                 }
                 case 8://我的银行卡
                 {
-//                    NSDictionary *scoreStrategy =[messageInfo objectForKey:@"scoreStrategy"];
+                    //                    NSDictionary *scoreStrategy =[messageInfo objectForKey:@"scoreStrategy"];
                     if (contributeLevel.count >0) {
                         CYGonglueController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"CYGonglueController"];
                         vc.name = [contributeLevel objectForKey:@"title"];
                         vc.url = [contributeLevel objectForKey:@"url"];
                         [self.navigationController pushViewController:vc animated:YES];
                     }
-
+                    
                     break;
                 }
                 case 9://贡献等级
@@ -465,14 +493,14 @@
                 {
                     CYMyGroupViewController *vc = viewControllerInStoryBoard(@"CYMyGroupViewController", @"My");
                     vc.quanzitype = WoDeQuanZiTypeQuanZi;
-//                    //vc.hidesBottomBarWhenPushed = YES;
+                    //                    //vc.hidesBottomBarWhenPushed = YES;
                     [self.navigationController pushViewController:vc animated:YES];
                     break;
                 }
                 case 1://我的话题
                 {
                     CYMyGroupViewController *vc = viewControllerInStoryBoard(@"CYMyGroupViewController", @"My");
-//                    //vc.hidesBottomBarWhenPushed = YES;
+                    //                    //vc.hidesBottomBarWhenPushed = YES;
                     vc.quanzitype = WoDeQuanZiTypeHuaTi;
                     [self.navigationController pushViewController:vc animated:YES];
                     break;
@@ -490,7 +518,7 @@
             CYAdviseViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"CYAdviseViewController"];
             [self.navigationController pushViewController:vc animated:YES];
         };
-//        CYAdviseViewController
+        //        CYAdviseViewController
         return cell;
     }else if(indexPath.section ==1){
         
@@ -512,7 +540,7 @@
             if (imgurl.length >0) {
                 [icoImg sd_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:SQUARE];
             }
-//            [icoImg sizeToFit];
+            //            [icoImg sizeToFit];
             icoImg.x = (view.width - icoImg.width)/2;
             icoImg.y = 16;
             [view addSubview:icoImg];
@@ -530,8 +558,8 @@
             [button addTarget:self action:@selector(item_click:) forControlEvents:UIControlEventTouchUpInside];
             [view addSubview:button];
         }
-
-     return cell;
+        
+        return cell;
     }
     return nil;
 }
@@ -549,7 +577,7 @@
 
 -(void)henghuantouxiang:(UITapGestureRecognizer *)sender
 {
-//    UIImageView *userImg = (UIImageView *)sender.view;
+    //    UIImageView *userImg = (UIImageView *)sender.view;
     UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:@"选择头像" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"从相册选择",@"拍照",nil];
     sheet.tag = 1600;
     [sheet showInView:self.view];
@@ -559,9 +587,9 @@
 {
     if (buttonIndex == 0) {
         [self album];
-      
+        
     }else if (buttonIndex == 1){
-          [self takePhoto];
+        [self takePhoto];
     }
 }
 #pragma mark 拍照
@@ -594,21 +622,21 @@
 #pragma mark - UIImagePickerControllerDelegate
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
-//        long long size = [SharedInstance fileSizeAtPath:[info objectForKey:UIImagePickerControllerMediaURL]];
-//        NSLog(@"size: %lld  chang:%@",size,[info objectForKey:@"_UIImagePickerControllerVideoEditingEnd"]);
+    //        long long size = [SharedInstance fileSizeAtPath:[info objectForKey:UIImagePickerControllerMediaURL]];
+    //        NSLog(@"size: %lld  chang:%@",size,[info objectForKey:@"_UIImagePickerControllerVideoEditingEnd"]);
     
-        UIImage *image = [info objectForKey:UIImagePickerControllerEditedImage];
-//        _showImg.image = image;
-        [picker dismissViewControllerAnimated:YES completion:nil];
+    UIImage *image = [info objectForKey:UIImagePickerControllerEditedImage];
+    //        _showImg.image = image;
+    [picker dismissViewControllerAnimated:YES completion:nil];
     
     [CYWebClient Post:@"Usermodify" parametes:@{@"nickname":MANAGER.nickname} files:@{@"avatar":[NSArray arrayWithObject:image]} success:^(id responObject) {
-            ChaYuer *manager = MANAGER;
-            manager.avatar = [responObject objectForJSONKey:@"avatar"];
-            [ChaYuManager archiveCurrentUser:manager];
-            [self loadUserInfo];
-        } failure:^(id error) {
-            [SVProgressHUD showInfoWithStatus:@"请求失败"];
-        }];
+        ChaYuer *manager = MANAGER;
+        manager.avatar = [responObject objectForJSONKey:@"avatar"];
+        [ChaYuManager archiveCurrentUser:manager];
+        [self loadUserInfo];
+    } failure:^(id error) {
+        [SVProgressHUD showInfoWithStatus:@"请求失败"];
+    }];
     
 }
 

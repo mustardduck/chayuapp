@@ -25,6 +25,10 @@
 
 @property (nonatomic,weak)UIImageView *isNewImg;
 
+
+@property (nonatomic,weak)UILabel *statusLbl;
+
+
 /**
  *  <#属性说明#>
  */
@@ -48,7 +52,7 @@
     _merch_showimg.height = self.width;
     _merch_showimg.layer.cornerRadius = 2.0f;
     
-
+    
     
     _merch_Introduction.x = 10;
     _merch_Introduction.width = self.width-20;
@@ -93,8 +97,13 @@
     [_statusImg sizeToFit];
     
     _isNewImg.width = _isNewImg.height  = 29;
-//    [_isNewImg sizeToFit];
-     _isNewImg.x = _isNewImg.y = 1;
+    //    [_isNewImg sizeToFit];
+    _isNewImg.x = _isNewImg.y = 1;
+    
+    _statusLbl.x = 10;
+    _statusLbl.y = 10;
+    _statusLbl.width= 37;
+    _statusLbl.height = 21;
     
 }
 
@@ -122,7 +131,7 @@
     [_merch_showimg sd_setImageWithURL:url placeholderImage:SQUARE];
     
     _merch_Introduction.text = _PDCellModel.name;
-
+    
     _merch_Price.text = [NSString stringWithFormat:@"￥%.2f",[_PDCellModel.price_sell floatValue]];
     _merch_Sold.text = [NSString stringWithFormat:@"已售：%@",_PDCellModel.pay_count];
     [_merch_Price sizeToFit];
@@ -130,21 +139,21 @@
     _statusImg.hidden = YES;
     _isNewImg.hidden = YES;
     
-//    if ([_PDCellModel.sold_out integerValue] == 0) {
-//        _statusImg.hidden = NO;
-//        _statusImg.image = [UIImage imageNamed:@"sold_out"];
-//    }else{
-//        
-//        if ([_PDCellModel.is_hot integerValue] == 1) {
-//            _isNewImg.hidden = NO;
-//            _isNewImg.image = [UIImage imageNamed:@"hot_shiji"];
-//        }
-//        
-//        if ([_PDCellModel.is_new integerValue] == 1) {
-//            _isNewImg.hidden = NO;
-//            _isNewImg.image = [UIImage imageNamed:@"new"];
-//        }
-//    }
+    //    if ([_PDCellModel.sold_out integerValue] == 0) {
+    //        _statusImg.hidden = NO;
+    //        _statusImg.image = [UIImage imageNamed:@"sold_out"];
+    //    }else{
+    //        
+    //        if ([_PDCellModel.is_hot integerValue] == 1) {
+    //            _isNewImg.hidden = NO;
+    //            _isNewImg.image = [UIImage imageNamed:@"hot_shiji"];
+    //        }
+    //        
+    //        if ([_PDCellModel.is_new integerValue] == 1) {
+    //            _isNewImg.hidden = NO;
+    //            _isNewImg.image = [UIImage imageNamed:@"new"];
+    //        }
+    //    }
 }
 
 -(void)setMerchModel:(CYMerchCellModel *)merchModel
@@ -152,7 +161,7 @@
     _merchModel = merchModel;
     NSURL *url = [NSURL URLWithString:_merchModel.thumb];
     [_merch_showimg sd_setImageWithURL:url placeholderImage:SQUARE];
-
+    
     _merch_Introduction.text = _merchModel.name;
     
     _merch_Price.text = [NSString stringWithFormat:@"￥%.2f",[_merchModel.priceSell floatValue]];
@@ -161,23 +170,30 @@
     [_merch_Sold sizeToFit];
     _statusImg.hidden = YES;
     _isNewImg.hidden = YES;
-  
     
-    if ([_merchModel.sold_out integerValue] == 0) {
-        _statusImg.hidden = NO;
-        _statusImg.image = [UIImage imageNamed:@"sold_out"];
+    
+    if (_merchModel.icon.length) {
+        _statusLbl.hidden = NO;
+        _statusLbl.text = _merchModel.icon;
     }else{
-
-        if ([_merchModel.is_hot integerValue] == 1) {
-            _isNewImg.hidden = NO;
-            _isNewImg.image = [UIImage imageNamed:@"hot_shiji"];
-        }
-        
-        if ([_merchModel.is_new integerValue] == 1) {
-            _isNewImg.hidden = NO;
-            _isNewImg.image = [UIImage imageNamed:@"new"];
-        }
+        _statusLbl.hidden = YES;
     }
+    //
+    //    if ([_merchModel.sold_out integerValue] == 0) {
+    //        _statusImg.hidden = NO;
+    //        _statusImg.image = [UIImage imageNamed:@"sold_out"];
+    //    }else{
+    //        
+    //        if ([_merchModel.is_hot integerValue] == 1) {
+    //            _isNewImg.hidden = NO;
+    //            _isNewImg.image = [UIImage imageNamed:@"hot_shiji"];
+    //        }
+    //        
+    //        if ([_merchModel.is_new integerValue] == 1) {
+    //            _isNewImg.hidden = NO;
+    //            _isNewImg.image = [UIImage imageNamed:@"new"];
+    //        }
+    //    }
 }
 
 -(void)setupCell
@@ -231,7 +247,21 @@
     UIImageView *isnewimg = [[UIImageView alloc] init];
     _isNewImg = isnewimg;
     [self addSubview:_isNewImg];
-
+    
+    
+    UILabel *statuslbl = [[UILabel alloc] init];
+    _statusLbl = statuslbl;
+    _statusLbl.clipsToBounds = YES;
+    _statusLbl.textAlignment = NSTextAlignmentCenter;
+    _statusLbl.textColor = [UIColor whiteColor];
+    _statusLbl.backgroundColor =CLEARCOLOR;
+    _statusLbl.font = [UIFont systemFontOfSize:12.0];
+    _statusLbl.clipsToBounds = YES;
+    _statusLbl.numberOfLines = 2.0f;
+    _statusLbl.backgroundColor = MAIN_COLOR;
+    
+    [self addSubview:_statusLbl];
+    
 }
 
 @end

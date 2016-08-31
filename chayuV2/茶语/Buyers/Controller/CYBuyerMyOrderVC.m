@@ -13,7 +13,7 @@
 
 #define TOPMENUTAG 6000
 
-@interface CYBuyerMyOrderVC ()<UITableViewDataSource,UITableViewDelegate>
+@interface CYBuyerMyOrderVC ()<UITableViewDataSource,UITableViewDelegate,CYBuyerMyOrderCellDelegate>
 {
     NSMutableArray *_dataArr;
     NSInteger page;
@@ -89,8 +89,8 @@
     NSString *urlPath = @"RefundList";
     NSDictionary *param =@{@"p":@(page),@"pageSize":@"10"};
     if (_ordertype != BuyerOrderTypeRefund) {
-        urlPath = @"MyOrderList";
-        param =@{@"p":@(page),@"pageSize":@"10",@"orderStatus":@(_ordertype)};
+        urlPath = @"2.0_mingxing_list";
+        param =@{@"p":@(page),@"pageSize":@"1",@"type":@(_ordertype)};
     }
     
     [CYWebClient Post:urlPath parametes:param success:^(id responObj) {
@@ -172,17 +172,17 @@
 //        
 //        return 185.;
     }else{
-//        CYOrderInfoModel *model = _dataArr[indexPath.section];
-//        CGFloat offect_height = 0;
-//        if (model.goodsList.count>1) {
-//            offect_height = 89*(model.goodsList.count-1);
-//        }
-//        
-//        if ([model.status isEqualToString:@"2"]){
+        CYBuyerOrderInfoModel *model = _dataArr[indexPath.section];
+        CGFloat offect_height = 0;
+        if (model.goodsList.count>1) {
+            offect_height = 89*(model.goodsList.count-1);
+        }
+        
+//        if ([model.type isEqualToString:@"2"]){
 //            offect_height -=53;
 //        }
-//        
-//        return offect_height + BASECELLHEIGHT;
+        
+        return offect_height + BASECELLHEIGHT;
     }
     return 0;
 }
@@ -191,7 +191,7 @@
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     CYBuyerMyOrderCell *cell = [CYBuyerMyOrderCell cellWidthTableView:tableView];
-//    cell.delegate = self;
+    cell.delegate = self;
     cell.orderModel = _dataArr[indexPath.section];
     return cell;
 }

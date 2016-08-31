@@ -682,7 +682,6 @@
 		AFE099961D13961C005B0BF8 /* HongBaoView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AFE097321D13961B005B0BF8 /* HongBaoView.xib */; };
 		AFE099971D13961C005B0BF8 /* BBImageChooseView.m in Sources */ = {isa = PBXBuildFile; fileRef = AFE097361D13961B005B0BF8 /* BBImageChooseView.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		AFE099981D13961C005B0BF8 /* BBImageChooseView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AFE097371D13961B005B0BF8 /* BBImageChooseView.xib */; };
-		AFE099991D13961C005B0BF8 /* getIPhoneIP.m in Sources */ = {isa = PBXBuildFile; fileRef = AFE0973A1D13961B005B0BF8 /* getIPhoneIP.m */; };
 		AFE0999A1D13961C005B0BF8 /* JKImagePickerController.strings in Resources */ = {isa = PBXBuildFile; fileRef = AFE0973D1D13961B005B0BF8 /* JKImagePickerController.strings */; };
 		AFE0999B1D13961C005B0BF8 /* ImagesPicker.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AFE0973F1D13961B005B0BF8 /* ImagesPicker.xcassets */; };
 		AFE0999C1D13961C005B0BF8 /* JKAssets.m in Sources */ = {isa = PBXBuildFile; fileRef = AFE097431D13961B005B0BF8 /* JKAssets.m */; };
@@ -1958,8 +1957,6 @@
 		AFE097351D13961B005B0BF8 /* BBImageChooseView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BBImageChooseView.h; sourceTree = "<group>"; };
 		AFE097361D13961B005B0BF8 /* BBImageChooseView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BBImageChooseView.m; sourceTree = "<group>"; };
 		AFE097371D13961B005B0BF8 /* BBImageChooseView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BBImageChooseView.xib; sourceTree = "<group>"; };
-		AFE097391D13961B005B0BF8 /* getIPhoneIP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = getIPhoneIP.h; sourceTree = "<group>"; };
-		AFE0973A1D13961B005B0BF8 /* getIPhoneIP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = getIPhoneIP.m; sourceTree = "<group>"; };
 		AFE0973E1D13961B005B0BF8 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/JKImagePickerController.strings; sourceTree = "<group>"; };
 		AFE0973F1D13961B005B0BF8 /* ImagesPicker.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = ImagesPicker.xcassets; sourceTree = "<group>"; };
 		AFE097401D13961B005B0BF8 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/JKImagePickerController.strings"; sourceTree = "<group>"; };
@@ -3905,8 +3902,6 @@
 		AFE097381D13961B005B0BF8 /* GetIP */ = {
 			isa = PBXGroup;
 			children = (
-				AFE097391D13961B005B0BF8 /* getIPhoneIP.h */,
-				AFE0973A1D13961B005B0BF8 /* getIPhoneIP.m */,
 			);
 			path = GetIP;
 			sourceTree = "<group>";
@@ -4898,7 +4893,6 @@
 				AFE099871D13961C005B0BF8 /* CYSelectGiftCell.m in Sources */,
 				1DA4AC101D4AF5B800067FA4 /* CYMyHuoDongCell.m in Sources */,
 				AFE0995F1D13961C005B0BF8 /* CYHomeFooterView.m in Sources */,
-				AFE099991D13961C005B0BF8 /* getIPhoneIP.m in Sources */,
 				AF3F03FD1D3CFB8D0054406A /* CYBuyerPDEditVC.m in Sources */,
 				AFB9A83C1D20D6BE0068075F /* CYTeaCommentListViewController.m in Sources */,
 				AFE098E71D13961B005B0BF8 /* CYMoneyDetailViewController.m in Sources */,
